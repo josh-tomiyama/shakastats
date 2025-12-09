@@ -1,0 +1,20 @@
+baseURL = 'https://josh-tomiyama.github.io/'
+languageCode = 'en-us'
+title = 'Shakastats'
+theme = 'anatole'
+
+# setup for quarto rendering
+
+# ignore quarto files
+ignoreFiles = ["\\.qmd$", "\\.ipynb", "\\.py$"]
+
+# allow raw html from r and python
+[markup.goldmark.renderer]
+unsafe= true
+
+# setup for github pages
+
+## change image cache directory
+[caches]
+  [caches.images]
+    dir = ':cacheDir/images'
