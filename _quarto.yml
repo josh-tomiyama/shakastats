@@ -1,9 +1,10 @@
 project:
   type: website
+  output-dir: docs
 
 website:
-  description: "A blog built with Quarto"
-  site-url: https://your-website-url.example.com # you must change this appropriately for RSS feeds to work properly
+  description: "A blog about statistics, machine learning, and data analysis software"
+  site-url: https://josh-tomiyama.github.io/shakastats/ # you must change this appropriately for RSS feeds to work properly
   title: "ShakaStats"
   search: 
     location: navbar
@@ -17,7 +18,11 @@ website:
       - text: "Blog" 
         href: "./blog/blog_listing.qmd"
       - icon: github
-        href: https://github.com/josh-tomiyama/
+        menu:
+          - text: Source Code
+            href: https://github.com/josh-tomiyama/shakastats
+          - text: Report a Bug
+            href: https://github.com/josh-tomiyama/shakastats/issues
   cookie-consent:
     type: express
     style: headline

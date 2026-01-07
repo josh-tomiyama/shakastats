@@ -1,5 +1,6 @@
 ---
 title: "Projects"
+author: ""
 listing:
   contents: "."
   feed: true

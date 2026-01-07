@@ -6,15 +6,15 @@
       version="2.0">
 <channel>
 <title>ShakaStats</title>
-<link>https://your-website-url.example.com/projects/project_listing.html</link>
-<atom:link href="https://your-website-url.example.com/projects/project_listing.xml" rel="self" type="application/rss+xml"/>
-<description>A blog built with Quarto</description>
+<link>https://josh-tomiyama.github.io/shakastats/projects/project_listing.html</link>
+<atom:link href="https://josh-tomiyama.github.io/shakastats/projects/project_listing.xml" rel="self" type="application/rss+xml"/>
+<description>A blog about statistics, machine learning, and data analysis software</description>
 <generator>quarto-1.8.26</generator>
 <lastBuildDate>Fri, 07 Nov 2025 10:00:00 GMT</lastBuildDate>
 <item>
   <title>Logistic Regression Analysis Example: Optimizing Expected Returns</title>
   <dc:creator>Josh Tomiyama</dc:creator>
-  <link>https://your-website-url.example.com/projects/optimizingExpectedReturns/</link>
+  <link>https://josh-tomiyama.github.io/shakastats/projects/optimizingExpectedReturns/</link>
   <description><![CDATA[ 
 
 
@@ -961,7 +961,7 @@ Table&nbsp;1: Summary Tables
 }
 </style>
 
-<div id="tbl-summ-1" class="gt_table do-not-create-environment quarto-float quarto-figure quarto-figure-center anchored" data-quarto-disable-processing="false" data-quarto-postprocess="true" data-quarto-bootstrap="false">
+<div id="tbl-summ-1" class="gt_table do-not-create-environment quarto-float quarto-figure quarto-figure-center anchored" data-quarto-bootstrap="false" data-quarto-disable-processing="false" data-quarto-postprocess="true">
 <figure class="quarto-float quarto-subfloat-tbl figure">
 <figcaption class="quarto-float-caption-top quarto-subfloat-caption quarto-subfloat-tbl" id="tbl-summ-1-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
 (a) Summary by Type
@@ -1512,7 +1512,7 @@ N = 604<span class="gt_footnote_marks" style="white-space:nowrap;font-style:ital
 }
 </style>
 
-<div id="tbl-summ-2" class="gt_table do-not-create-environment quarto-float quarto-figure quarto-figure-center anchored" data-quarto-disable-processing="false" data-quarto-postprocess="true" data-quarto-bootstrap="false">
+<div id="tbl-summ-2" class="gt_table do-not-create-environment quarto-float quarto-figure quarto-figure-center anchored" data-quarto-bootstrap="false" data-quarto-disable-processing="false" data-quarto-postprocess="true">
 <figure class="quarto-float quarto-subfloat-tbl figure">
 <figcaption class="quarto-float-caption-top quarto-subfloat-caption quarto-subfloat-tbl" id="tbl-summ-2-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
 (b) Summary by Sold
@@ -1614,7 +1614,7 @@ font-style: inherit;">"markup of product (%)"</span>)</span></code></pre></div><
 <div id="fig-comp" class="quarto-float quarto-figure quarto-figure-center anchored">
 <figure class="quarto-float quarto-float-fig figure">
 <div aria-describedby="fig-comp-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
-<img src="https://your-website-url.example.com/projects/optimizingExpectedReturns/index_files/figure-html/fig-comp-1.png" class="img-fluid figure-img" width="672">
+<img src="https://josh-tomiyama.github.io/shakastats/projects/optimizingExpectedReturns/index_files/figure-html/fig-comp-1.png" class="img-fluid figure-img" width="672">
 </div>
 <figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-comp-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
 Figure&nbsp;1: Comparing cost and markup
@@ -2117,7 +2117,7 @@ font-style: inherit;">16</span>)</span></code></pre></div></div>
 <div class="cell-output-display">
 <div>
 <figure class="figure">
-<p><img src="https://your-website-url.example.com/projects/optimizingExpectedReturns/index_files/figure-html/unnamed-chunk-4-1.png" class="img-fluid figure-img" width="672"></p>
+<p><img src="https://josh-tomiyama.github.io/shakastats/projects/optimizingExpectedReturns/index_files/figure-html/unnamed-chunk-4-1.png" class="img-fluid figure-img" width="672"></p>
 </figure>
 </div>
 </div>
@@ -2166,7 +2166,7 @@ font-style: inherit;">"Binned residual plot"</span>)</span></code></pre></div></
 <div class="cell-output-display">
 <div>
 <figure class="figure">
-<p><img src="https://your-website-url.example.com/projects/optimizingExpectedReturns/index_files/figure-html/unnamed-chunk-5-1.png" class="img-fluid figure-img" width="672"></p>
+<p><img src="https://josh-tomiyama.github.io/shakastats/projects/optimizingExpectedReturns/index_files/figure-html/unnamed-chunk-5-1.png" class="img-fluid figure-img" width="672"></p>
 </figure>
 </div>
 </div>
@@ -2203,7 +2203,7 @@ font-style: inherit;">"Binned residual plot of markup"</span>)</span></code></pr
 <div class="cell-output-display">
 <div>
 <figure class="figure">
-<p><img src="https://your-website-url.example.com/projects/optimizingExpectedReturns/index_files/figure-html/unnamed-chunk-5-2.png" class="img-fluid figure-img" width="672"></p>
+<p><img src="https://josh-tomiyama.github.io/shakastats/projects/optimizingExpectedReturns/index_files/figure-html/unnamed-chunk-5-2.png" class="img-fluid figure-img" width="672"></p>
 </figure>
 </div>
 </div>
@@ -2240,7 +2240,7 @@ font-style: inherit;">"Binned residual plot of cost"</span>)</span></code></pre>
 <div class="cell-output-display">
 <div>
 <figure class="figure">
-<p><img src="https://your-website-url.example.com/projects/optimizingExpectedReturns/index_files/figure-html/unnamed-chunk-5-3.png" class="img-fluid figure-img" width="672"></p>
+<p><img src="https://josh-tomiyama.github.io/shakastats/projects/optimizingExpectedReturns/index_files/figure-html/unnamed-chunk-5-3.png" class="img-fluid figure-img" width="672"></p>
 </figure>
 </div>
 </div>
@@ -2543,7 +2543,7 @@ font-style: inherit;">"Probability of Selling Product"</span>)</span></code></pr
 <div class="cell-output-display">
 <div>
 <figure class="figure">
-<p><img src="https://your-website-url.example.com/projects/optimizingExpectedReturns/index_files/figure-html/unnamed-chunk-6-1.png" class="img-fluid figure-img" width="672"></p>
+<p><img src="https://josh-tomiyama.github.io/shakastats/projects/optimizingExpectedReturns/index_files/figure-html/unnamed-chunk-6-1.png" class="img-fluid figure-img" width="672"></p>
 </figure>
 </div>
 </div>
@@ -2591,7 +2591,7 @@ font-style: inherit;">"Difference between True and Predicted Probabilities"</spa
 <div id="fig-diffprob" class="quarto-float quarto-figure quarto-figure-center anchored">
 <figure class="quarto-float quarto-float-fig figure">
 <div aria-describedby="fig-diffprob-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
-<img src="https://your-website-url.example.com/projects/optimizingExpectedReturns/index_files/figure-html/fig-diffprob-1.png" class="img-fluid figure-img" width="672">
+<img src="https://josh-tomiyama.github.io/shakastats/projects/optimizingExpectedReturns/index_files/figure-html/fig-diffprob-1.png" class="img-fluid figure-img" width="672">
 </div>
 <figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-diffprob-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
 Figure&nbsp;2: Differences between predicted probability and true probability
@@ -2970,7 +2970,7 @@ font-style: inherit;">$</span>markup)</span></code></pre></div></div>
 <div class="cell-output-display">
 <div>
 <figure class="figure">
-<p><img src="https://your-website-url.example.com/projects/optimizingExpectedReturns/index_files/figure-html/unnamed-chunk-8-1.png" class="img-fluid figure-img" width="672"></p>
+<p><img src="https://josh-tomiyama.github.io/shakastats/projects/optimizingExpectedReturns/index_files/figure-html/unnamed-chunk-8-1.png" class="img-fluid figure-img" width="672"></p>
 </figure>
 </div>
 </div>
@@ -3234,7 +3234,7 @@ loaded via a namespace (and not attached):
   <category>Machine Learning</category>
   <category>Logistic Regression</category>
   <category>Optimization</category>
-  <guid>https://your-website-url.example.com/projects/optimizingExpectedReturns/</guid>
+  <guid>https://josh-tomiyama.github.io/shakastats/projects/optimizingExpectedReturns/</guid>
   <pubDate>Fri, 07 Nov 2025 10:00:00 GMT</pubDate>
 </item>
 </channel>
