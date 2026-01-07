@@ -1,0 +1,3241 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<rss  xmlns:atom="http://www.w3.org/2005/Atom" 
+      xmlns:media="http://search.yahoo.com/mrss/" 
+      xmlns:content="http://purl.org/rss/1.0/modules/content/" 
+      xmlns:dc="http://purl.org/dc/elements/1.1/" 
+      version="2.0">
+<channel>
+<title>ShakaStats</title>
+<link>https://your-website-url.example.com/projects/project_listing.html</link>
+<atom:link href="https://your-website-url.example.com/projects/project_listing.xml" rel="self" type="application/rss+xml"/>
+<description>A blog built with Quarto</description>
+<generator>quarto-1.8.26</generator>
+<lastBuildDate>Fri, 07 Nov 2025 10:00:00 GMT</lastBuildDate>
+<item>
+  <title>Logistic Regression Analysis Example: Optimizing Expected Returns</title>
+  <dc:creator>Josh Tomiyama</dc:creator>
+  <link>https://your-website-url.example.com/projects/optimizingExpectedReturns/</link>
+  <description><![CDATA[ 
+
+
+
+
+
+<p>Last Update: January 07, 2026</p>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb1" style="background: #f1f3f5;"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb1-1"><span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">library</span>(knitr)</span>
+<span id="cb1-2"><span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">library</span>(kableExtra)</span>
+<span id="cb1-3"><span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">library</span>(arm)</span>
+<span id="cb1-4"><span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">library</span>(gtsummary)</span>
+<span id="cb1-5"><span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">library</span>(dplyr)</span>
+<span id="cb1-6"><span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">library</span>(ggplot2)</span></code></pre></div></div>
+</div>
+<section id="introduction" class="level1">
+<h1>Introduction</h1>
+<p>This will be the one of the first in a series of example analyses I plan to post online to showcase my statistical technical knowledge as well as document some interesting problems I have come across in my experience. I specifically want to focus on what and why I do things over the course of an analysis rather than the how I do the analysis. As such, I will assume some familiarity with the statistical tools and code presented here and generally keep theoretical discussion at a higher level.</p>
+<p>The article is organized into the following parts:</p>
+<ol type="1">
+<li><p>A basic introduction of the logistic regression model and its comparison to other machine learning models</p></li>
+<li><p>A simulated example detailing the workflow to build a logistic regression model</p></li>
+<li><p>Methods to leverage the logistic regression model to optimize some target goal</p></li>
+<li><p>Discussion of how to approach practical problems when the data is less than ideal</p></li>
+</ol>
+</section>
+<section id="logistic-regression" class="level1">
+<h1>Logistic Regression</h1>
+<p>Logistic regression is one of the fundamental tools of machine learning and statistics and is actually one of the more powerful tools when one has enough time to go that extra mile and fine tune the model to the data. First I’ll just state the mathematical formula for logistic regression beginning with the data model:</p>
+<p><img src="https://latex.codecogs.com/png.latex?Y_i%7C%5Cpi_i%20%5Csim%20Bernoulli(%5Cpi_i)"></p>
+<p>where <img src="https://latex.codecogs.com/png.latex?i"> refers to the data sample index (think of a row in your data table), <img src="https://latex.codecogs.com/png.latex?Y_i"> is whether “success” is observed for sample <img src="https://latex.codecogs.com/png.latex?i">, and <img src="https://latex.codecogs.com/png.latex?%5Cpi_i"> is the probability of success for the <img src="https://latex.codecogs.com/png.latex?i">-th subject. In typical applications, <img src="https://latex.codecogs.com/png.latex?Y_i"> is coded such that 0 means “failure” and 1 means “success”. Now we can move on to the regression part of the model between the log-odds and the covariates of interest:</p>
+<p><img src="https://latex.codecogs.com/png.latex?%5Clog(%5Cfrac%7B%5Cpi_i%7D%7B1-%5Cpi_i%7D)%20=%20%5Cpmb%20x_i%20%5Cpmb%20%5Cbeta"></p>
+<p>where <img src="https://latex.codecogs.com/png.latex?%5Cpmb%20x_i"> is a vector of covariates that you think explain the probability of success and <img src="https://latex.codecogs.com/png.latex?%5Cpmb%20%5Cbeta"> is the vector of weights that indicate how strongly they contribute to the log-odds of success. When estimating the logistic regression model the <img src="https://latex.codecogs.com/png.latex?%5Cpmb%20%5Cbeta"> coefficients are the main parameters of interest (as <img src="https://latex.codecogs.com/png.latex?%5Cpi_i"> is derived from <img src="https://latex.codecogs.com/png.latex?%5Cpmb%20%5Cbeta">). The reason we call it “logistic” regression is because <img src="https://latex.codecogs.com/png.latex?%5Clog(%5Cfrac%7Bx_i%7D%7B1-x_i%7D)"> is the inverse of the logistic function.</p>
+<p>The assumptions of the model are as follows:</p>
+<ol type="1">
+<li><p>The outcome is a binary random variable, specifically a Bernoulli<sup>1</sup> random variable.</p></li>
+<li><p>The independent/explanatory variables (I’ll commonly refer to these as covariates) have a linear relationship with the log-odds of “success”. The linearity here refers to the beta parameters, for example one may include an <img src="https://latex.codecogs.com/png.latex?x%5E2%5Cbeta"> term in the model as the beta parameter has a power of 1.</p></li>
+<li><p>Observations are independent of each other</p></li>
+<li><p>No multicollinearity between covariates. For any single covariate, the other covariates in the model don’t perfectly describe that covariate.</p></li>
+<li><p>No complete separation. In other words, the covariates cannot perfectly predict binary outcome.</p></li>
+</ol>
+<section id="logistic-regression-compared-to-other-machine-learning-models" class="level2">
+<h2 class="anchored" data-anchor-id="logistic-regression-compared-to-other-machine-learning-models">Logistic regression compared to other machine learning models</h2>
+<p>The important distinction between logistic regression and other machine learning models is that the statistical theory on the model parameters is well understood. For each of the <img src="https://latex.codecogs.com/png.latex?%5Cbeta"> parameters in our model, we know the statistical properties to allow inference through p-values or confidence intervals. Logistic regression is still a tool used today to understand, or <em>infer</em>, the relationship between a binary outcome and other data collected when statistical evidence is required to validate any findings.</p>
+<p>Although in most real-world scenarios the other machine learning models perform better in terms of predictiveness, logistic regression can sometimes still be a better model in terms of predictiveness. In my experience through classes and work projects, a logistic regression model is actually superior to the more sophisticated machine learning techniques of Gradient Boosted Trees and Random Forests under a few scenarios with respect to the AUC (area under the curve) performance metric.</p>
+<p>The first scenario I’ve come across is when the sample size is relatively small. The machine learning techniques tend to work very well when there is more data to help effectively learn the functional relationship between the data you have and the target outcome. I would say this would be the situation when your sample size is in the magnitude of a few hundreds or less. After that point, other machine learning techniques perform at their expected capacity.</p>
+<p>The second scenario where logistic regression can prove better than tree based methods is if one is willing to both select the covariates that strongly relate to the outcome of interest and also identify how each covariate functionally relates to the outcome. To expand on what I mean by “how each covariate functionally relates to the outcome”, some examples of functional relationships are the usual linear relationship, quadratic relationship, or sinusoidal relationship. In mathematical terms you can propose the following models:</p>
+<p><img src="https://latex.codecogs.com/png.latex?Linear:%20%5Clog(%5Cfrac%7B%5Cpi_i%7D%7B1%20-%20%5Cpi_i%7D)%20=%20x_i%5Cbeta"></p>
+<p><img src="https://latex.codecogs.com/png.latex?Quadratic:%20%5Clog(%5Cfrac%7B%5Cpi_i%7D%7B1%20-%20%5Cpi_i%7D)%20=%20x_i%5Cbeta_1%20+%20x_i%5E2%5Cbeta_2"></p>
+<p><img src="https://latex.codecogs.com/png.latex?Sinusoidal:%20%5Clog(%5Cfrac%7B%5Cpi_i%7D%7B1%20-%20%5Cpi_i%7D)%20=%20sin(x_i)%5Cbeta"></p>
+<p>Choosing a functional relationship alone produces infinite possibilities for one to sort through in addition to just choosing which covariates to include in one’s analysis. The strength of tree based approaches is that they learn these relationships with enough data, but of course the tree won’t be as accurate as if one were to explicitly identify that “true” relationship when training a logistic regression. However, identifying the “true” functional relationship between the outcome and covariates is rather impractical when one has many different covariates to consider at once. So once again, when the data becomes sufficiently large, it is more practical to use a Gradient Boosted Tree model or Random Forest model.</p>
+<p>The advantages and shortfalls of logistic regression compared to other machine learning techniques naturally extend to any generalized linear model such as linear regression. To be clear, I am <strong>NOT</strong> saying that in these scenarios generalized linear models will <strong>ALWAYS</strong> surpass the newer machine learning models and algorithms, but rather that these scenarios <strong>ALLOW</strong> generalized linear models to shine just as well, if not better, than their other machine learning counterparts in terms of predictiveness.</p>
+</section>
+</section>
+<section id="a-novel-application-problem" class="level1">
+<h1>A Novel Application Problem</h1>
+<p>Suppose that one is starting an online clothing store selling clothes, shoes, and accessories. They have the production cost of each product and wish to know what markup percentage is optimal for generating the most revenue. The data is set up such that we have many offers for products on sale for different markup percentages and it is recorded whether the sale was made or not. From past data, it is plausible that the type of product (clothes, shoes, accessories) has an affect on whether a sale is made.</p>
+<p>Defining and estimating the optimal markup percentage is the novel part of the analysis that I think differentiates this analysis from typical logistic regression analyses. If the problem seems somewhat uninspiring, I obfuscated the real application for privacy reasons. This simplified problem does target the core methods and ideas for that application.</p>
+<p>Before jumping into the analysis or looking at the data, it is imperative to decide whether the analysis is attempting to optimize prediction or inference. Although inference and prediction are similar goals and a way Because of the optimization scheme I outline in a later section, I believe having an unbiased estimate of <img src="https://latex.codecogs.com/png.latex?%5Cpi_i"> and <img src="https://latex.codecogs.com/png.latex?%5Cbeta_%7Bmarkup%7D"> is the main goal, so I interpret this as predominantly an inference problem because of that.</p>
+</section>
+<section id="simulating-toy-data" class="level1">
+<h1>Simulating toy data</h1>
+<p>Before proceeding with the analysis we shall simulate a toy data set in R that will fit the problem. We will use the following logistic regression model to simulate data:</p>
+<p>From this set up, we can propose the following logistic regression model:</p>
+<p><img src="https://latex.codecogs.com/png.latex?%0A%5Clog(%5Cfrac%7B%5Cpi_i%7D%7B1%20-%20%5Cpi_i%7D)%20=%20%5Cbeta_0%20+%20x_%7Bmarkup%7D%20*%20%5Cbeta_%7Bmarkup%7D%20+%0Ax_%7Bcost%7D%20*%20%5Cbeta_%7Bcost%7D%20+%20x_%7Btype=shoes%7D%20*%20%5Cbeta_%7Btype=shoes%7D%20+%20x_%7Btype%20=%20clothes%7D*%5Cbeta_%7Btype%20=%20clothes%7D%0A"></p>
+<p>where <img src="https://latex.codecogs.com/png.latex?x_%7Bmarkup%7D"> is the markup percentage above 0 (above 100 is allowed), <img src="https://latex.codecogs.com/png.latex?x_%7Bcost%7D"> is cost in dollars, <img src="https://latex.codecogs.com/png.latex?x_%7Btype=shoes%7D"> is 1 when product <img src="https://latex.codecogs.com/png.latex?i"> is shoes and 0 otherwise, and similarly <img src="https://latex.codecogs.com/png.latex?x_%7Btype%20=%20clothes%7D"> is 1 when product <img src="https://latex.codecogs.com/png.latex?i"> is clothes and 0 otherwise. When product <img src="https://latex.codecogs.com/png.latex?i"> is accessories, both <img src="https://latex.codecogs.com/png.latex?x_%7Btype=shoes%7D"> and <img src="https://latex.codecogs.com/png.latex?x_%7Btype%20=%20clothes%7D"> are 0. The way that <img src="https://latex.codecogs.com/png.latex?x_%7Btype%7D"> is encoded is known as the dummy variable encoding common in statistics (which is different from the one-hot encoding more prevalent in the machine learning field). The outcome of interest <img src="https://latex.codecogs.com/png.latex?Y_i"> is a binary variable where 1 indicates the product was sold and 0 the product was not sold, and it follows that <img src="https://latex.codecogs.com/png.latex?%5Cpi_i"> is the probability that product <img src="https://latex.codecogs.com/png.latex?i"> is sold or not. To clarify about the <img src="https://latex.codecogs.com/png.latex?x_%7Bmarkup%7D"> covariate, if <img src="https://latex.codecogs.com/png.latex?x_%7Bmarkup%7D%20=%2020"> then the product was marked up <img src="https://latex.codecogs.com/png.latex?20%5C%25">.</p>
+<p>I chose the values for true parameters <img src="https://latex.codecogs.com/png.latex?%5Cpmb%20%5Cbeta"> that I felt gave a good spread of the true probabilities while also being representative of the expected behavior in the example problem described to me. I arbitrarily chose a decently large sample size of 3000 to ensure proper estimation.</p>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb2" style="background: #f1f3f5;"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb2-1"><span class="do" style="color: #5E5E5E;
+background-color: null;
+font-style: italic;">## True parameter values</span></span>
+<span id="cb2-2"></span>
+<span id="cb2-3"><span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">set.seed</span>(<span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">2013</span>)</span>
+<span id="cb2-4"></span>
+<span id="cb2-5">sample_size <span class="ot" style="color: #003B4F;
+background-color: null;
+font-style: inherit;">&lt;-</span> <span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">3000</span></span>
+<span id="cb2-6"></span>
+<span id="cb2-7">true_beta <span class="ot" style="color: #003B4F;
+background-color: null;
+font-style: inherit;">&lt;-</span> <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">c</span>(<span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">2</span>, <span class="co" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;"># intercept</span></span>
+<span id="cb2-8">               <span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">-</span><span class="fl" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">0.2</span>, <span class="co" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;"># markup</span></span>
+<span id="cb2-9">               <span class="fl" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">0.002</span>, <span class="co" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;"># cost</span></span>
+<span id="cb2-10">               <span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">1</span>, <span class="co" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;"># type=clothes</span></span>
+<span id="cb2-11">               <span class="fl" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">1.5</span> )<span class="co" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;"># type=shoes</span></span>
+<span id="cb2-12"></span>
+<span id="cb2-13"><span class="do" style="color: #5E5E5E;
+background-color: null;
+font-style: italic;">### Simulate data</span></span>
+<span id="cb2-14"></span>
+<span id="cb2-15">type <span class="ot" style="color: #003B4F;
+background-color: null;
+font-style: inherit;">&lt;-</span> <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">sample</span>(<span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">c</span>(<span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"accessories"</span>, <span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"clothes"</span>, <span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"shoes"</span>), </span>
+<span id="cb2-16">               <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">size =</span> sample_size,</span>
+<span id="cb2-17">               <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">replace =</span> <span class="cn" style="color: #8f5902;
+background-color: null;
+font-style: inherit;">TRUE</span>,</span>
+<span id="cb2-18">               <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">prob =</span> <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">c</span>(<span class="fl" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">0.3</span>, <span class="fl" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">0.5</span>, <span class="fl" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">0.2</span>))</span>
+<span id="cb2-19">cost <span class="ot" style="color: #003B4F;
+background-color: null;
+font-style: inherit;">&lt;-</span> <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">rnorm</span>(sample_size, <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">mean =</span> <span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">2000</span>, <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">sd =</span> <span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">400</span>)</span>
+<span id="cb2-20">markup <span class="ot" style="color: #003B4F;
+background-color: null;
+font-style: inherit;">&lt;-</span> <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">runif</span>(sample_size, <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">min =</span> <span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">20</span>, <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">max =</span> <span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">120</span>)</span>
+<span id="cb2-21"></span>
+<span id="cb2-22"><span class="do" style="color: #5E5E5E;
+background-color: null;
+font-style: italic;">## make sure markup and cost are above 0</span></span>
+<span id="cb2-23">markup <span class="ot" style="color: #003B4F;
+background-color: null;
+font-style: inherit;">&lt;-</span> <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">ifelse</span>(markup <span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">&lt;=</span> <span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">0</span>, <span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">10</span>, markup)</span>
+<span id="cb2-24">cost <span class="ot" style="color: #003B4F;
+background-color: null;
+font-style: inherit;">&lt;-</span> <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">ifelse</span>(cost <span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">&lt;=</span> <span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">0</span>, <span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">2000</span>, cost)</span>
+<span id="cb2-25"></span>
+<span id="cb2-26"><span class="co" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;"># convert type into a factor variable to prepare for analysis</span></span>
+<span id="cb2-27"></span>
+<span id="cb2-28">type <span class="ot" style="color: #003B4F;
+background-color: null;
+font-style: inherit;">&lt;-</span> <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">factor</span>(type, <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">levels =</span> <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">c</span>(<span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"accessories"</span>, <span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"clothes"</span>, <span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"shoes"</span>))</span>
+<span id="cb2-29"></span>
+<span id="cb2-30">x_df <span class="ot" style="color: #003B4F;
+background-color: null;
+font-style: inherit;">&lt;-</span> <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">data.frame</span>(<span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">markup =</span> markup, <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">cost =</span> cost, <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">type =</span> type)</span>
+<span id="cb2-31"></span>
+<span id="cb2-32"><span class="co" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;"># get x_matrix</span></span>
+<span id="cb2-33"></span>
+<span id="cb2-34">x_matrix <span class="ot" style="color: #003B4F;
+background-color: null;
+font-style: inherit;">&lt;-</span> <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">model.matrix</span>(<span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">~</span> <span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">1</span> <span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">+</span> markup <span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">+</span> cost <span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">+</span> type, <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">data =</span> x_df)</span>
+<span id="cb2-35"></span>
+<span id="cb2-36"><span class="co" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">#simulated log-odds per person</span></span>
+<span id="cb2-37"></span>
+<span id="cb2-38">log_odds <span class="ot" style="color: #003B4F;
+background-color: null;
+font-style: inherit;">&lt;-</span> x_matrix <span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">%*%</span> true_beta</span>
+<span id="cb2-39"></span>
+<span id="cb2-40"><span class="co" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">#convert log_odds to probabilities</span></span>
+<span id="cb2-41"></span>
+<span id="cb2-42">inverse_logit <span class="ot" style="color: #003B4F;
+background-color: null;
+font-style: inherit;">&lt;-</span> <span class="cf" style="color: #003B4F;
+background-color: null;
+font-weight: bold;
+font-style: inherit;">function</span>(x){(<span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">1</span> <span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">+</span> <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">exp</span>(<span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">-</span>x))<span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">^-</span><span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">1</span>}</span>
+<span id="cb2-43">true_probs <span class="ot" style="color: #003B4F;
+background-color: null;
+font-style: inherit;">&lt;-</span> <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">inverse_logit</span>(log_odds)</span>
+<span id="cb2-44"></span>
+<span id="cb2-45"><span class="co" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;"># get the outcome</span></span>
+<span id="cb2-46">sold <span class="ot" style="color: #003B4F;
+background-color: null;
+font-style: inherit;">&lt;-</span> <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">rbinom</span>(sample_size, <span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">1</span>, true_probs)</span>
+<span id="cb2-47">x_df<span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">$</span>sold <span class="ot" style="color: #003B4F;
+background-color: null;
+font-style: inherit;">&lt;-</span> sold</span>
+<span id="cb2-48"><span class="co" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;"># x_df$true_probs &lt;- c(true_probs)</span></span>
+<span id="cb2-49"><span class="co" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;"># x_df$true_log_odds &lt;- c(log_odds)</span></span></code></pre></div></div>
+</div>
+<p>Here are the first few rows of the data set to get an idea of how the data is organized:</p>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb3" style="background: #f1f3f5;"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb3-1"><span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">head</span>(x_df, <span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">5</span>) <span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">%&gt;%</span></span>
+<span id="cb3-2">  <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">kable</span>() <span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">%&gt;%</span></span>
+<span id="cb3-3">  <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">kable_styling</span>()</span></code></pre></div></div>
+<div class="cell-output-display">
+<table class="table caption-top table-sm table-striped small">
+<thead>
+<tr class="header">
+<th style="text-align: right;" data-quarto-table-cell-role="th">markup</th>
+<th style="text-align: right;" data-quarto-table-cell-role="th">cost</th>
+<th style="text-align: left;" data-quarto-table-cell-role="th">type</th>
+<th style="text-align: right;" data-quarto-table-cell-role="th">sold</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: right;">106.39550</td>
+<td style="text-align: right;">2233.739</td>
+<td style="text-align: left;">clothes</td>
+<td style="text-align: right;">0</td>
+</tr>
+<tr class="even">
+<td style="text-align: right;">34.87069</td>
+<td style="text-align: right;">1786.943</td>
+<td style="text-align: left;">shoes</td>
+<td style="text-align: right;">1</td>
+</tr>
+<tr class="odd">
+<td style="text-align: right;">42.20465</td>
+<td style="text-align: right;">1646.098</td>
+<td style="text-align: left;">accessories</td>
+<td style="text-align: right;">0</td>
+</tr>
+<tr class="even">
+<td style="text-align: right;">21.46863</td>
+<td style="text-align: right;">1793.615</td>
+<td style="text-align: left;">accessories</td>
+<td style="text-align: right;">1</td>
+</tr>
+<tr class="odd">
+<td style="text-align: right;">42.81934</td>
+<td style="text-align: right;">2247.883</td>
+<td style="text-align: left;">clothes</td>
+<td style="text-align: right;">0</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+</section>
+<section id="example-logistic-regression-analysis" class="level1">
+<h1>Example Logistic Regression Analysis</h1>
+<section id="quick-exploratory-analysis-of-the-data-set" class="level2">
+<h2 class="anchored" data-anchor-id="quick-exploratory-analysis-of-the-data-set">Quick Exploratory analysis of the Data Set</h2>
+<p>When starting an analysis, it’s important to first summarize and get a feel of the data. This is a useful and important step as it informs what are reasonable models for the data and indicates the quality of the data.</p>
+<div class="cell" data-layout-nrow="2">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb4" style="background: #f1f3f5;"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb4-1">x_df <span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">%&gt;%</span> </span>
+<span id="cb4-2">  <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">tbl_summary</span>(</span>
+<span id="cb4-3">    <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">include =</span> <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">c</span>(markup, cost, type, sold),</span>
+<span id="cb4-4">    <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">type =</span> <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">list</span>(<span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">all_continuous</span>() <span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">~</span> <span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"continuous2"</span>),</span>
+<span id="cb4-5">    <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">statistic =</span> <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">list</span>(</span>
+<span id="cb4-6">      <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">all_continuous</span>() <span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">~</span> <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">c</span>(<span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"{mean} ({sd})"</span>, <span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"{median} ({p25}, {p75})"</span>, <span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"[{min}, {max}]"</span>)</span>
+<span id="cb4-7">    ),</span>
+<span id="cb4-8">    <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">by =</span> type)</span>
+<span id="cb4-9">x_df <span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">%&gt;%</span></span>
+<span id="cb4-10">  <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">tbl_summary</span>(</span>
+<span id="cb4-11">    <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">include =</span> <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">c</span>(markup, cost, sold),</span>
+<span id="cb4-12">    <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">type =</span> <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">list</span>(<span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">all_continuous</span>() <span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">~</span> <span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"continuous2"</span>),</span>
+<span id="cb4-13">    <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">statistic =</span> <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">list</span>(</span>
+<span id="cb4-14">      <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">all_continuous</span>() <span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">~</span> <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">c</span>(<span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"{mean} ({sd})"</span>, <span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"{median} ({p25}, {p75})"</span>, <span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"[{min}, {max}]"</span>)</span>
+<span id="cb4-15">    ),</span>
+<span id="cb4-16">    <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">by =</span> sold)</span></code></pre></div></div>
+<div id="tbl-summ" class="quarto-layout-panel anchored">
+<figure class="quarto-float quarto-float-tbl figure">
+<figcaption class="quarto-float-caption-top quarto-float-caption quarto-float-tbl" id="tbl-summ-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Table&nbsp;1: Summary Tables
+</figcaption>
+<div aria-describedby="tbl-summ-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<div class="quarto-layout-row">
+<div class="cell-output-display quarto-layout-cell-subref quarto-layout-cell" data-ref-parent="tbl-summ" style="flex-basis: 100.0%;justify-content: center;">
+<div id="dozzpvrzwh" style="padding-left:0px;padding-right:0px;padding-top:10px;padding-bottom:10px;overflow-x:auto;overflow-y:auto;width:auto;height:auto;">
+<style>#dozzpvrzwh table {
+  font-family: system-ui, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji';
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+#dozzpvrzwh thead, #dozzpvrzwh tbody, #dozzpvrzwh tfoot, #dozzpvrzwh tr, #dozzpvrzwh td, #dozzpvrzwh th {
+  border-style: none;
+}
+
+#dozzpvrzwh p {
+  margin: 0;
+  padding: 0;
+}
+
+#dozzpvrzwh .gt_table {
+  display: table;
+  border-collapse: collapse;
+  line-height: normal;
+  margin-left: auto;
+  margin-right: auto;
+  color: #333333;
+  font-size: 16px;
+  font-weight: normal;
+  font-style: normal;
+  background-color: #FFFFFF;
+  width: auto;
+  border-top-style: solid;
+  border-top-width: 2px;
+  border-top-color: #A8A8A8;
+  border-right-style: none;
+  border-right-width: 2px;
+  border-right-color: #D3D3D3;
+  border-bottom-style: solid;
+  border-bottom-width: 2px;
+  border-bottom-color: #A8A8A8;
+  border-left-style: none;
+  border-left-width: 2px;
+  border-left-color: #D3D3D3;
+}
+
+#dozzpvrzwh .gt_caption {
+  padding-top: 4px;
+  padding-bottom: 4px;
+}
+
+#dozzpvrzwh .gt_title {
+  color: #333333;
+  font-size: 125%;
+  font-weight: initial;
+  padding-top: 4px;
+  padding-bottom: 4px;
+  padding-left: 5px;
+  padding-right: 5px;
+  border-bottom-color: #FFFFFF;
+  border-bottom-width: 0;
+}
+
+#dozzpvrzwh .gt_subtitle {
+  color: #333333;
+  font-size: 85%;
+  font-weight: initial;
+  padding-top: 3px;
+  padding-bottom: 5px;
+  padding-left: 5px;
+  padding-right: 5px;
+  border-top-color: #FFFFFF;
+  border-top-width: 0;
+}
+
+#dozzpvrzwh .gt_heading {
+  background-color: #FFFFFF;
+  text-align: center;
+  border-bottom-color: #FFFFFF;
+  border-left-style: none;
+  border-left-width: 1px;
+  border-left-color: #D3D3D3;
+  border-right-style: none;
+  border-right-width: 1px;
+  border-right-color: #D3D3D3;
+}
+
+#dozzpvrzwh .gt_bottom_border {
+  border-bottom-style: solid;
+  border-bottom-width: 2px;
+  border-bottom-color: #D3D3D3;
+}
+
+#dozzpvrzwh .gt_col_headings {
+  border-top-style: solid;
+  border-top-width: 2px;
+  border-top-color: #D3D3D3;
+  border-bottom-style: solid;
+  border-bottom-width: 2px;
+  border-bottom-color: #D3D3D3;
+  border-left-style: none;
+  border-left-width: 1px;
+  border-left-color: #D3D3D3;
+  border-right-style: none;
+  border-right-width: 1px;
+  border-right-color: #D3D3D3;
+}
+
+#dozzpvrzwh .gt_col_heading {
+  color: #333333;
+  background-color: #FFFFFF;
+  font-size: 100%;
+  font-weight: normal;
+  text-transform: inherit;
+  border-left-style: none;
+  border-left-width: 1px;
+  border-left-color: #D3D3D3;
+  border-right-style: none;
+  border-right-width: 1px;
+  border-right-color: #D3D3D3;
+  vertical-align: bottom;
+  padding-top: 5px;
+  padding-bottom: 6px;
+  padding-left: 5px;
+  padding-right: 5px;
+  overflow-x: hidden;
+}
+
+#dozzpvrzwh .gt_column_spanner_outer {
+  color: #333333;
+  background-color: #FFFFFF;
+  font-size: 100%;
+  font-weight: normal;
+  text-transform: inherit;
+  padding-top: 0;
+  padding-bottom: 0;
+  padding-left: 4px;
+  padding-right: 4px;
+}
+
+#dozzpvrzwh .gt_column_spanner_outer:first-child {
+  padding-left: 0;
+}
+
+#dozzpvrzwh .gt_column_spanner_outer:last-child {
+  padding-right: 0;
+}
+
+#dozzpvrzwh .gt_column_spanner {
+  border-bottom-style: solid;
+  border-bottom-width: 2px;
+  border-bottom-color: #D3D3D3;
+  vertical-align: bottom;
+  padding-top: 5px;
+  padding-bottom: 5px;
+  overflow-x: hidden;
+  display: inline-block;
+  width: 100%;
+}
+
+#dozzpvrzwh .gt_spanner_row {
+  border-bottom-style: hidden;
+}
+
+#dozzpvrzwh .gt_group_heading {
+  padding-top: 8px;
+  padding-bottom: 8px;
+  padding-left: 5px;
+  padding-right: 5px;
+  color: #333333;
+  background-color: #FFFFFF;
+  font-size: 100%;
+  font-weight: initial;
+  text-transform: inherit;
+  border-top-style: solid;
+  border-top-width: 2px;
+  border-top-color: #D3D3D3;
+  border-bottom-style: solid;
+  border-bottom-width: 2px;
+  border-bottom-color: #D3D3D3;
+  border-left-style: none;
+  border-left-width: 1px;
+  border-left-color: #D3D3D3;
+  border-right-style: none;
+  border-right-width: 1px;
+  border-right-color: #D3D3D3;
+  vertical-align: middle;
+  text-align: left;
+}
+
+#dozzpvrzwh .gt_empty_group_heading {
+  padding: 0.5px;
+  color: #333333;
+  background-color: #FFFFFF;
+  font-size: 100%;
+  font-weight: initial;
+  border-top-style: solid;
+  border-top-width: 2px;
+  border-top-color: #D3D3D3;
+  border-bottom-style: solid;
+  border-bottom-width: 2px;
+  border-bottom-color: #D3D3D3;
+  vertical-align: middle;
+}
+
+#dozzpvrzwh .gt_from_md > :first-child {
+  margin-top: 0;
+}
+
+#dozzpvrzwh .gt_from_md > :last-child {
+  margin-bottom: 0;
+}
+
+#dozzpvrzwh .gt_row {
+  padding-top: 8px;
+  padding-bottom: 8px;
+  padding-left: 5px;
+  padding-right: 5px;
+  margin: 10px;
+  border-top-style: solid;
+  border-top-width: 1px;
+  border-top-color: #D3D3D3;
+  border-left-style: none;
+  border-left-width: 1px;
+  border-left-color: #D3D3D3;
+  border-right-style: none;
+  border-right-width: 1px;
+  border-right-color: #D3D3D3;
+  vertical-align: middle;
+  overflow-x: hidden;
+}
+
+#dozzpvrzwh .gt_stub {
+  color: #333333;
+  background-color: #FFFFFF;
+  font-size: 100%;
+  font-weight: initial;
+  text-transform: inherit;
+  border-right-style: solid;
+  border-right-width: 2px;
+  border-right-color: #D3D3D3;
+  padding-left: 5px;
+  padding-right: 5px;
+}
+
+#dozzpvrzwh .gt_stub_row_group {
+  color: #333333;
+  background-color: #FFFFFF;
+  font-size: 100%;
+  font-weight: initial;
+  text-transform: inherit;
+  border-right-style: solid;
+  border-right-width: 2px;
+  border-right-color: #D3D3D3;
+  padding-left: 5px;
+  padding-right: 5px;
+  vertical-align: top;
+}
+
+#dozzpvrzwh .gt_row_group_first td {
+  border-top-width: 2px;
+}
+
+#dozzpvrzwh .gt_row_group_first th {
+  border-top-width: 2px;
+}
+
+#dozzpvrzwh .gt_summary_row {
+  color: #333333;
+  background-color: #FFFFFF;
+  text-transform: inherit;
+  padding-top: 8px;
+  padding-bottom: 8px;
+  padding-left: 5px;
+  padding-right: 5px;
+}
+
+#dozzpvrzwh .gt_first_summary_row {
+  border-top-style: solid;
+  border-top-color: #D3D3D3;
+}
+
+#dozzpvrzwh .gt_first_summary_row.thick {
+  border-top-width: 2px;
+}
+
+#dozzpvrzwh .gt_last_summary_row {
+  padding-top: 8px;
+  padding-bottom: 8px;
+  padding-left: 5px;
+  padding-right: 5px;
+  border-bottom-style: solid;
+  border-bottom-width: 2px;
+  border-bottom-color: #D3D3D3;
+}
+
+#dozzpvrzwh .gt_grand_summary_row {
+  color: #333333;
+  background-color: #FFFFFF;
+  text-transform: inherit;
+  padding-top: 8px;
+  padding-bottom: 8px;
+  padding-left: 5px;
+  padding-right: 5px;
+}
+
+#dozzpvrzwh .gt_first_grand_summary_row {
+  padding-top: 8px;
+  padding-bottom: 8px;
+  padding-left: 5px;
+  padding-right: 5px;
+  border-top-style: double;
+  border-top-width: 6px;
+  border-top-color: #D3D3D3;
+}
+
+#dozzpvrzwh .gt_last_grand_summary_row_top {
+  padding-top: 8px;
+  padding-bottom: 8px;
+  padding-left: 5px;
+  padding-right: 5px;
+  border-bottom-style: double;
+  border-bottom-width: 6px;
+  border-bottom-color: #D3D3D3;
+}
+
+#dozzpvrzwh .gt_striped {
+  background-color: rgba(128, 128, 128, 0.05);
+}
+
+#dozzpvrzwh .gt_table_body {
+  border-top-style: solid;
+  border-top-width: 2px;
+  border-top-color: #D3D3D3;
+  border-bottom-style: solid;
+  border-bottom-width: 2px;
+  border-bottom-color: #D3D3D3;
+}
+
+#dozzpvrzwh .gt_footnotes {
+  color: #333333;
+  background-color: #FFFFFF;
+  border-bottom-style: none;
+  border-bottom-width: 2px;
+  border-bottom-color: #D3D3D3;
+  border-left-style: none;
+  border-left-width: 2px;
+  border-left-color: #D3D3D3;
+  border-right-style: none;
+  border-right-width: 2px;
+  border-right-color: #D3D3D3;
+}
+
+#dozzpvrzwh .gt_footnote {
+  margin: 0px;
+  font-size: 90%;
+  padding-top: 4px;
+  padding-bottom: 4px;
+  padding-left: 5px;
+  padding-right: 5px;
+}
+
+#dozzpvrzwh .gt_sourcenotes {
+  color: #333333;
+  background-color: #FFFFFF;
+  border-bottom-style: none;
+  border-bottom-width: 2px;
+  border-bottom-color: #D3D3D3;
+  border-left-style: none;
+  border-left-width: 2px;
+  border-left-color: #D3D3D3;
+  border-right-style: none;
+  border-right-width: 2px;
+  border-right-color: #D3D3D3;
+}
+
+#dozzpvrzwh .gt_sourcenote {
+  font-size: 90%;
+  padding-top: 4px;
+  padding-bottom: 4px;
+  padding-left: 5px;
+  padding-right: 5px;
+}
+
+#dozzpvrzwh .gt_left {
+  text-align: left;
+}
+
+#dozzpvrzwh .gt_center {
+  text-align: center;
+}
+
+#dozzpvrzwh .gt_right {
+  text-align: right;
+  font-variant-numeric: tabular-nums;
+}
+
+#dozzpvrzwh .gt_font_normal {
+  font-weight: normal;
+}
+
+#dozzpvrzwh .gt_font_bold {
+  font-weight: bold;
+}
+
+#dozzpvrzwh .gt_font_italic {
+  font-style: italic;
+}
+
+#dozzpvrzwh .gt_super {
+  font-size: 65%;
+}
+
+#dozzpvrzwh .gt_footnote_marks {
+  font-size: 75%;
+  vertical-align: 0.4em;
+  position: initial;
+}
+
+#dozzpvrzwh .gt_asterisk {
+  font-size: 100%;
+  vertical-align: 0;
+}
+
+#dozzpvrzwh .gt_indent_1 {
+  text-indent: 5px;
+}
+
+#dozzpvrzwh .gt_indent_2 {
+  text-indent: 10px;
+}
+
+#dozzpvrzwh .gt_indent_3 {
+  text-indent: 15px;
+}
+
+#dozzpvrzwh .gt_indent_4 {
+  text-indent: 20px;
+}
+
+#dozzpvrzwh .gt_indent_5 {
+  text-indent: 25px;
+}
+
+#dozzpvrzwh .katex-display {
+  display: inline-flex !important;
+  margin-bottom: 0.75em !important;
+}
+
+#dozzpvrzwh div.Reactable > div.rt-table > div.rt-thead > div.rt-tr.rt-tr-group-header > div.rt-th-group:after {
+  height: 0px !important;
+}
+</style>
+
+<div id="tbl-summ-1" class="gt_table do-not-create-environment quarto-float quarto-figure quarto-figure-center anchored" data-quarto-disable-processing="false" data-quarto-postprocess="true" data-quarto-bootstrap="false">
+<figure class="quarto-float quarto-subfloat-tbl figure">
+<figcaption class="quarto-float-caption-top quarto-subfloat-caption quarto-subfloat-tbl" id="tbl-summ-1-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+(a) Summary by Type
+</figcaption>
+<div aria-describedby="tbl-summ-1-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<table id="tbl-summ-1" class="gt_table do-not-create-environment caption-top table table-sm table-striped small" data-quarto-bootstrap="false">
+<colgroup>
+<col style="width: 25%">
+<col style="width: 25%">
+<col style="width: 25%">
+<col style="width: 25%">
+</colgroup>
+<thead>
+<tr class="gt_col_headings header">
+<th id="label" class="gt_col_heading gt_columns_bottom_border gt_left" style="text-align: left;" data-quarto-table-cell-role="th" scope="col"><strong>Characteristic</strong></th>
+<th id="stat_1" class="gt_col_heading gt_columns_bottom_border gt_center" style="text-align: left;" data-quarto-table-cell-role="th" scope="col"><strong>accessories</strong><br>
+N = 871<span class="gt_footnote_marks" style="white-space:nowrap;font-style:italic;font-weight:normal;line-height:0;"><sup>1</sup></span></th>
+<th id="stat_2" class="gt_col_heading gt_columns_bottom_border gt_center" style="text-align: left;" data-quarto-table-cell-role="th" scope="col"><strong>clothes</strong><br>
+N = 1,525<span class="gt_footnote_marks" style="white-space:nowrap;font-style:italic;font-weight:normal;line-height:0;"><sup>1</sup></span></th>
+<th id="stat_3" class="gt_col_heading gt_columns_bottom_border gt_center" style="text-align: left;" data-quarto-table-cell-role="th" scope="col"><strong>shoes</strong><br>
+N = 604<span class="gt_footnote_marks" style="white-space:nowrap;font-style:italic;font-weight:normal;line-height:0;"><sup>1</sup></span></th>
+</tr>
+</thead>
+<tbody class="gt_table_body">
+<tr class="odd">
+<td class="gt_row gt_left" style="text-align: left;" headers="label">markup</td>
+<td class="gt_row gt_center" style="text-align: left;" headers="stat_1"><br>
+</td>
+<td class="gt_row gt_center" style="text-align: left;" headers="stat_2"><br>
+</td>
+<td class="gt_row gt_center" style="text-align: left;" headers="stat_3"><br>
+</td>
+</tr>
+<tr class="even">
+<td class="gt_row gt_left" style="text-align: left;" headers="label">&nbsp;&nbsp;&nbsp;&nbsp;Mean (SD)</td>
+<td class="gt_row gt_center" style="text-align: left;" headers="stat_1">70 (28)</td>
+<td class="gt_row gt_center" style="text-align: left;" headers="stat_2">68 (29)</td>
+<td class="gt_row gt_center" style="text-align: left;" headers="stat_3">69 (29)</td>
+</tr>
+<tr class="odd">
+<td class="gt_row gt_left" style="text-align: left;" headers="label">&nbsp;&nbsp;&nbsp;&nbsp;Median (Q1, Q3)</td>
+<td class="gt_row gt_center" style="text-align: left;" headers="stat_1">70 (45, 93)</td>
+<td class="gt_row gt_center" style="text-align: left;" headers="stat_2">67 (43, 92)</td>
+<td class="gt_row gt_center" style="text-align: left;" headers="stat_3">68 (44, 92)</td>
+</tr>
+<tr class="even">
+<td class="gt_row gt_left" style="text-align: left;" headers="label">&nbsp;&nbsp;&nbsp;&nbsp;[Min, Max]</td>
+<td class="gt_row gt_center" style="text-align: left;" headers="stat_1">[20, 120]</td>
+<td class="gt_row gt_center" style="text-align: left;" headers="stat_2">[20, 120]</td>
+<td class="gt_row gt_center" style="text-align: left;" headers="stat_3">[20, 120]</td>
+</tr>
+<tr class="odd">
+<td class="gt_row gt_left" style="text-align: left;" headers="label">cost</td>
+<td class="gt_row gt_center" style="text-align: left;" headers="stat_1"><br>
+</td>
+<td class="gt_row gt_center" style="text-align: left;" headers="stat_2"><br>
+</td>
+<td class="gt_row gt_center" style="text-align: left;" headers="stat_3"><br>
+</td>
+</tr>
+<tr class="even">
+<td class="gt_row gt_left" style="text-align: left;" headers="label">&nbsp;&nbsp;&nbsp;&nbsp;Mean (SD)</td>
+<td class="gt_row gt_center" style="text-align: left;" headers="stat_1">1,990 (386)</td>
+<td class="gt_row gt_center" style="text-align: left;" headers="stat_2">2,022 (404)</td>
+<td class="gt_row gt_center" style="text-align: left;" headers="stat_3">2,014 (404)</td>
+</tr>
+<tr class="odd">
+<td class="gt_row gt_left" style="text-align: left;" headers="label">&nbsp;&nbsp;&nbsp;&nbsp;Median (Q1, Q3)</td>
+<td class="gt_row gt_center" style="text-align: left;" headers="stat_1">1,984 (1,731, 2,246)</td>
+<td class="gt_row gt_center" style="text-align: left;" headers="stat_2">2,033 (1,750, 2,297)</td>
+<td class="gt_row gt_center" style="text-align: left;" headers="stat_3">2,006 (1,734, 2,305)</td>
+</tr>
+<tr class="even">
+<td class="gt_row gt_left" style="text-align: left;" headers="label">&nbsp;&nbsp;&nbsp;&nbsp;[Min, Max]</td>
+<td class="gt_row gt_center" style="text-align: left;" headers="stat_1">[712, 3,263]</td>
+<td class="gt_row gt_center" style="text-align: left;" headers="stat_2">[533, 3,587]</td>
+<td class="gt_row gt_center" style="text-align: left;" headers="stat_3">[688, 3,153]</td>
+</tr>
+<tr class="odd">
+<td class="gt_row gt_left" style="text-align: left;" headers="label">sold</td>
+<td class="gt_row gt_center" style="text-align: left;" headers="stat_1">82 (9.4%)</td>
+<td class="gt_row gt_center" style="text-align: left;" headers="stat_2">242 (16%)</td>
+<td class="gt_row gt_center" style="text-align: left;" headers="stat_3">118 (20%)</td>
+</tr>
+</tbody><tfoot>
+<tr class="gt_footnotes odd">
+<td colspan="4" class="gt_footnote" style="text-align: left;"><span class="gt_footnote_marks" style="white-space:nowrap;font-style:italic;font-weight:normal;line-height:0;"><sup>1</sup></span> n (%)</td>
+</tr>
+</tfoot>
+
+</table>
+</div>
+</figure>
+</div>
+
+</div>
+</div>
+</div>
+<div class="quarto-layout-row">
+<div class="cell-output-display quarto-layout-cell-subref quarto-layout-cell" data-ref-parent="tbl-summ" style="flex-basis: 100.0%;justify-content: center;">
+<div id="jieefxmxbc" style="padding-left:0px;padding-right:0px;padding-top:10px;padding-bottom:10px;overflow-x:auto;overflow-y:auto;width:auto;height:auto;">
+<style>#jieefxmxbc table {
+  font-family: system-ui, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji';
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+#jieefxmxbc thead, #jieefxmxbc tbody, #jieefxmxbc tfoot, #jieefxmxbc tr, #jieefxmxbc td, #jieefxmxbc th {
+  border-style: none;
+}
+
+#jieefxmxbc p {
+  margin: 0;
+  padding: 0;
+}
+
+#jieefxmxbc .gt_table {
+  display: table;
+  border-collapse: collapse;
+  line-height: normal;
+  margin-left: auto;
+  margin-right: auto;
+  color: #333333;
+  font-size: 16px;
+  font-weight: normal;
+  font-style: normal;
+  background-color: #FFFFFF;
+  width: auto;
+  border-top-style: solid;
+  border-top-width: 2px;
+  border-top-color: #A8A8A8;
+  border-right-style: none;
+  border-right-width: 2px;
+  border-right-color: #D3D3D3;
+  border-bottom-style: solid;
+  border-bottom-width: 2px;
+  border-bottom-color: #A8A8A8;
+  border-left-style: none;
+  border-left-width: 2px;
+  border-left-color: #D3D3D3;
+}
+
+#jieefxmxbc .gt_caption {
+  padding-top: 4px;
+  padding-bottom: 4px;
+}
+
+#jieefxmxbc .gt_title {
+  color: #333333;
+  font-size: 125%;
+  font-weight: initial;
+  padding-top: 4px;
+  padding-bottom: 4px;
+  padding-left: 5px;
+  padding-right: 5px;
+  border-bottom-color: #FFFFFF;
+  border-bottom-width: 0;
+}
+
+#jieefxmxbc .gt_subtitle {
+  color: #333333;
+  font-size: 85%;
+  font-weight: initial;
+  padding-top: 3px;
+  padding-bottom: 5px;
+  padding-left: 5px;
+  padding-right: 5px;
+  border-top-color: #FFFFFF;
+  border-top-width: 0;
+}
+
+#jieefxmxbc .gt_heading {
+  background-color: #FFFFFF;
+  text-align: center;
+  border-bottom-color: #FFFFFF;
+  border-left-style: none;
+  border-left-width: 1px;
+  border-left-color: #D3D3D3;
+  border-right-style: none;
+  border-right-width: 1px;
+  border-right-color: #D3D3D3;
+}
+
+#jieefxmxbc .gt_bottom_border {
+  border-bottom-style: solid;
+  border-bottom-width: 2px;
+  border-bottom-color: #D3D3D3;
+}
+
+#jieefxmxbc .gt_col_headings {
+  border-top-style: solid;
+  border-top-width: 2px;
+  border-top-color: #D3D3D3;
+  border-bottom-style: solid;
+  border-bottom-width: 2px;
+  border-bottom-color: #D3D3D3;
+  border-left-style: none;
+  border-left-width: 1px;
+  border-left-color: #D3D3D3;
+  border-right-style: none;
+  border-right-width: 1px;
+  border-right-color: #D3D3D3;
+}
+
+#jieefxmxbc .gt_col_heading {
+  color: #333333;
+  background-color: #FFFFFF;
+  font-size: 100%;
+  font-weight: normal;
+  text-transform: inherit;
+  border-left-style: none;
+  border-left-width: 1px;
+  border-left-color: #D3D3D3;
+  border-right-style: none;
+  border-right-width: 1px;
+  border-right-color: #D3D3D3;
+  vertical-align: bottom;
+  padding-top: 5px;
+  padding-bottom: 6px;
+  padding-left: 5px;
+  padding-right: 5px;
+  overflow-x: hidden;
+}
+
+#jieefxmxbc .gt_column_spanner_outer {
+  color: #333333;
+  background-color: #FFFFFF;
+  font-size: 100%;
+  font-weight: normal;
+  text-transform: inherit;
+  padding-top: 0;
+  padding-bottom: 0;
+  padding-left: 4px;
+  padding-right: 4px;
+}
+
+#jieefxmxbc .gt_column_spanner_outer:first-child {
+  padding-left: 0;
+}
+
+#jieefxmxbc .gt_column_spanner_outer:last-child {
+  padding-right: 0;
+}
+
+#jieefxmxbc .gt_column_spanner {
+  border-bottom-style: solid;
+  border-bottom-width: 2px;
+  border-bottom-color: #D3D3D3;
+  vertical-align: bottom;
+  padding-top: 5px;
+  padding-bottom: 5px;
+  overflow-x: hidden;
+  display: inline-block;
+  width: 100%;
+}
+
+#jieefxmxbc .gt_spanner_row {
+  border-bottom-style: hidden;
+}
+
+#jieefxmxbc .gt_group_heading {
+  padding-top: 8px;
+  padding-bottom: 8px;
+  padding-left: 5px;
+  padding-right: 5px;
+  color: #333333;
+  background-color: #FFFFFF;
+  font-size: 100%;
+  font-weight: initial;
+  text-transform: inherit;
+  border-top-style: solid;
+  border-top-width: 2px;
+  border-top-color: #D3D3D3;
+  border-bottom-style: solid;
+  border-bottom-width: 2px;
+  border-bottom-color: #D3D3D3;
+  border-left-style: none;
+  border-left-width: 1px;
+  border-left-color: #D3D3D3;
+  border-right-style: none;
+  border-right-width: 1px;
+  border-right-color: #D3D3D3;
+  vertical-align: middle;
+  text-align: left;
+}
+
+#jieefxmxbc .gt_empty_group_heading {
+  padding: 0.5px;
+  color: #333333;
+  background-color: #FFFFFF;
+  font-size: 100%;
+  font-weight: initial;
+  border-top-style: solid;
+  border-top-width: 2px;
+  border-top-color: #D3D3D3;
+  border-bottom-style: solid;
+  border-bottom-width: 2px;
+  border-bottom-color: #D3D3D3;
+  vertical-align: middle;
+}
+
+#jieefxmxbc .gt_from_md > :first-child {
+  margin-top: 0;
+}
+
+#jieefxmxbc .gt_from_md > :last-child {
+  margin-bottom: 0;
+}
+
+#jieefxmxbc .gt_row {
+  padding-top: 8px;
+  padding-bottom: 8px;
+  padding-left: 5px;
+  padding-right: 5px;
+  margin: 10px;
+  border-top-style: solid;
+  border-top-width: 1px;
+  border-top-color: #D3D3D3;
+  border-left-style: none;
+  border-left-width: 1px;
+  border-left-color: #D3D3D3;
+  border-right-style: none;
+  border-right-width: 1px;
+  border-right-color: #D3D3D3;
+  vertical-align: middle;
+  overflow-x: hidden;
+}
+
+#jieefxmxbc .gt_stub {
+  color: #333333;
+  background-color: #FFFFFF;
+  font-size: 100%;
+  font-weight: initial;
+  text-transform: inherit;
+  border-right-style: solid;
+  border-right-width: 2px;
+  border-right-color: #D3D3D3;
+  padding-left: 5px;
+  padding-right: 5px;
+}
+
+#jieefxmxbc .gt_stub_row_group {
+  color: #333333;
+  background-color: #FFFFFF;
+  font-size: 100%;
+  font-weight: initial;
+  text-transform: inherit;
+  border-right-style: solid;
+  border-right-width: 2px;
+  border-right-color: #D3D3D3;
+  padding-left: 5px;
+  padding-right: 5px;
+  vertical-align: top;
+}
+
+#jieefxmxbc .gt_row_group_first td {
+  border-top-width: 2px;
+}
+
+#jieefxmxbc .gt_row_group_first th {
+  border-top-width: 2px;
+}
+
+#jieefxmxbc .gt_summary_row {
+  color: #333333;
+  background-color: #FFFFFF;
+  text-transform: inherit;
+  padding-top: 8px;
+  padding-bottom: 8px;
+  padding-left: 5px;
+  padding-right: 5px;
+}
+
+#jieefxmxbc .gt_first_summary_row {
+  border-top-style: solid;
+  border-top-color: #D3D3D3;
+}
+
+#jieefxmxbc .gt_first_summary_row.thick {
+  border-top-width: 2px;
+}
+
+#jieefxmxbc .gt_last_summary_row {
+  padding-top: 8px;
+  padding-bottom: 8px;
+  padding-left: 5px;
+  padding-right: 5px;
+  border-bottom-style: solid;
+  border-bottom-width: 2px;
+  border-bottom-color: #D3D3D3;
+}
+
+#jieefxmxbc .gt_grand_summary_row {
+  color: #333333;
+  background-color: #FFFFFF;
+  text-transform: inherit;
+  padding-top: 8px;
+  padding-bottom: 8px;
+  padding-left: 5px;
+  padding-right: 5px;
+}
+
+#jieefxmxbc .gt_first_grand_summary_row {
+  padding-top: 8px;
+  padding-bottom: 8px;
+  padding-left: 5px;
+  padding-right: 5px;
+  border-top-style: double;
+  border-top-width: 6px;
+  border-top-color: #D3D3D3;
+}
+
+#jieefxmxbc .gt_last_grand_summary_row_top {
+  padding-top: 8px;
+  padding-bottom: 8px;
+  padding-left: 5px;
+  padding-right: 5px;
+  border-bottom-style: double;
+  border-bottom-width: 6px;
+  border-bottom-color: #D3D3D3;
+}
+
+#jieefxmxbc .gt_striped {
+  background-color: rgba(128, 128, 128, 0.05);
+}
+
+#jieefxmxbc .gt_table_body {
+  border-top-style: solid;
+  border-top-width: 2px;
+  border-top-color: #D3D3D3;
+  border-bottom-style: solid;
+  border-bottom-width: 2px;
+  border-bottom-color: #D3D3D3;
+}
+
+#jieefxmxbc .gt_footnotes {
+  color: #333333;
+  background-color: #FFFFFF;
+  border-bottom-style: none;
+  border-bottom-width: 2px;
+  border-bottom-color: #D3D3D3;
+  border-left-style: none;
+  border-left-width: 2px;
+  border-left-color: #D3D3D3;
+  border-right-style: none;
+  border-right-width: 2px;
+  border-right-color: #D3D3D3;
+}
+
+#jieefxmxbc .gt_footnote {
+  margin: 0px;
+  font-size: 90%;
+  padding-top: 4px;
+  padding-bottom: 4px;
+  padding-left: 5px;
+  padding-right: 5px;
+}
+
+#jieefxmxbc .gt_sourcenotes {
+  color: #333333;
+  background-color: #FFFFFF;
+  border-bottom-style: none;
+  border-bottom-width: 2px;
+  border-bottom-color: #D3D3D3;
+  border-left-style: none;
+  border-left-width: 2px;
+  border-left-color: #D3D3D3;
+  border-right-style: none;
+  border-right-width: 2px;
+  border-right-color: #D3D3D3;
+}
+
+#jieefxmxbc .gt_sourcenote {
+  font-size: 90%;
+  padding-top: 4px;
+  padding-bottom: 4px;
+  padding-left: 5px;
+  padding-right: 5px;
+}
+
+#jieefxmxbc .gt_left {
+  text-align: left;
+}
+
+#jieefxmxbc .gt_center {
+  text-align: center;
+}
+
+#jieefxmxbc .gt_right {
+  text-align: right;
+  font-variant-numeric: tabular-nums;
+}
+
+#jieefxmxbc .gt_font_normal {
+  font-weight: normal;
+}
+
+#jieefxmxbc .gt_font_bold {
+  font-weight: bold;
+}
+
+#jieefxmxbc .gt_font_italic {
+  font-style: italic;
+}
+
+#jieefxmxbc .gt_super {
+  font-size: 65%;
+}
+
+#jieefxmxbc .gt_footnote_marks {
+  font-size: 75%;
+  vertical-align: 0.4em;
+  position: initial;
+}
+
+#jieefxmxbc .gt_asterisk {
+  font-size: 100%;
+  vertical-align: 0;
+}
+
+#jieefxmxbc .gt_indent_1 {
+  text-indent: 5px;
+}
+
+#jieefxmxbc .gt_indent_2 {
+  text-indent: 10px;
+}
+
+#jieefxmxbc .gt_indent_3 {
+  text-indent: 15px;
+}
+
+#jieefxmxbc .gt_indent_4 {
+  text-indent: 20px;
+}
+
+#jieefxmxbc .gt_indent_5 {
+  text-indent: 25px;
+}
+
+#jieefxmxbc .katex-display {
+  display: inline-flex !important;
+  margin-bottom: 0.75em !important;
+}
+
+#jieefxmxbc div.Reactable > div.rt-table > div.rt-thead > div.rt-tr.rt-tr-group-header > div.rt-th-group:after {
+  height: 0px !important;
+}
+</style>
+
+<div id="tbl-summ-2" class="gt_table do-not-create-environment quarto-float quarto-figure quarto-figure-center anchored" data-quarto-disable-processing="false" data-quarto-postprocess="true" data-quarto-bootstrap="false">
+<figure class="quarto-float quarto-subfloat-tbl figure">
+<figcaption class="quarto-float-caption-top quarto-subfloat-caption quarto-subfloat-tbl" id="tbl-summ-2-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+(b) Summary by Sold
+</figcaption>
+<div aria-describedby="tbl-summ-2-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<table id="tbl-summ-2" class="gt_table do-not-create-environment caption-top table table-sm table-striped small" data-quarto-bootstrap="false">
+<colgroup>
+<col style="width: 33%">
+<col style="width: 33%">
+<col style="width: 33%">
+</colgroup>
+<thead>
+<tr class="gt_col_headings header">
+<th id="label" class="gt_col_heading gt_columns_bottom_border gt_left" style="text-align: left;" data-quarto-table-cell-role="th" scope="col"><strong>Characteristic</strong></th>
+<th id="stat_1" class="gt_col_heading gt_columns_bottom_border gt_center" style="text-align: left;" data-quarto-table-cell-role="th" scope="col"><strong>0</strong><br>
+N = 2,558</th>
+<th id="stat_2" class="gt_col_heading gt_columns_bottom_border gt_center" style="text-align: left;" data-quarto-table-cell-role="th" scope="col"><strong>1</strong><br>
+N = 442</th>
+</tr>
+</thead>
+<tbody class="gt_table_body">
+<tr class="odd">
+<td class="gt_row gt_left" style="text-align: left;" headers="label">markup</td>
+<td class="gt_row gt_center" style="text-align: left;" headers="stat_1"><br>
+</td>
+<td class="gt_row gt_center" style="text-align: left;" headers="stat_2"><br>
+</td>
+</tr>
+<tr class="even">
+<td class="gt_row gt_left" style="text-align: left;" headers="label">&nbsp;&nbsp;&nbsp;&nbsp;Mean (SD)</td>
+<td class="gt_row gt_center" style="text-align: left;" headers="stat_1">75 (26)</td>
+<td class="gt_row gt_center" style="text-align: left;" headers="stat_2">30 (8)</td>
+</tr>
+<tr class="odd">
+<td class="gt_row gt_left" style="text-align: left;" headers="label">&nbsp;&nbsp;&nbsp;&nbsp;Median (Q1, Q3)</td>
+<td class="gt_row gt_center" style="text-align: left;" headers="stat_1">76 (54, 96)</td>
+<td class="gt_row gt_center" style="text-align: left;" headers="stat_2">28 (24, 35)</td>
+</tr>
+<tr class="even">
+<td class="gt_row gt_left" style="text-align: left;" headers="label">&nbsp;&nbsp;&nbsp;&nbsp;[Min, Max]</td>
+<td class="gt_row gt_center" style="text-align: left;" headers="stat_1">[21, 120]</td>
+<td class="gt_row gt_center" style="text-align: left;" headers="stat_2">[20, 57]</td>
+</tr>
+<tr class="odd">
+<td class="gt_row gt_left" style="text-align: left;" headers="label">cost</td>
+<td class="gt_row gt_center" style="text-align: left;" headers="stat_1"><br>
+</td>
+<td class="gt_row gt_center" style="text-align: left;" headers="stat_2"><br>
+</td>
+</tr>
+<tr class="even">
+<td class="gt_row gt_left" style="text-align: left;" headers="label">&nbsp;&nbsp;&nbsp;&nbsp;Mean (SD)</td>
+<td class="gt_row gt_center" style="text-align: left;" headers="stat_1">1,992 (395)</td>
+<td class="gt_row gt_center" style="text-align: left;" headers="stat_2">2,123 (404)</td>
+</tr>
+<tr class="odd">
+<td class="gt_row gt_left" style="text-align: left;" headers="label">&nbsp;&nbsp;&nbsp;&nbsp;Median (Q1, Q3)</td>
+<td class="gt_row gt_center" style="text-align: left;" headers="stat_1">1,991 (1,728, 2,258)</td>
+<td class="gt_row gt_center" style="text-align: left;" headers="stat_2">2,129 (1,827, 2,405)</td>
+</tr>
+<tr class="even">
+<td class="gt_row gt_left" style="text-align: left;" headers="label">&nbsp;&nbsp;&nbsp;&nbsp;[Min, Max]</td>
+<td class="gt_row gt_center" style="text-align: left;" headers="stat_1">[533, 3,587]</td>
+<td class="gt_row gt_center" style="text-align: left;" headers="stat_2">[1,023, 3,353]</td>
+</tr>
+</tbody>
+</table>
+</div>
+</figure>
+</div>
+
+</div>
+</div>
+</div>
+</div>
+</figure>
+</div>
+</div>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb5" style="background: #f1f3f5;"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb5-1"><span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">plot</span>(markup, cost, </span>
+<span id="cb5-2">     <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">main =</span> <span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"cost vs markup"</span>, </span>
+<span id="cb5-3">     <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">ylab =</span> <span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"cost of production ($)"</span>, </span>
+<span id="cb5-4">     <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">xlab =</span> <span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"markup of product (%)"</span>)</span></code></pre></div></div>
+<div class="cell-output-display">
+<div id="fig-comp" class="quarto-float quarto-figure quarto-figure-center anchored">
+<figure class="quarto-float quarto-float-fig figure">
+<div aria-describedby="fig-comp-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<img src="https://your-website-url.example.com/projects/optimizingExpectedReturns/index_files/figure-html/fig-comp-1.png" class="img-fluid figure-img" width="672">
+</div>
+<figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-comp-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Figure&nbsp;1: Comparing cost and markup
+</figcaption>
+</figure>
+</div>
+</div>
+</div>
+<p>The first table summarizes the different covariates and outcome by type. Inspecting the average and quartiles of markup and cost between the different types, we don’t notice any difference in the distributions. This implies that type is associated with neither the cost nor markup, which is a best case scenario for a logistic regression analysis. The proportion of successful sales is different among the product types with clothes and shoe products selling at a higher rate than the accessories. This implies that there may be an association between type and product sales. Clearly, there is an imbalance in the distribution of type in the data set, but we have enough cases of each product type such that including type in the logistic regression model shouldn’t be a problem.</p>
+<p>The second table summarizes markup and the cost variables by whether the product sold (the 1 group) or not (the 0 group). Comparing these two groups, we can clearly see that markup is lower in the groups that sold and indicates a negative association between sales and markup. The distribution of cost shifts about 100 dollars higher in the group that sold and thus suggests a positive association between cost and sales.</p>
+<p>Finally, in the scatter plot comparing cost and markup, we observe random spread of the points. There is no indication of a linear or other functional relationship between markup and cost, which is an ideal scenario for logistic regression.</p>
+</section>
+<section id="building-a-logistic-regression-model" class="level2">
+<h2 class="anchored" data-anchor-id="building-a-logistic-regression-model">Building a logistic regression model</h2>
+<p>Fitting a logistic regression model in R is a simple one line of code. Since we know what the true generating parameters are above, let’s double check our work by comparing the fitted values to the true parameters.</p>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb6" style="background: #f1f3f5;"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb6-1">fit <span class="ot" style="color: #003B4F;
+background-color: null;
+font-style: inherit;">&lt;-</span> <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">glm</span>(sold <span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">~</span> <span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">1</span> <span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">+</span> markup <span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">+</span> cost <span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">+</span> type, </span>
+<span id="cb6-2">           <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">data =</span> x_df,</span>
+<span id="cb6-3">           <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">family =</span> binomial)</span>
+<span id="cb6-4">ci <span class="ot" style="color: #003B4F;
+background-color: null;
+font-style: inherit;">&lt;-</span> <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">confint</span>(fit)</span></code></pre></div></div>
+<div class="cell-output cell-output-stderr">
+<pre><code>Waiting for profiling to be done...</code></pre>
+</div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb8" style="background: #f1f3f5;"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb8-1">result <span class="ot" style="color: #003B4F;
+background-color: null;
+font-style: inherit;">&lt;-</span> <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">data.frame</span>(<span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">truth =</span> true_beta, </span>
+<span id="cb8-2">                     <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">est =</span> <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">coef</span>(fit),</span>
+<span id="cb8-3">                     <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">ci_lwr =</span> ci[,<span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">1</span>],</span>
+<span id="cb8-4">                     <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">ci_upr =</span> ci[,<span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">2</span>])</span>
+<span id="cb8-5"></span>
+<span id="cb8-6"><span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">kable</span>(result, <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">digits =</span> <span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">4</span>) <span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">%&gt;%</span> </span>
+<span id="cb8-7">  <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">kable_styling</span>()</span></code></pre></div></div>
+<div id="tbl-truefit" class="cell quarto-float quarto-figure quarto-figure-center anchored">
+<figure class="quarto-float quarto-float-tbl figure">
+<figcaption class="quarto-float-caption-top quarto-float-caption quarto-float-tbl" id="tbl-truefit-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Table&nbsp;2: Comparing estimates to true values. Estimates are on the log-odds scale
+</figcaption>
+<div aria-describedby="tbl-truefit-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<div class="cell-output-display">
+<table class="table do-not-create-environment cell caption-top table-sm table-striped small">
+<thead>
+<tr class="header">
+<th style="text-align: left;" data-quarto-table-cell-role="th"></th>
+<th style="text-align: right;" data-quarto-table-cell-role="th">truth</th>
+<th style="text-align: right;" data-quarto-table-cell-role="th">est</th>
+<th style="text-align: right;" data-quarto-table-cell-role="th">ci_lwr</th>
+<th style="text-align: right;" data-quarto-table-cell-role="th">ci_upr</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: left;">(Intercept)</td>
+<td style="text-align: right;">2.000</td>
+<td style="text-align: right;">1.7716</td>
+<td style="text-align: right;">0.7778</td>
+<td style="text-align: right;">2.7816</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">markup</td>
+<td style="text-align: right;">-0.200</td>
+<td style="text-align: right;">-0.2045</td>
+<td style="text-align: right;">-0.2272</td>
+<td style="text-align: right;">-0.1837</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">cost</td>
+<td style="text-align: right;">0.002</td>
+<td style="text-align: right;">0.0021</td>
+<td style="text-align: right;">0.0017</td>
+<td style="text-align: right;">0.0026</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">typeclothes</td>
+<td style="text-align: right;">1.000</td>
+<td style="text-align: right;">0.8584</td>
+<td style="text-align: right;">0.4595</td>
+<td style="text-align: right;">1.2656</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">typeshoes</td>
+<td style="text-align: right;">1.500</td>
+<td style="text-align: right;">1.8053</td>
+<td style="text-align: right;">1.3052</td>
+<td style="text-align: right;">2.3199</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+</figure>
+</div>
+</div>
+<p>As expected with this rather large sample size, the estimates are fairly close to the true values and are well within the 95% confidence intervals. All of the parameter estimates are statistically significant as 0 is not within the confidence intervals, so this is a convincing model. At this step, one would normally interpret these values as odds ratios, but that is not the goal of this analysis, so I will skip the interpretation.</p>
+<p>When building a logistic regression model, one usually has to consider a few different models to find the best fit to the data. Let’s consider three other logistic regression models. One without type in the model but all other variables in the model:</p>
+<p><img src="https://latex.codecogs.com/png.latex?%0A%5Clog(%5Cfrac%7B%5Cpi_i%7D%7B1%20-%20%5Cpi_i%7D)%20=%20%5Cbeta_0%20+%20x_%7Bmarkup%7D%20*%20%5Cbeta_%7Bmarkup%7D%20+%0Ax_%7Bcost%7D%20*%20%5Cbeta_%7Bcost%7D%0A"></p>
+<p>a second model with a quadratic term for markup and including all the other variables:</p>
+<p><img src="https://latex.codecogs.com/png.latex?%0A%5Clog(%5Cfrac%7B%5Cpi_i%7D%7B1%20-%20%5Cpi_i%7D)%20=%20%5Cbeta_0%20+%20x_%7Bmarkup%7D%20*%20%5Cbeta_%7Bmarkup%7D%20+%20x_%7Bmarkup%7D%5E2%20*%20%5Cbeta_%7Bmarkup%5E2%7D%20+%0Ax_%7Bcost%7D%20*%20%5Cbeta_%7Bcost%7D%20+%20x_%7Btype=shoes%7D%20*%20%5Cbeta_%7Btype=shoes%7D%20+%20x_%7Btype%20=%20clothes%7D*%5Cbeta_%7Btype%20=%20clothes%7D%0A"></p>
+<p>and finally a simple model with just markup:</p>
+<p><img src="https://latex.codecogs.com/png.latex?%0A%5Clog(%5Cfrac%7B%5Cpi_i%7D%7B1%20-%20%5Cpi_i%7D)%20=%20%5Cbeta_0%20+%20x_%7Bmarkup%7D%20*%20%5Cbeta_%7Bmarkup%7D%0A"></p>
+<p>There are many model selection criteria to choose from and which one to use depends on the goal of the analysis. In this application, the goal is estimation and inference, so I would personally advocate for the Bayesian Information Criterion (BIC). The BIC is a quantity that expresses how well the proposed model fits the data while also balancing how many parameters are in a model. More parameters in a model results in a better fit to the data but too many parameters results in overfitting. The problem with an overfit model is the lack of generalizability to new data. Please refer to the BIC() documentation to see the formula for its calculation. BIC favors having less parameters in a model as compared to it’s counterpart the Akaike Information Criterion (AIC). Therefore, the BIC is sometimes the preferred model selection criterion when the goal is to identify what covariates to go into a model.</p>
+<p>Lower values of BIC indicate a better statistical model for the data. A difference of at least 2 is the typical threshold to consider one model superior the other. For differences of less than 2 the models are about equivalent and the statistician must decide which model is superior.</p>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb9" style="background: #f1f3f5;"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb9-1">fit1 <span class="ot" style="color: #003B4F;
+background-color: null;
+font-style: inherit;">&lt;-</span> <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">glm</span>(sold <span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">~</span> <span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">1</span> <span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">+</span> markup <span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">+</span> cost, </span>
+<span id="cb9-2">           <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">data =</span> x_df,</span>
+<span id="cb9-3">           <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">family =</span> binomial)</span>
+<span id="cb9-4">fit2 <span class="ot" style="color: #003B4F;
+background-color: null;
+font-style: inherit;">&lt;-</span> <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">glm</span>(sold <span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">~</span> <span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">1</span> <span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">+</span> markup <span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">+</span> <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">I</span>(markup<span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">^</span><span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">2</span>) <span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">+</span> cost <span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">+</span> type, </span>
+<span id="cb9-5">           <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">data =</span> x_df,</span>
+<span id="cb9-6">           <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">family =</span> binomial)</span>
+<span id="cb9-7">fit3 <span class="ot" style="color: #003B4F;
+background-color: null;
+font-style: inherit;">&lt;-</span> <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">glm</span>(sold <span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">~</span> markup, <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">data =</span> x_df, <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">family =</span> binomial)</span>
+<span id="cb9-8"></span>
+<span id="cb9-9">df_model_selection <span class="ot" style="color: #003B4F;
+background-color: null;
+font-style: inherit;">&lt;-</span> <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">data.frame</span>(<span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">model =</span> <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">c</span>(<span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"True_model"</span>, <span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"no_type"</span>, <span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"quadratic_markup"</span>, <span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"Simple_markup"</span>), </span>
+<span id="cb9-10">                                 <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">bic =</span> <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">c</span>(<span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">BIC</span>(fit), <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">BIC</span>(fit1), <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">BIC</span>(fit2), <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">BIC</span>(fit3))</span>
+<span id="cb9-11">                                 ) </span>
+<span id="cb9-12">df_model_selection <span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">%&gt;%</span>    </span>
+<span id="cb9-13">  <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">kable</span>(<span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">digits =</span> <span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">2</span>, <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">caption =</span> <span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"Smaller BIC indicates better model"</span>) <span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">%&gt;%</span>  </span>
+<span id="cb9-14">  <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">kable_styling</span>()</span></code></pre></div></div>
+<div id="tbl-modselect" class="cell quarto-float quarto-figure quarto-figure-center anchored">
+<figure class="quarto-float quarto-float-tbl figure">
+<figcaption class="quarto-float-caption-top quarto-float-caption quarto-float-tbl" id="tbl-modselect-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Table&nbsp;3: Comparing Logistic Regression Models
+</figcaption>
+<div aria-describedby="tbl-modselect-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<div class="cell-output-display">
+<table class="table do-not-create-environment cell caption-top table-sm table-striped small">
+<caption>Smaller BIC indicates better model</caption>
+<thead>
+<tr class="header">
+<th style="text-align: left;" data-quarto-table-cell-role="th">model</th>
+<th style="text-align: right;" data-quarto-table-cell-role="th">bic</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: left;">True_model</td>
+<td style="text-align: right;">927.72</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">no_type</td>
+<td style="text-align: right;">964.57</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">quadratic_markup</td>
+<td style="text-align: right;">935.31</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Simple_markup</td>
+<td style="text-align: right;">1046.51</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+</figure>
+</div>
+</div>
+<p>Upon inspecting the BIC values, the true model is unsurprisingly the lowest BIC and thus the best model. Disregarding our knowledge of the true data generating model, the model chosen at this step strongly translates the trends observed in the exploratory data analysis step, and thus highlights the importance of exploring the data before building models. The simple model with just markup is clearly the worst model with the highest BIC, so although the simple model would drastically simplify our optimal estimation of <img src="https://latex.codecogs.com/png.latex?%5Cpi_i"> in the next step, the data indicates a more complex relationship between the outcome and covariates is more appropriate.</p>
+<p>Although we only inspect 4 models here, usually one would explore many more models and spend the bulk of their time trying to figure out the best model. More complex relationships like interactions and different functional transformations of continuous variables could be considered. Based on the exploratory analysis, this does not seem necessary in this analysis.</p>
+</section>
+<section id="assessing-model-assumptions" class="level2">
+<h2 class="anchored" data-anchor-id="assessing-model-assumptions">Assessing Model Assumptions</h2>
+<p>Assessing whether the model assumptions are violated is often overlooked when fitting a logistic regression model. The main ones to assess are linearity of covariates (assumption 2), independent sampling (assumption 3), and multicollinearity (assumption 4). Perfect separation (assumption 5) is normally a warning from R if that occurs.</p>
+<p>Based on the exploratory analysis earlier, multicollinearity is not likely not an issue in this data set. We know this for a fact because I generated the data independently. The exploratory analysis revealed that there wasn’t any clear relationship between pairs of the covariates, and all of the parameters in the model are statistically significant. These are both great signs that multicollinearity is not present. However, to formally check for multicollinearity, one can check the Variance Inflation Factors (VIFs) in the covariates. I’ll skip this step for now but one can read more on VIF theory here: https://online.stat.psu.edu/stat462/node/180/ and how to calculate it using the <code>car</code> package in R here: https://www.r-bloggers.com/2023/12/exploring-variance-inflation-factor-vif-in-r-a-practical-guide/.</p>
+<p>I will note though that if one adds higher order terms in the regression, for example</p>
+<p><img src="https://latex.codecogs.com/png.latex?%0A%5Clog(%5Cfrac%7B%5Cpi_i%7D%7B1%20-%20%5Cpi_i%7D)%20=%20%5Cbeta_0%20+%20x_%7Bmarkup%7D%20*%20%5Cbeta_%7Bmarkup%7D%20+%20x_%7Bmarkup%7D%5E2%20*%20%5Cbeta_%7Bmarkup%5E2%7D%0A"> then instead of the VIF one will need to inspect the Generalized Variance Inflation Factor (GVIF).</p>
+<p>The hardest assumption to verify is the linearity assumption. This only applies to continuous covariates which are markup and cost in this example. We can use the <code>binnedplot</code> function in the <code>arm</code> package to assess this. What this function does is bin or discretize the continuous variable into equally spaced segments. Within each segment, calculate the residual for the observations via:</p>
+<p><img src="https://latex.codecogs.com/png.latex?%0A%20%20residual_i%20=%20y_i%20-%20%5Chat%20%5Cpi_i%0A"> where <img src="https://latex.codecogs.com/png.latex?%5Chat%20%5Cpi_i"> is calculated from a proposed logistic regression model. We inspect the plot to make sure that the residuals are randomly scattered around the <img src="https://latex.codecogs.com/png.latex?y%20=%200"> horizontal line, there is no pattern in the residuals, and that at most ~5% of the residuals are outside of the confidence interval lines.</p>
+<p>These binned residuals plots assume a large sample size for the statistical properties to hold. Specifically <strong>if the sample size is large within each bin</strong>, then the expected value of these residuals is 0 with known standard errors due to the Lindeberg-Feller central limit theorem. My personal rule-of-thumb is at least 30 observations to be reasonably confident in the approximation, but the more the better. Unfortunately, the binned plots from the arm package don’t throw warnings when the bins have small sample size, so some caution is needed when interpretting these plots. In addition to large sample sizes, for values of <img src="https://latex.codecogs.com/png.latex?%5Chat%20%5Cpi_i"> close to 0 or 1, the statistical theory does not hold, so bins with mostly very low or very high predicted values of <img src="https://latex.codecogs.com/png.latex?%5Chat%20%5Cpi_i"> are not as informative.</p>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb10" style="background: #f1f3f5;"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb10-1"><span class="do" style="color: #5E5E5E;
+background-color: null;
+font-style: italic;">## example on how the binned residual plot is constructed</span></span>
+<span id="cb10-2">rng <span class="ot" style="color: #003B4F;
+background-color: null;
+font-style: inherit;">&lt;-</span> <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">range</span>(x_df<span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">$</span>cost) <span class="co" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;"># min, max of markup</span></span>
+<span id="cb10-3"><span class="do" style="color: #5E5E5E;
+background-color: null;
+font-style: italic;">## break up range into 3 equal parts</span></span>
+<span id="cb10-4">breakpoints <span class="ot" style="color: #003B4F;
+background-color: null;
+font-style: inherit;">&lt;-</span> <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">seq</span>(<span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">from =</span> rng[<span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">1</span>],</span>
+<span id="cb10-5">                   <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">to =</span> rng[<span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">2</span>],</span>
+<span id="cb10-6">                   <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">by =</span> <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">diff</span>(rng<span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">/</span><span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">3</span>))</span>
+<span id="cb10-7">midpoints <span class="ot" style="color: #003B4F;
+background-color: null;
+font-style: inherit;">&lt;-</span> (breakpoints[<span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">-</span><span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">1</span>] <span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">+</span> breakpoints[<span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">-</span><span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">length</span>(breakpoints)]) <span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">/</span> <span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">2</span></span>
+<span id="cb10-8">res <span class="ot" style="color: #003B4F;
+background-color: null;
+font-style: inherit;">&lt;-</span> x_df<span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">$</span>sold <span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">-</span> <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">predict</span>(fit, <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">type =</span> <span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">'response'</span>)</span>
+<span id="cb10-9">res_df <span class="ot" style="color: #003B4F;
+background-color: null;
+font-style: inherit;">&lt;-</span> <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">data.frame</span>(<span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">res =</span> res,</span>
+<span id="cb10-10">           <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">bp =</span> <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">cut</span>(x_df<span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">$</span>cost, <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">breaks =</span> breakpoints))</span>
+<span id="cb10-11">res_ave <span class="ot" style="color: #003B4F;
+background-color: null;
+font-style: inherit;">&lt;-</span> <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">aggregate</span>(res <span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">~</span> bp,</span>
+<span id="cb10-12">                     <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">data =</span> res_df,</span>
+<span id="cb10-13">                     <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">FUN =</span> mean)</span>
+<span id="cb10-14"><span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">plot</span>(<span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">x =</span> x_df<span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">$</span>cost, <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">y =</span> res, </span>
+<span id="cb10-15">     <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">xlab =</span> <span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"cost"</span>,</span>
+<span id="cb10-16">     <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">ylab =</span> <span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"Residuals: observed - predicted"</span>,</span>
+<span id="cb10-17">     <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">main  =</span> <span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"How a binned residual plot is constructed"</span>,</span>
+<span id="cb10-18">     <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">pch =</span> <span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">16</span>)</span>
+<span id="cb10-19"><span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">points</span>(<span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">x =</span> midpoints, <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">y =</span> res_ave<span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">$</span>res, </span>
+<span id="cb10-20">       <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">pch =</span> <span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">16</span>, <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">cex =</span> <span class="fl" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">1.2</span>,</span>
+<span id="cb10-21">       <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">col =</span> <span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">'red'</span>)</span>
+<span id="cb10-22"><span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">abline</span>(<span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">v =</span> breakpoints, <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">col =</span> <span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">'red'</span>)</span>
+<span id="cb10-23"><span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">legend</span>(<span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"topright"</span>, </span>
+<span id="cb10-24">       <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">legend =</span> <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">c</span>(<span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"observed_residual"</span>,</span>
+<span id="cb10-25">                  <span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"average_residual"</span>),</span>
+<span id="cb10-26">       <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">col =</span> <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">c</span>(<span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">'black'</span>, <span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">'red'</span>),</span>
+<span id="cb10-27">       <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">pch =</span> <span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">16</span>)</span></code></pre></div></div>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="https://your-website-url.example.com/projects/optimizingExpectedReturns/index_files/figure-html/unnamed-chunk-4-1.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
+</div>
+</div>
+<p>Let’s look at several binned residual plots to assess whether our proposed model is reasonable.</p>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb11" style="background: #f1f3f5;"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb11-1">res <span class="ot" style="color: #003B4F;
+background-color: null;
+font-style: inherit;">&lt;-</span> <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">residuals</span>(fit, <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">type =</span> <span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"response"</span>)</span>
+<span id="cb11-2"><span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">binnedplot</span>(<span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">x =</span> <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">fitted</span>(fit),</span>
+<span id="cb11-3">           <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">y =</span> res, </span>
+<span id="cb11-4">           <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">nclass=</span><span class="cn" style="color: #8f5902;
+background-color: null;
+font-style: inherit;">NULL</span>, </span>
+<span id="cb11-5">           <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">xlab=</span><span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"Expected Values"</span>, </span>
+<span id="cb11-6">           <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">ylab=</span><span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"Average residual"</span>, </span>
+<span id="cb11-7">           <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">main=</span><span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"Binned residual plot"</span>)</span></code></pre></div></div>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="https://your-website-url.example.com/projects/optimizingExpectedReturns/index_files/figure-html/unnamed-chunk-5-1.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
+</div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb12" style="background: #f1f3f5;"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb12-1"><span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">binnedplot</span>(<span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">x =</span> x_df<span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">$</span>markup,</span>
+<span id="cb12-2">           <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">y =</span> res, </span>
+<span id="cb12-3">           <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">nclass=</span><span class="cn" style="color: #8f5902;
+background-color: null;
+font-style: inherit;">NULL</span>, </span>
+<span id="cb12-4">           <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">xlab=</span><span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"Binned markup"</span>, </span>
+<span id="cb12-5">           <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">ylab=</span><span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"Average residual"</span>, </span>
+<span id="cb12-6">           <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">main=</span><span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"Binned residual plot of markup"</span>)</span></code></pre></div></div>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="https://your-website-url.example.com/projects/optimizingExpectedReturns/index_files/figure-html/unnamed-chunk-5-2.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
+</div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb13" style="background: #f1f3f5;"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb13-1"><span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">binnedplot</span>(<span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">x =</span> x_df<span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">$</span>cost,</span>
+<span id="cb13-2">           <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">y =</span> res, </span>
+<span id="cb13-3">           <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">nclass=</span><span class="cn" style="color: #8f5902;
+background-color: null;
+font-style: inherit;">NULL</span>, </span>
+<span id="cb13-4">           <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">xlab=</span><span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"Binned cost"</span>, </span>
+<span id="cb13-5">           <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">ylab=</span><span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"Average residual"</span>, </span>
+<span id="cb13-6">           <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">main=</span><span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"Binned residual plot of cost"</span>)</span></code></pre></div></div>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="https://your-website-url.example.com/projects/optimizingExpectedReturns/index_files/figure-html/unnamed-chunk-5-3.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
+</div>
+</div>
+</section>
+</section>
+<section id="optimizing-the-expected-returns-expected-revenue" class="level1">
+<h1>Optimizing the Expected Returns (Expected Revenue)</h1>
+<section id="relationship-between-x_markup-and-pi_i" class="level2">
+<h2 class="anchored" data-anchor-id="relationship-between-x_markup-and-pi_i">Relationship between <img src="https://latex.codecogs.com/png.latex?x_%7Bmarkup%7D"> and <img src="https://latex.codecogs.com/png.latex?%5Cpi_i"></h2>
+<p>Now that we have decided on a logistic regression model, let’s explore the relationship between markup and the probability of selling the product. The relationship between markup and the log-odds might be linear, but when we invert the problem to get the relationship between markup and the probability it is certainly non-linear. To produce this non-linear relationship, we can invert the log-odds back to the probability scale through the following formula:</p>
+<p><img src="https://latex.codecogs.com/png.latex?%0A%5Cpi_i%20=%20(1%20+%20%5Cexp%5B-(%5Cbeta_0%20+%20x_%7Bmarkup%7D%20*%20%5Cbeta_%7Bmarkup%7D%20+%0Ax_%7Bcost%7D%20*%20%5Cbeta_%7Bcost%7D%20+%20x_%7Btype=shoes%7D%20*%20%5Cbeta_%7Btype=shoes%7D%20+%20x_%7Btype%20=%20clothes%7D*%5Cbeta_%7Btype%20=%20clothes%7D)%5D)%5E%7B-1%7D%0A"></p>
+<p>We are specifically interested in how markup relates to the probability of selling, but we have the other data variables in the formula. Before exploring how the probability of selling changes over a range of values for markup, it is pertinent to choose some representative values for cost and type. To start with, let’s set the cost level to be the observed average cost level and let type be the most common type in the data set to provide a curve.</p>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb14" style="background: #f1f3f5;"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb14-1"><span class="do" style="color: #5E5E5E;
+background-color: null;
+font-style: italic;">## there isn't a mode function in base R</span></span>
+<span id="cb14-2">getMode <span class="ot" style="color: #003B4F;
+background-color: null;
+font-style: inherit;">&lt;-</span> <span class="cf" style="color: #003B4F;
+background-color: null;
+font-weight: bold;
+font-style: inherit;">function</span>(x){</span>
+<span id="cb14-3">  lx <span class="ot" style="color: #003B4F;
+background-color: null;
+font-style: inherit;">&lt;-</span> <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">levels</span>(x)</span>
+<span id="cb14-4">  ux <span class="ot" style="color: #003B4F;
+background-color: null;
+font-style: inherit;">&lt;-</span> <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">unique</span>(lx)</span>
+<span id="cb14-5">  <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">factor</span>(ux[<span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">which.max</span>(<span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">tabulate</span>(<span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">match</span>(lx, ux)))], <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">levels =</span> lx)</span>
+<span id="cb14-6">}</span>
+<span id="cb14-7">range_markup <span class="ot" style="color: #003B4F;
+background-color: null;
+font-style: inherit;">&lt;-</span> <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">seq</span>(<span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">from =</span> <span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">0</span>, <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">to =</span> <span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">75</span>, <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">by =</span> <span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">1</span>)</span>
+<span id="cb14-8">mode_type <span class="ot" style="color: #003B4F;
+background-color: null;
+font-style: inherit;">&lt;-</span> <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">getMode</span>(x_df<span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">$</span>type)</span>
+<span id="cb14-9">mean_cost <span class="ot" style="color: #003B4F;
+background-color: null;
+font-style: inherit;">&lt;-</span> <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">mean</span>(x_df<span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">$</span>cost)</span>
+<span id="cb14-10">new_x_df <span class="ot" style="color: #003B4F;
+background-color: null;
+font-style: inherit;">&lt;-</span> <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">data.frame</span>(<span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"markup"</span> <span class="ot" style="color: #003B4F;
+background-color: null;
+font-style: inherit;">=</span> range_markup,</span>
+<span id="cb14-11">                       <span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"cost"</span> <span class="ot" style="color: #003B4F;
+background-color: null;
+font-style: inherit;">=</span> mean_cost,</span>
+<span id="cb14-12">                       <span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"type"</span> <span class="ot" style="color: #003B4F;
+background-color: null;
+font-style: inherit;">=</span> mode_type)</span>
+<span id="cb14-13"></span>
+<span id="cb14-14">preds <span class="ot" style="color: #003B4F;
+background-color: null;
+font-style: inherit;">&lt;-</span> <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">predict</span>(fit, <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">newdata =</span> new_x_df, <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">se.fit =</span> <span class="cn" style="color: #8f5902;
+background-color: null;
+font-style: inherit;">TRUE</span>)</span>
+<span id="cb14-15">preds_ci_upr <span class="ot" style="color: #003B4F;
+background-color: null;
+font-style: inherit;">&lt;-</span> preds<span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">$</span>fit <span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">+</span> <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">qnorm</span>(<span class="fl" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">0.975</span>)<span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">*</span>preds<span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">$</span>se.fit</span>
+<span id="cb14-16">preds_ci_lwr <span class="ot" style="color: #003B4F;
+background-color: null;
+font-style: inherit;">&lt;-</span> preds<span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">$</span>fit <span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">-</span> <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">qnorm</span>(<span class="fl" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">0.975</span>)<span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">*</span>preds<span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">$</span>se.fit</span>
+<span id="cb14-17">probs_df <span class="ot" style="color: #003B4F;
+background-color: null;
+font-style: inherit;">&lt;-</span> <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">data.frame</span>(<span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">pred_prob =</span> <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">inverse_logit</span>(preds<span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">$</span>fit),</span>
+<span id="cb14-18">                       <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">pred_prob_lwr =</span> <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">inverse_logit</span>(preds_ci_lwr),</span>
+<span id="cb14-19">                       <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">pred_prob_upr =</span> <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">inverse_logit</span>(preds_ci_upr),</span>
+<span id="cb14-20">                       <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">markup =</span> range_markup)</span>
+<span id="cb14-21"></span>
+<span id="cb14-22">true_probs <span class="ot" style="color: #003B4F;
+background-color: null;
+font-style: inherit;">&lt;-</span> <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">model.matrix</span>(<span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">~</span> markup <span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">+</span> cost <span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">+</span> type, <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">data =</span> new_x_df) <span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">%*%</span> true_beta</span>
+<span id="cb14-23">probs_df<span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">$</span>true_probs <span class="ot" style="color: #003B4F;
+background-color: null;
+font-style: inherit;">&lt;-</span> <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">inverse_logit</span>(true_probs)</span>
+<span id="cb14-24"></span>
+<span id="cb14-25"></span>
+<span id="cb14-26"><span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">ggplot</span>(probs_df) <span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">+</span> </span>
+<span id="cb14-27">  <span class="do" style="color: #5E5E5E;
+background-color: null;
+font-style: italic;">## probability curve predicted from logistic regression in black</span></span>
+<span id="cb14-28">  <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">geom_line</span>(<span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">aes</span>(<span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">x =</span> markup, <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">y =</span> pred_prob)) <span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">+</span> </span>
+<span id="cb14-29">  <span class="do" style="color: #5E5E5E;
+background-color: null;
+font-style: italic;">## 95% wald CI in red</span></span>
+<span id="cb14-30">  <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">geom_line</span>(<span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">aes</span>(<span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">x =</span> markup, <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">y =</span> pred_prob_upr), <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">col =</span> <span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"red"</span>) <span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">+</span> </span>
+<span id="cb14-31">  <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">geom_line</span>(<span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">aes</span>(<span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">x =</span> markup, <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">y =</span> pred_prob_lwr), <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">col =</span> <span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"red"</span>) <span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">+</span> </span>
+<span id="cb14-32">  <span class="do" style="color: #5E5E5E;
+background-color: null;
+font-style: italic;">## probability curve using true values will be in blue</span></span>
+<span id="cb14-33">  <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">geom_line</span>(<span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">aes</span>(<span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">x =</span> markup, <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">y =</span> true_probs), <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">col =</span> <span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"blue"</span>) <span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">+</span> </span>
+<span id="cb14-34">  <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">ggtitle</span>(<span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">paste0</span>(<span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"Probablity of Selling Product vs markup percentage"</span>),</span>
+<span id="cb14-35">          <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">subtitle =</span> <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">paste0</span>(<span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"type = "</span>, mode_type[<span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">1</span>], </span>
+<span id="cb14-36">                            <span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"  cost = "</span>, </span>
+<span id="cb14-37">                            <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">round</span>(mean_cost[<span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">1</span>], <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">digits =</span> <span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">2</span>)</span>
+<span id="cb14-38">                            )</span>
+<span id="cb14-39">  ) <span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">+</span> </span>
+<span id="cb14-40">  <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">labs</span>(<span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">x =</span> <span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"markup (%)"</span>, <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">y =</span> <span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"Probability of Selling Product"</span>)</span></code></pre></div></div>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="https://your-website-url.example.com/projects/optimizingExpectedReturns/index_files/figure-html/unnamed-chunk-6-1.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
+</div>
+</div>
+<p>As expected, due to how well our estimates of the parameters are, the estimated probability curve in black is mostly overlapped by expected probabilities calculated from the true parameters in blue. As we can see from the graph above, the probability of selling decreases as markup increases. This isn’t surprising given that the true parameter for markup is -0.02.</p>
+<p>Let’s plot the differences between the true and predicted probabilities to really show how small the difference in magnitude is. We can see that the probabilities only differ at most by 0.02. Depending on the application context, this can be a meaningful difference or not, but for this application let’s assume that an underestimation of 0.02 is a reasonably close estimate.</p>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb15" style="background: #f1f3f5;"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb15-1"><span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">plot</span>(<span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">x =</span> probs_df<span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">$</span>markup, </span>
+<span id="cb15-2">     <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">y =</span> probs_df<span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">$</span>true_probs <span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">-</span> probs_df<span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">$</span>pred_prob,</span>
+<span id="cb15-3">     <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">type =</span> <span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">'h'</span>,</span>
+<span id="cb15-4">     <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">ylab =</span> <span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"True Prob - Pred Prob"</span>,</span>
+<span id="cb15-5">     <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">xlab =</span> <span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"markup"</span>,</span>
+<span id="cb15-6">     <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">main =</span> <span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"Difference between True and Predicted Probabilities"</span>)</span></code></pre></div></div>
+<div class="cell-output-display">
+<div id="fig-diffprob" class="quarto-float quarto-figure quarto-figure-center anchored">
+<figure class="quarto-float quarto-float-fig figure">
+<div aria-describedby="fig-diffprob-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<img src="https://your-website-url.example.com/projects/optimizingExpectedReturns/index_files/figure-html/fig-diffprob-1.png" class="img-fluid figure-img" width="672">
+</div>
+<figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-diffprob-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Figure&nbsp;2: Differences between predicted probability and true probability
+</figcaption>
+</figure>
+</div>
+</div>
+</div>
+</section>
+<section id="calculating-the-optimal-markup" class="level2">
+<h2 class="anchored" data-anchor-id="calculating-the-optimal-markup">Calculating the Optimal markup</h2>
+<p>We can propose the following function to express a balance between optimizing cost markup while increasing the probability of successfully selling the product:</p>
+<p><img src="https://latex.codecogs.com/png.latex?f(x_%7Bmarkup%7D)%20=%20(1%20+%20%5Cfrac%7Bx_%7Bmarkup%7D%7D%7B100%7D)x_%7Bcost%7D%20%5Cpi_i"></p>
+<p>This function is derived from the idea of the expected total revenue generated by a new product. The new products total revenue is expressed as <img src="https://latex.codecogs.com/png.latex?(1%20+%20%5Cfrac%7Bx_%7Bmarkup%7D%7D%7B100%7D)*x_%7Bcost%7D"> and the expected value of a new observation <img src="https://latex.codecogs.com/png.latex?Y_i"> is <img src="https://latex.codecogs.com/png.latex?%5Cpi_i"> because <img src="https://latex.codecogs.com/png.latex?Y_i"> is a Bernoulli random variable (see appendix for small derivation). Thus, the expected total revenue generated from this product is the multiplication of these two quantities.</p>
+<p>The calculation of <img src="https://latex.codecogs.com/png.latex?%5Cpi_i"> depends on <img src="https://latex.codecogs.com/png.latex?x_%7Bmarkup%7D"> and <img src="https://latex.codecogs.com/png.latex?x_%7Bcost%7D">.</p>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb16" style="background: #f1f3f5;"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb16-1">expected_return <span class="ot" style="color: #003B4F;
+background-color: null;
+font-style: inherit;">&lt;-</span> <span class="cf" style="color: #003B4F;
+background-color: null;
+font-weight: bold;
+font-style: inherit;">function</span>(markup, cost, type, fit, <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">log =</span> <span class="cn" style="color: #8f5902;
+background-color: null;
+font-style: inherit;">FALSE</span>){</span>
+<span id="cb16-2">  new_data <span class="ot" style="color: #003B4F;
+background-color: null;
+font-style: inherit;">&lt;-</span> <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">data.frame</span>(<span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">markup =</span> markup,</span>
+<span id="cb16-3">                         <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">cost =</span> cost,</span>
+<span id="cb16-4">                         <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">type =</span> type)</span>
+<span id="cb16-5">  <span class="co" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;"># if(markup &lt; 0){</span></span>
+<span id="cb16-6">  <span class="co" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">#   return(-Inf)</span></span>
+<span id="cb16-7">  <span class="co" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;"># }</span></span>
+<span id="cb16-8">  </span>
+<span id="cb16-9">  <span class="cf" style="color: #003B4F;
+background-color: null;
+font-weight: bold;
+font-style: inherit;">if</span>(log){</span>
+<span id="cb16-10">   <span class="do" style="color: #5E5E5E;
+background-color: null;
+font-style: italic;">### doing optimization on the log scale is more stable, if markup &gt; 0</span></span>
+<span id="cb16-11">    <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">log</span>(<span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">1</span> <span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">+</span> markup<span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">/</span><span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">100</span>) <span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">+</span> <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">log</span>(cost) <span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">+</span> </span>
+<span id="cb16-12">      <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">log</span>(<span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">predict</span>(fit, <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">newdata =</span> new_data, <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">type =</span> <span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"response"</span>))</span>
+<span id="cb16-13">  }<span class="cf" style="color: #003B4F;
+background-color: null;
+font-weight: bold;
+font-style: inherit;">else</span>{</span>
+<span id="cb16-14">   (<span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">1</span> <span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">+</span> markup<span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">/</span><span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">100</span>)<span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">*</span>cost <span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">*</span> <span class="co" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">#total sale price</span></span>
+<span id="cb16-15">    <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">predict</span>(fit, <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">newdata =</span> new_data, <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">type =</span> <span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"response"</span>) <span class="co" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">#prob success </span></span>
+<span id="cb16-16">  }</span>
+<span id="cb16-17">}</span>
+<span id="cb16-18"></span>
+<span id="cb16-19">optimal_vals <span class="ot" style="color: #003B4F;
+background-color: null;
+font-style: inherit;">&lt;-</span> <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">optim</span>(<span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">par =</span> <span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">50</span>, </span>
+<span id="cb16-20">      <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">fn =</span> expected_return, </span>
+<span id="cb16-21">      <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">method =</span> <span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"BFGS"</span>,</span>
+<span id="cb16-22">      <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">control =</span> <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">list</span>(<span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">fnscale =</span> <span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">-</span><span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">1</span>), <span class="co" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;"># do maximization not minimization</span></span>
+<span id="cb16-23">      <span class="co" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;"># These params don't change</span></span>
+<span id="cb16-24">      <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">cost =</span> mean_cost[<span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">1</span>], <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">type =</span> mode_type[<span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">1</span>], <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">fit =</span> fit </span>
+<span id="cb16-25">      )</span>
+<span id="cb16-26"></span>
+<span id="cb16-27"><span class="cf" style="color: #003B4F;
+background-color: null;
+font-weight: bold;
+font-style: inherit;">if</span>(optimal_vals<span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">$</span>convergence <span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">!=</span> <span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">0</span>){</span>
+<span id="cb16-28">  <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">stop</span>(<span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"The numerical optimization did not converge"</span>)</span>
+<span id="cb16-29">}<span class="cf" style="color: #003B4F;
+background-color: null;
+font-weight: bold;
+font-style: inherit;">else</span>{</span>
+<span id="cb16-30">  new_data <span class="ot" style="color: #003B4F;
+background-color: null;
+font-style: inherit;">&lt;-</span> <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">data.frame</span>(<span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">markup =</span> optimal_vals<span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">$</span>par,</span>
+<span id="cb16-31">                         <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">cost =</span> mean_cost[<span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">1</span>],</span>
+<span id="cb16-32">                         <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">type =</span> mode_type[<span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">1</span>])</span>
+<span id="cb16-33">  optimal_prob_success <span class="ot" style="color: #003B4F;
+background-color: null;
+font-style: inherit;">&lt;-</span> <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">inverse_logit</span>(<span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">predict</span>(fit, new_data))</span>
+<span id="cb16-34">  optimal_df <span class="ot" style="color: #003B4F;
+background-color: null;
+font-style: inherit;">&lt;-</span> <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">data.frame</span>(<span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">optimal_markup =</span> optimal_vals<span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">$</span>par,</span>
+<span id="cb16-35">                           <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">expected_total_cost =</span> optimal_vals<span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">$</span>value,</span>
+<span id="cb16-36">                           <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">type =</span> mode_type[<span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">1</span>],</span>
+<span id="cb16-37">                           <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">cost =</span> mean_cost[<span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">1</span>],</span>
+<span id="cb16-38">                           <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">prob_success =</span> optimal_prob_success)</span>
+<span id="cb16-39">  <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">kable</span>(optimal_df, <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">digits =</span> <span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">3</span>, <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">align =</span> <span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">'c'</span>) <span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">%&gt;%</span></span>
+<span id="cb16-40">    <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">kable_styling</span>()</span>
+<span id="cb16-41">}</span></code></pre></div></div>
+<div class="cell-output-display">
+<table class="table caption-top table-sm table-striped small">
+<thead>
+<tr class="header">
+<th style="text-align: center;" data-quarto-table-cell-role="th">optimal_markup</th>
+<th style="text-align: center;" data-quarto-table-cell-role="th">expected_total_cost</th>
+<th style="text-align: center;" data-quarto-table-cell-role="th">type</th>
+<th style="text-align: center;" data-quarto-table-cell-role="th">cost</th>
+<th style="text-align: center;" data-quarto-table-cell-role="th">prob_success</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: center;">14.48</td>
+<td style="text-align: center;">2203.908</td>
+<td style="text-align: center;">accessories</td>
+<td style="text-align: center;">2011.027</td>
+<td style="text-align: center;">0.957</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+<p>From this analysis, we find that for an accessory product that costs of $2011.03 to produce, the optimal markup is about 14.48 percent. This results in a total revenue generated of $2203.91.</p>
+<p>Although our formula calculates an optimal markup of 14.48 percent, we need to keep in mind that the range of markup in the data set are values between 20 and 120 percent. Thus, a markup of 14.48 percent is outside the region covered by the data. I would suggest collecting more data in this range before widely adopting this decision rule.</p>
+<p>In this section we only looked at one specific combination of covariates. Of course, we may want to consider cases with combinations of product costs and product types. To explore these different scenarios more easily, I’ve created a Rshiny dashboard that’ll be linked below when it’s done.</p>
+</section>
+<section id="hypothetical-impact-of-optimal-markup-strategy" class="level2">
+<h2 class="anchored" data-anchor-id="hypothetical-impact-of-optimal-markup-strategy">Hypothetical Impact of Optimal Markup strategy</h2>
+<p>Let’s assess the business impact of this optimal markup strategy is in terms of two important outcomes:</p>
+<ol type="1">
+<li><p>The change in successful sales compared to the observed sales data</p></li>
+<li><p>The change in revenue generated compared to the observed revenue</p></li>
+</ol>
+<p>For each point in our data set, we will substitute the observed optimal markup strategy with the optimal markup and check the change in sales and revenue.</p>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb17" style="background: #f1f3f5;"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb17-1">calc_optimal_markup <span class="ot" style="color: #003B4F;
+background-color: null;
+font-style: inherit;">&lt;-</span> <span class="cf" style="color: #003B4F;
+background-color: null;
+font-weight: bold;
+font-style: inherit;">function</span>(cost, type, fit){</span>
+<span id="cb17-2">  <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">optim</span>(<span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">par =</span> <span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">50</span>, </span>
+<span id="cb17-3">      <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">fn =</span> expected_return, </span>
+<span id="cb17-4">      <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">method =</span> <span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"BFGS"</span>,</span>
+<span id="cb17-5">      <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">control =</span> <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">list</span>(<span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">fnscale =</span> <span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">-</span><span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">1</span>), <span class="co" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;"># do maximization not minimization</span></span>
+<span id="cb17-6">      <span class="co" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;"># These params don't change</span></span>
+<span id="cb17-7">      <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">cost =</span> cost, <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">type =</span> type, <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">fit =</span> fit </span>
+<span id="cb17-8">      )  </span>
+<span id="cb17-9">}</span>
+<span id="cb17-10"></span>
+<span id="cb17-11">optimal_markups <span class="ot" style="color: #003B4F;
+background-color: null;
+font-style: inherit;">&lt;-</span> <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">mapply</span>(calc_optimal_markup, </span>
+<span id="cb17-12">                          <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">cost =</span> x_df<span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">$</span>cost, </span>
+<span id="cb17-13">                          <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">type =</span> x_df<span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">$</span>type, </span>
+<span id="cb17-14">                          <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">MoreArgs =</span> <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">list</span>(<span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">fit =</span> fit))</span>
+<span id="cb17-15">optimal_x_df <span class="ot" style="color: #003B4F;
+background-color: null;
+font-style: inherit;">&lt;-</span> x_df</span>
+<span id="cb17-16">optimal_x_df<span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">$</span>markup <span class="ot" style="color: #003B4F;
+background-color: null;
+font-style: inherit;">&lt;-</span> <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">unlist</span>(optimal_markups[<span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">1</span>,])</span>
+<span id="cb17-17"></span>
+<span id="cb17-18"><span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">hist</span>(optimal_x_df<span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">$</span>markup)</span></code></pre></div></div>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="https://your-website-url.example.com/projects/optimizingExpectedReturns/index_files/figure-html/unnamed-chunk-8-1.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
+</div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb18" style="background: #f1f3f5;"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb18-1">hypothetical_probs <span class="ot" style="color: #003B4F;
+background-color: null;
+font-style: inherit;">&lt;-</span> <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">predict</span>(fit, </span>
+<span id="cb18-2">                              <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">newdata =</span> optimal_x_df, </span>
+<span id="cb18-3">                              <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">type =</span> <span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">'response'</span>)</span>
+<span id="cb18-4">est_probs <span class="ot" style="color: #003B4F;
+background-color: null;
+font-style: inherit;">&lt;-</span> <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">predict</span>(fit, <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">newdata =</span> x_df, <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">type =</span> <span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">'response'</span>)</span>
+<span id="cb18-5"></span>
+<span id="cb18-6"><span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">set.seed</span>(<span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">2013</span>)</span>
+<span id="cb18-7">expected_results <span class="ot" style="color: #003B4F;
+background-color: null;
+font-style: inherit;">&lt;-</span> <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">replicate</span>(<span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">5000</span>,</span>
+<span id="cb18-8">          <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">expr =</span> {</span>
+<span id="cb18-9">            hypothetical_success <span class="ot" style="color: #003B4F;
+background-color: null;
+font-style: inherit;">&lt;-</span> <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">rbinom</span>(sample_size, <span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">1</span>, hypothetical_probs)</span>
+<span id="cb18-10">            <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">c</span>(<span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">change_sales =</span> <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">sum</span>(hypothetical_success) <span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">-</span> <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">sum</span>(x_df<span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">$</span>sold),</span>
+<span id="cb18-11">              <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">change_rev =</span> <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">sum</span>(hypothetical_success <span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">*</span> (<span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">1</span> <span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">+</span> optimal_x_df<span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">$</span>markup<span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">/</span><span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">100</span>)<span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">*</span>x_df<span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">$</span>cost) <span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">-</span> </span>
+<span id="cb18-12">                           <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">sum</span>(x_df<span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">$</span>sold <span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">*</span> (<span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">1</span> <span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">+</span> x_df<span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">$</span>markup<span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">/</span><span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">100</span>)<span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">*</span>x_df<span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">$</span>cost)</span>
+<span id="cb18-13">            )</span>
+<span id="cb18-14">          })</span>
+<span id="cb18-15">obs_revenue <span class="ot" style="color: #003B4F;
+background-color: null;
+font-style: inherit;">&lt;-</span> <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">sum</span>(x_df<span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">$</span>sold <span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">*</span> (<span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">1</span> <span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">+</span> x_df<span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">$</span>markup<span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">/</span><span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">100</span>)<span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">*</span>x_df<span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">$</span>cost)</span>
+<span id="cb18-16"></span>
+<span id="cb18-17">optimal_results <span class="ot" style="color: #003B4F;
+background-color: null;
+font-style: inherit;">&lt;-</span> <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">data.frame</span>(<span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">ave_change_sales =</span> <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">mean</span>(expected_results[<span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">1</span>,]),</span>
+<span id="cb18-18">                              <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">ave_change_revenue =</span> <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">mean</span>(expected_results[<span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">2</span>,]),</span>
+<span id="cb18-19">                              <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">ave_percent_change_sales =</span> <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">mean</span>(expected_results[<span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">1</span>,])<span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">/</span><span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">sum</span>(x_df<span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">$</span>sold),</span>
+<span id="cb18-20">                              <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">ave_percent_change_revenue =</span> <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">mean</span>(expected_results[<span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">2</span>,]) <span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">/</span> obs_revenue)</span>
+<span id="cb18-21">optimal_results</span></code></pre></div></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>  ave_change_sales ave_change_revenue ave_percent_change_sales
+1         2433.894            5664458                 5.506547
+  ave_percent_change_revenue
+1                     4.6332</code></pre>
+</div>
+</div>
+</section>
+</section>
+<section id="discussion" class="level1">
+<h1>Discussion</h1>
+<p>Easy to extend to</p>
+</section>
+<section id="appendix-deriving-expected-revenue-formula" class="level1">
+<h1>Appendix: Deriving expected revenue formula</h1>
+<p>First, we calculate that <img src="https://latex.codecogs.com/png.latex?(1%20+%20%5Cfrac%7Bx_%7Bmarkup%7D%7D%7B100%7D)x_%7Bcost%7D"> would be the sales price of the item (ignoring any taxes).</p>
+<p>Next let’s derive a simple random variable <img src="https://latex.codecogs.com/png.latex?Z_i"> to represent the revenue generated from each sale. Consider the random variable <img src="https://latex.codecogs.com/png.latex?Z_i"> which is a transformation of our previous outcome variable <img src="https://latex.codecogs.com/png.latex?Y_i">:</p>
+<p><img src="https://latex.codecogs.com/png.latex?Z_i%20=%20(1%20+%20%5Cfrac%7Bx_%7Bmarkup%7D%7D%7B100%7D)x_%7Bcost%7D%20Y_i"></p>
+<p>A straightforward application of deriving shows that</p>
+<p><img src="https://latex.codecogs.com/png.latex?%5Cmathbb%20E(Z_i)%20=%20(1%20+%20%5Cfrac%7Bx_%7Bmarkup%7D%7D%7B100%7D)x_%7Bcost%7D%20%5Cmathbb%20E(Y_i)%20=%20%20(1%20+%20%5Cfrac%7Bx_%7Bmarkup%7D%7D%7B100%7D)x_%7Bcost%7D%20%5Cpi_i"></p>
+<p>We have a (maximum-likelihood) estimate of <img src="https://latex.codecogs.com/png.latex?%5Cpi_i"> that we will denote as <img src="https://latex.codecogs.com/png.latex?%5Chat%20%5Cpi_i">. Thus our (maximum-likelihood) estimate of <img src="https://latex.codecogs.com/png.latex?E(Z_i)"> is</p>
+<p><img src="https://latex.codecogs.com/png.latex?%5Cwidehat%7B%5Cmathbb%20E(Z_i)%7D%20=%20(1%20+%20%5Cfrac%7Bx_%7Bmarkup%7D%7D%7B100%7D)x_%7Bcost%7D%20%5Chat%20%5Cpi_i">.</p>
+<p>For the more statistically rigorous, the expectations here are conditional on the covariates in the logistic regression model and <img src="https://latex.codecogs.com/png.latex?%5Cwidehat%7B%5Cmathbb%20E(Z_i)%7D"> is a maximum-likelihood estimator of <img src="https://latex.codecogs.com/png.latex?%5Cmathbb%20E(Z_i)">.</p>
+</section>
+<section id="session-info-and-bibliography" class="level1">
+<h1>Session Info and Bibliography</h1>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb20" style="background: #f1f3f5;"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb20-1"><span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">sessionInfo</span>()</span></code></pre></div></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>R version 4.5.2 (2025-10-31 ucrt)
+Platform: x86_64-w64-mingw32/x64
+Running under: Windows 11 x64 (build 26100)
+
+Matrix products: default
+  LAPACK version 3.12.1
+
+locale:
+[1] LC_COLLATE=English_United States.utf8 
+[2] LC_CTYPE=en_US.UTF-8                  
+[3] LC_MONETARY=English_United States.utf8
+[4] LC_NUMERIC=C                          
+[5] LC_TIME=English_United States.utf8    
+
+time zone: Pacific/Honolulu
+tzcode source: internal
+
+attached base packages:
+[1] stats     graphics  grDevices utils     datasets  methods   base     
+
+other attached packages:
+[1] ggplot2_4.0.1    dplyr_1.1.4      gtsummary_2.5.0  arm_1.14-4      
+[5] lme4_1.1-38      Matrix_1.7-4     MASS_7.3-65      kableExtra_1.4.0
+[9] knitr_1.51      
+
+loaded via a namespace (and not attached):
+ [1] gt_1.2.0           sass_0.4.10        tidyr_1.3.2        generics_0.1.4    
+ [5] xml2_1.5.1         stringi_1.8.7      lattice_0.22-7     digest_0.6.39     
+ [9] magrittr_2.0.4     evaluate_1.0.5     grid_4.5.2         RColorBrewer_1.1-3
+[13] cards_0.7.1        fastmap_1.2.0      jsonlite_2.0.0     purrr_1.2.0       
+[17] viridisLite_0.4.2  scales_1.4.0       textshaping_1.0.4  abind_1.4-8       
+[21] reformulas_0.4.3   Rdpack_2.6.4       cli_3.6.5          rlang_1.1.6       
+[25] rbibutils_2.4      litedown_0.9       commonmark_2.0.0   splines_4.5.2     
+[29] base64enc_0.1-3    withr_3.0.2        yaml_2.3.12        otel_0.2.0        
+[33] tools_4.5.2        nloptr_2.2.1       coda_0.19-4.1      minqa_1.2.8       
+[37] boot_1.3-32        vctrs_0.6.5        R6_2.6.1           lifecycle_1.0.4   
+[41] stringr_1.6.0      fs_1.6.6           htmlwidgets_1.6.4  pkgconfig_2.0.3   
+[45] gtable_0.3.6       pillar_1.11.1      glue_1.8.0         Rcpp_1.1.0        
+[49] systemfonts_1.3.1  xfun_0.55          tibble_3.3.0       tidyselect_1.2.1  
+[53] rstudioapi_0.17.1  farver_2.1.2       htmltools_0.5.9    nlme_3.1-168      
+[57] labeling_0.4.3     rmarkdown_2.30     svglite_2.2.2      compiler_4.5.2    
+[61] S7_0.2.1           markdown_2.0      </code></pre>
+</div>
+</div>
+
+
+</section>
+
+
+<div id="quarto-appendix" class="default"><section id="footnotes" class="footnotes footnotes-end-of-document"><h2 class="anchored quarto-appendix-heading">Footnotes</h2>
+
+<ol>
+<li id="fn1"><p>There is an extension of logistic regression to group level data where the outcome is the number of successes observed and is modeled as a binomial random variable.↩︎</p></li>
+</ol>
+</section></div> ]]></description>
+  <category>Machine Learning</category>
+  <category>Logistic Regression</category>
+  <category>Optimization</category>
+  <guid>https://your-website-url.example.com/projects/optimizingExpectedReturns/</guid>
+  <pubDate>Fri, 07 Nov 2025 10:00:00 GMT</pubDate>
+</item>
+</channel>
+</rss>

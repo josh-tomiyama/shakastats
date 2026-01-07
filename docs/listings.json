@@ -1,0 +1,15 @@
+[
+  {
+    "listing": "/projects/project_listing.html",
+    "items": [
+      "/projects/optimizingExpectedReturns/index.html"
+    ]
+  },
+  {
+    "listing": "/blog/blog_listing.html",
+    "items": [
+      "/blog/posts/post-with-code/index.html",
+      "/blog/posts/welcome/index.html"
+    ]
+  }
+]

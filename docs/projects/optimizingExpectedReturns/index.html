@@ -1,0 +1,2726 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
+
+<meta charset="utf-8">
+<meta name="generator" content="quarto-1.8.26">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+
+<meta name="author" content="Josh Tomiyama">
+<meta name="dcterms.date" content="2025-11-07">
+
+<title>Logistic Regression Analysis Example: Optimizing Expected Returns – ShakaStats</title>
+<style>
+code{white-space: pre-wrap;}
+span.smallcaps{font-variant: small-caps;}
+div.columns{display: flex; gap: min(4vw, 1.5em);}
+div.column{flex: auto; overflow-x: auto;}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+ul.task-list{list-style: none;}
+ul.task-list li input[type="checkbox"] {
+  width: 0.8em;
+  margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
+  vertical-align: middle;
+}
+/* CSS for syntax highlighting */
+html { -webkit-text-size-adjust: 100%; }
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+  }
+pre.numberSource { margin-left: 3em;  padding-left: 4px; }
+div.sourceCode
+  {   }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
+</style>
+
+
+<script src="../../site_libs/quarto-nav/quarto-nav.js"></script>
+<script src="../../site_libs/quarto-nav/headroom.min.js"></script>
+<script src="../../site_libs/clipboard/clipboard.min.js"></script>
+<script src="../../site_libs/quarto-search/autocomplete.umd.js"></script>
+<script src="../../site_libs/quarto-search/fuse.min.js"></script>
+<script src="../../site_libs/quarto-search/quarto-search.js"></script>
+<meta name="quarto:offset" content="../../">
+<script src="../../site_libs/cookie-consent/cookie-consent.js"></script>
+<link href="../../site_libs/cookie-consent/cookie-consent.css" rel="stylesheet">
+<script src="../../site_libs/quarto-html/quarto.js" type="module"></script>
+<script src="../../site_libs/quarto-html/tabsets/tabsets.js" type="module"></script>
+<script src="../../site_libs/quarto-html/axe/axe-check.js" type="module"></script>
+<script src="../../site_libs/quarto-html/popper.min.js"></script>
+<script src="../../site_libs/quarto-html/tippy.umd.min.js"></script>
+<script src="../../site_libs/quarto-html/anchor.min.js"></script>
+<link href="../../site_libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="../../site_libs/quarto-html/quarto-syntax-highlighting-587c61ba64f3a5504c4d52d930310e48.css" rel="stylesheet" class="quarto-color-scheme" id="quarto-text-highlighting-styles">
+<link href="../../site_libs/quarto-html/quarto-syntax-highlighting-dark-b758ccaa5987ceb1b75504551e579abf.css" rel="stylesheet" class="quarto-color-scheme quarto-color-alternate" id="quarto-text-highlighting-styles">
+<script src="../../site_libs/bootstrap/bootstrap.min.js"></script>
+<link href="../../site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
+<link href="../../site_libs/bootstrap/bootstrap-ffa9a6279353761231ec249df0a7fdd3.min.css" rel="stylesheet" append-hash="true" class="quarto-color-scheme" id="quarto-bootstrap" data-mode="light">
+<link href="../../site_libs/bootstrap/bootstrap-dark-24772959a0e306aba8d7698078628ce7.min.css" rel="stylesheet" append-hash="true" class="quarto-color-scheme quarto-color-alternate" id="quarto-bootstrap" data-mode="dark">
+<script id="quarto-search-options" type="application/json">{
+  "location": "navbar",
+  "copy-button": false,
+  "collapse-after": 3,
+  "panel-placement": "end",
+  "type": "overlay",
+  "limit": 50,
+  "keyboard-shortcut": [
+    "f",
+    "/",
+    "s"
+  ],
+  "language": {
+    "search-no-results-text": "No results",
+    "search-matching-documents-text": "matching documents",
+    "search-copy-link-title": "Copy link to search",
+    "search-hide-matches-text": "Hide additional matches",
+    "search-more-match-text": "more match in this document",
+    "search-more-matches-text": "more matches in this document",
+    "search-clear-button-title": "Clear",
+    "search-text-placeholder": "",
+    "search-detached-cancel-button-title": "Cancel",
+    "search-submit-button-title": "Submit",
+    "search-label": "Search"
+  }
+}</script>
+
+<script type="text/javascript" charset="UTF-8">
+document.addEventListener('DOMContentLoaded', function () {
+cookieconsent.run({
+  "notice_banner_type":"headline",
+  "consent_type":"express",
+  "palette":"dark",
+  "language":"en",
+  "page_load_consent_levels":["strictly-necessary"],
+  "notice_banner_reject_button_hide":false,
+  "preferences_center_close_button_hide":false,
+  "website_name":""
+  ,
+"language":"en"
+  });
+});
+</script> 
+  
+<script src="../../site_libs/kePrint-0.0.1/kePrint.js"></script>
+
+<link href="../../site_libs/lightable-0.0.1/lightable.css" rel="stylesheet">
+
+
+  <script src="https://cdnjs.cloudflare.com/polyfill/v3/polyfill.min.js?features=es6"></script>
+  <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml-full.js" type="text/javascript"></script>
+
+<script type="text/javascript">
+const typesetMath = (el) => {
+  if (window.MathJax) {
+    // MathJax Typeset
+    window.MathJax.typeset([el]);
+  } else if (window.katex) {
+    // KaTeX Render
+    var mathElements = el.getElementsByClassName("math");
+    var macros = [];
+    for (var i = 0; i < mathElements.length; i++) {
+      var texText = mathElements[i].firstChild;
+      if (mathElements[i].tagName == "SPAN" && texText && texText.data) {
+        window.katex.render(texText.data, mathElements[i], {
+          displayMode: mathElements[i].classList.contains('display'),
+          throwOnError: false,
+          macros: macros,
+          fleqn: false
+        });
+      }
+    }
+  }
+}
+window.Quarto = {
+  typesetMath
+};
+</script>
+
+<link rel="stylesheet" href="../../styles.css">
+</head>
+
+<body class="floating nav-fixed quarto-dark"><script id="quarto-html-before-body" type="application/javascript">
+    const toggleBodyColorMode = (bsSheetEl) => {
+      const mode = bsSheetEl.getAttribute("data-mode");
+      const bodyEl = window.document.querySelector("body");
+      if (mode === "dark") {
+        bodyEl.classList.add("quarto-dark");
+        bodyEl.classList.remove("quarto-light");
+      } else {
+        bodyEl.classList.add("quarto-light");
+        bodyEl.classList.remove("quarto-dark");
+      }
+    }
+    const toggleBodyColorPrimary = () => {
+      const bsSheetEl = window.document.querySelector("link#quarto-bootstrap:not([rel=disabled-stylesheet])");
+      if (bsSheetEl) {
+        toggleBodyColorMode(bsSheetEl);
+      }
+    }
+    const setColorSchemeToggle = (alternate) => {
+      const toggles = window.document.querySelectorAll('.quarto-color-scheme-toggle');
+      for (let i=0; i < toggles.length; i++) {
+        const toggle = toggles[i];
+        if (toggle) {
+          if (alternate) {
+            toggle.classList.add("alternate");
+          } else {
+            toggle.classList.remove("alternate");
+          }
+        }
+      }
+    };
+    const toggleColorMode = (alternate) => {
+      // Switch the stylesheets
+      const primaryStylesheets = window.document.querySelectorAll('link.quarto-color-scheme:not(.quarto-color-alternate)');
+      const alternateStylesheets = window.document.querySelectorAll('link.quarto-color-scheme.quarto-color-alternate');
+      manageTransitions('#quarto-margin-sidebar .nav-link', false);
+      if (alternate) {
+        // note: dark is layered on light, we don't disable primary!
+        enableStylesheet(alternateStylesheets);
+        for (const sheetNode of alternateStylesheets) {
+          if (sheetNode.id === "quarto-bootstrap") {
+            toggleBodyColorMode(sheetNode);
+          }
+        }
+      } else {
+        disableStylesheet(alternateStylesheets);
+        enableStylesheet(primaryStylesheets)
+        toggleBodyColorPrimary();
+      }
+      manageTransitions('#quarto-margin-sidebar .nav-link', true);
+      // Switch the toggles
+      setColorSchemeToggle(alternate)
+      // Hack to workaround the fact that safari doesn't
+      // properly recolor the scrollbar when toggling (#1455)
+      if (navigator.userAgent.indexOf('Safari') > 0 && navigator.userAgent.indexOf('Chrome') == -1) {
+        manageTransitions("body", false);
+        window.scrollTo(0, 1);
+        setTimeout(() => {
+          window.scrollTo(0, 0);
+          manageTransitions("body", true);
+        }, 40);
+      }
+    }
+    const disableStylesheet = (stylesheets) => {
+      for (let i=0; i < stylesheets.length; i++) {
+        const stylesheet = stylesheets[i];
+        stylesheet.rel = 'disabled-stylesheet';
+      }
+    }
+    const enableStylesheet = (stylesheets) => {
+      for (let i=0; i < stylesheets.length; i++) {
+        const stylesheet = stylesheets[i];
+        if(stylesheet.rel !== 'stylesheet') { // for Chrome, which will still FOUC without this check
+          stylesheet.rel = 'stylesheet';
+        }
+      }
+    }
+    const manageTransitions = (selector, allowTransitions) => {
+      const els = window.document.querySelectorAll(selector);
+      for (let i=0; i < els.length; i++) {
+        const el = els[i];
+        if (allowTransitions) {
+          el.classList.remove('notransition');
+        } else {
+          el.classList.add('notransition');
+        }
+      }
+    }
+    const isFileUrl = () => {
+      return window.location.protocol === 'file:';
+    }
+    const hasAlternateSentinel = () => {
+      let styleSentinel = getColorSchemeSentinel();
+      if (styleSentinel !== null) {
+        return styleSentinel === "alternate";
+      } else {
+        return false;
+      }
+    }
+    const setStyleSentinel = (alternate) => {
+      const value = alternate ? "alternate" : "default";
+      if (!isFileUrl()) {
+        window.localStorage.setItem("quarto-color-scheme", value);
+      } else {
+        localAlternateSentinel = value;
+      }
+    }
+    const getColorSchemeSentinel = () => {
+      if (!isFileUrl()) {
+        const storageValue = window.localStorage.getItem("quarto-color-scheme");
+        return storageValue != null ? storageValue : localAlternateSentinel;
+      } else {
+        return localAlternateSentinel;
+      }
+    }
+    const toggleGiscusIfUsed = (isAlternate, darkModeDefault) => {
+      const baseTheme = document.querySelector('#giscus-base-theme')?.value ?? 'light';
+      const alternateTheme = document.querySelector('#giscus-alt-theme')?.value ?? 'dark';
+      let newTheme = '';
+      if(authorPrefersDark) {
+        newTheme = isAlternate ? baseTheme : alternateTheme;
+      } else {
+        newTheme = isAlternate ? alternateTheme : baseTheme;
+      }
+      const changeGiscusTheme = () => {
+        // From: https://github.com/giscus/giscus/issues/336
+        const sendMessage = (message) => {
+          const iframe = document.querySelector('iframe.giscus-frame');
+          if (!iframe) return;
+          iframe.contentWindow.postMessage({ giscus: message }, 'https://giscus.app');
+        }
+        sendMessage({
+          setConfig: {
+            theme: newTheme
+          }
+        });
+      }
+      const isGiscussLoaded = window.document.querySelector('iframe.giscus-frame') !== null;
+      if (isGiscussLoaded) {
+        changeGiscusTheme();
+      }
+    };
+    const authorPrefersDark = true;
+    const queryPrefersDark = window.matchMedia('(prefers-color-scheme: dark)');
+    const darkModeDefault = queryPrefersDark.matches;
+    let localAlternateSentinel = darkModeDefault ? 'alternate' : 'default';
+    // Dark / light mode switch
+    window.quartoToggleColorScheme = () => {
+      // Read the current dark / light value
+      let toAlternate = !hasAlternateSentinel();
+      toggleColorMode(toAlternate);
+      setStyleSentinel(toAlternate);
+      toggleGiscusIfUsed(toAlternate, darkModeDefault);
+      window.dispatchEvent(new Event('resize'));
+    };
+    queryPrefersDark.addEventListener("change", e => {
+      if(window.localStorage.getItem("quarto-color-scheme") !== null)
+        return;
+      const alternate = e.matches
+      toggleColorMode(alternate);
+      localAlternateSentinel = e.matches ? 'alternate' : 'default'; // this is used alongside local storage!
+      toggleGiscusIfUsed(alternate, darkModeDefault);
+    });
+    // Switch to dark mode if need be
+    if (hasAlternateSentinel()) {
+      toggleColorMode(true);
+    } else {
+      toggleColorMode(false);
+    }
+  </script>
+
+<div id="quarto-search-results"></div>
+  <header id="quarto-header" class="headroom fixed-top">
+    <nav class="navbar navbar-expand-lg " data-bs-theme="dark">
+      <div class="navbar-container container-fluid">
+      <div class="navbar-brand-container mx-auto">
+    <a class="navbar-brand" href="../../index.html">
+    <span class="navbar-title">ShakaStats</span>
+    </a>
+  </div>
+            <div id="quarto-search" class="" title="Search"></div>
+          <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarCollapse" aria-controls="navbarCollapse" role="menu" aria-expanded="false" aria-label="Toggle navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
+  <span class="navbar-toggler-icon"></span>
+</button>
+          <div class="collapse navbar-collapse" id="navbarCollapse">
+            <ul class="navbar-nav navbar-nav-scroll ms-auto">
+  <li class="nav-item">
+    <a class="nav-link" href="../../about/about.html"> 
+<span class="menu-text">About</span></a>
+  </li>  
+  <li class="nav-item">
+    <a class="nav-link" href="../../projects/project_listing.html"> 
+<span class="menu-text">Projects</span></a>
+  </li>  
+  <li class="nav-item">
+    <a class="nav-link" href="../../blog/blog_listing.html"> 
+<span class="menu-text">Blog</span></a>
+  </li>  
+  <li class="nav-item compact">
+    <a class="nav-link" href="https://github.com/josh-tomiyama/"> <i class="bi bi-github" role="img">
+</i> 
+<span class="menu-text"></span></a>
+  </li>  
+</ul>
+          </div> <!-- /navcollapse -->
+            <div class="quarto-navbar-tools">
+  <a href="" class="quarto-color-scheme-toggle quarto-navigation-tool  px-1" onclick="window.quartoToggleColorScheme(); return false;" title="Toggle dark mode"><i class="bi"></i></a>
+</div>
+      </div> <!-- /container-fluid -->
+    </nav>
+</header>
+<!-- content -->
+<div id="quarto-content" class="quarto-container page-columns page-rows-contents page-layout-article page-navbar">
+<!-- sidebar -->
+  <nav id="quarto-sidebar" class="sidebar collapse collapse-horizontal quarto-sidebar-collapse-item sidebar-navigation floating overflow-auto">
+    <nav id="TOC" role="doc-toc" class="toc-active">
+    <h2 id="toc-title">On this page</h2>
+   
+  <ul class="collapse">
+  <li><a href="#introduction" id="toc-introduction" class="nav-link active" data-scroll-target="#introduction">Introduction</a></li>
+  <li><a href="#logistic-regression" id="toc-logistic-regression" class="nav-link" data-scroll-target="#logistic-regression">Logistic Regression</a>
+  <ul class="collapse">
+  <li><a href="#logistic-regression-compared-to-other-machine-learning-models" id="toc-logistic-regression-compared-to-other-machine-learning-models" class="nav-link" data-scroll-target="#logistic-regression-compared-to-other-machine-learning-models">Logistic regression compared to other machine learning models</a></li>
+  </ul></li>
+  <li><a href="#a-novel-application-problem" id="toc-a-novel-application-problem" class="nav-link" data-scroll-target="#a-novel-application-problem">A Novel Application Problem</a></li>
+  <li><a href="#simulating-toy-data" id="toc-simulating-toy-data" class="nav-link" data-scroll-target="#simulating-toy-data">Simulating toy data</a></li>
+  <li><a href="#example-logistic-regression-analysis" id="toc-example-logistic-regression-analysis" class="nav-link" data-scroll-target="#example-logistic-regression-analysis">Example Logistic Regression Analysis</a>
+  <ul class="collapse">
+  <li><a href="#quick-exploratory-analysis-of-the-data-set" id="toc-quick-exploratory-analysis-of-the-data-set" class="nav-link" data-scroll-target="#quick-exploratory-analysis-of-the-data-set">Quick Exploratory analysis of the Data Set</a></li>
+  <li><a href="#building-a-logistic-regression-model" id="toc-building-a-logistic-regression-model" class="nav-link" data-scroll-target="#building-a-logistic-regression-model">Building a logistic regression model</a></li>
+  <li><a href="#assessing-model-assumptions" id="toc-assessing-model-assumptions" class="nav-link" data-scroll-target="#assessing-model-assumptions">Assessing Model Assumptions</a></li>
+  </ul></li>
+  <li><a href="#optimizing-the-expected-returns-expected-revenue" id="toc-optimizing-the-expected-returns-expected-revenue" class="nav-link" data-scroll-target="#optimizing-the-expected-returns-expected-revenue">Optimizing the Expected Returns (Expected Revenue)</a>
+  <ul class="collapse">
+  <li><a href="#relationship-between-x_markup-and-pi_i" id="toc-relationship-between-x_markup-and-pi_i" class="nav-link" data-scroll-target="#relationship-between-x_markup-and-pi_i">Relationship between <span class="math inline">\(x_{markup}\)</span> and <span class="math inline">\(\pi_i\)</span></a></li>
+  <li><a href="#calculating-the-optimal-markup" id="toc-calculating-the-optimal-markup" class="nav-link" data-scroll-target="#calculating-the-optimal-markup">Calculating the Optimal markup</a></li>
+  <li><a href="#hypothetical-impact-of-optimal-markup-strategy" id="toc-hypothetical-impact-of-optimal-markup-strategy" class="nav-link" data-scroll-target="#hypothetical-impact-of-optimal-markup-strategy">Hypothetical Impact of Optimal Markup strategy</a></li>
+  </ul></li>
+  <li><a href="#discussion" id="toc-discussion" class="nav-link" data-scroll-target="#discussion">Discussion</a></li>
+  <li><a href="#appendix-deriving-expected-revenue-formula" id="toc-appendix-deriving-expected-revenue-formula" class="nav-link" data-scroll-target="#appendix-deriving-expected-revenue-formula">Appendix: Deriving expected revenue formula</a></li>
+  <li><a href="#session-info-and-bibliography" id="toc-session-info-and-bibliography" class="nav-link" data-scroll-target="#session-info-and-bibliography">Session Info and Bibliography</a></li>
+  </ul>
+</nav>
+</nav>
+<div id="quarto-sidebar-glass" class="quarto-sidebar-collapse-item" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item"></div>
+<!-- margin-sidebar -->
+    <div id="quarto-margin-sidebar" class="sidebar margin-sidebar zindex-bottom">
+    </div>
+<!-- main -->
+<main class="content" id="quarto-document-content">
+
+
+<header id="title-block-header" class="quarto-title-block default">
+<div class="quarto-title">
+<h1 class="title">Logistic Regression Analysis Example: Optimizing Expected Returns</h1>
+  <div class="quarto-categories">
+    <div class="quarto-category">Machine Learning</div>
+    <div class="quarto-category">Logistic Regression</div>
+    <div class="quarto-category">Optimization</div>
+  </div>
+  </div>
+
+
+
+<div class="quarto-title-meta">
+
+    <div>
+    <div class="quarto-title-meta-heading">Author</div>
+    <div class="quarto-title-meta-contents">
+             <p>Josh Tomiyama </p>
+          </div>
+  </div>
+    
+    <div>
+    <div class="quarto-title-meta-heading">Published</div>
+    <div class="quarto-title-meta-contents">
+      <p class="date">November 7, 2025</p>
+    </div>
+  </div>
+  
+    
+  </div>
+  
+
+
+</header>
+
+
+<p>Last Update: January 07, 2026</p>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb1"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(knitr)</span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(kableExtra)</span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(arm)</span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(gtsummary)</span>
+<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(dplyr)</span>
+<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(ggplot2)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</div>
+<section id="introduction" class="level1">
+<h1>Introduction</h1>
+<p>This will be the one of the first in a series of example analyses I plan to post online to showcase my statistical technical knowledge as well as document some interesting problems I have come across in my experience. I specifically want to focus on what and why I do things over the course of an analysis rather than the how I do the analysis. As such, I will assume some familiarity with the statistical tools and code presented here and generally keep theoretical discussion at a higher level.</p>
+<p>The article is organized into the following parts:</p>
+<ol type="1">
+<li><p>A basic introduction of the logistic regression model and its comparison to other machine learning models</p></li>
+<li><p>A simulated example detailing the workflow to build a logistic regression model</p></li>
+<li><p>Methods to leverage the logistic regression model to optimize some target goal</p></li>
+<li><p>Discussion of how to approach practical problems when the data is less than ideal</p></li>
+</ol>
+</section>
+<section id="logistic-regression" class="level1">
+<h1>Logistic Regression</h1>
+<p>Logistic regression is one of the fundamental tools of machine learning and statistics and is actually one of the more powerful tools when one has enough time to go that extra mile and fine tune the model to the data. First I’ll just state the mathematical formula for logistic regression beginning with the data model:</p>
+<p><span class="math inline">\(Y_i|\pi_i \sim Bernoulli(\pi_i)\)</span></p>
+<p>where <span class="math inline">\(i\)</span> refers to the data sample index (think of a row in your data table), <span class="math inline">\(Y_i\)</span> is whether “success” is observed for sample <span class="math inline">\(i\)</span>, and <span class="math inline">\(\pi_i\)</span> is the probability of success for the <span class="math inline">\(i\)</span>-th subject. In typical applications, <span class="math inline">\(Y_i\)</span> is coded such that 0 means “failure” and 1 means “success”. Now we can move on to the regression part of the model between the log-odds and the covariates of interest:</p>
+<p><span class="math inline">\(\log(\frac{\pi_i}{1-\pi_i}) = \pmb x_i \pmb \beta\)</span></p>
+<p>where <span class="math inline">\(\pmb x_i\)</span> is a vector of covariates that you think explain the probability of success and <span class="math inline">\(\pmb \beta\)</span> is the vector of weights that indicate how strongly they contribute to the log-odds of success. When estimating the logistic regression model the <span class="math inline">\(\pmb \beta\)</span> coefficients are the main parameters of interest (as <span class="math inline">\(\pi_i\)</span> is derived from <span class="math inline">\(\pmb \beta\)</span>). The reason we call it “logistic” regression is because <span class="math inline">\(\log(\frac{x_i}{1-x_i})\)</span> is the inverse of the logistic function.</p>
+<p>The assumptions of the model are as follows:</p>
+<ol type="1">
+<li><p>The outcome is a binary random variable, specifically a Bernoulli<a href="#fn1" class="footnote-ref" id="fnref1" role="doc-noteref"><sup>1</sup></a> random variable.</p></li>
+<li><p>The independent/explanatory variables (I’ll commonly refer to these as covariates) have a linear relationship with the log-odds of “success”. The linearity here refers to the beta parameters, for example one may include an <span class="math inline">\(x^2\beta\)</span> term in the model as the beta parameter has a power of 1.</p></li>
+<li><p>Observations are independent of each other</p></li>
+<li><p>No multicollinearity between covariates. For any single covariate, the other covariates in the model don’t perfectly describe that covariate.</p></li>
+<li><p>No complete separation. In other words, the covariates cannot perfectly predict binary outcome.</p></li>
+</ol>
+<section id="logistic-regression-compared-to-other-machine-learning-models" class="level2">
+<h2 class="anchored" data-anchor-id="logistic-regression-compared-to-other-machine-learning-models">Logistic regression compared to other machine learning models</h2>
+<p>The important distinction between logistic regression and other machine learning models is that the statistical theory on the model parameters is well understood. For each of the <span class="math inline">\(\beta\)</span> parameters in our model, we know the statistical properties to allow inference through p-values or confidence intervals. Logistic regression is still a tool used today to understand, or <em>infer</em>, the relationship between a binary outcome and other data collected when statistical evidence is required to validate any findings.</p>
+<p>Although in most real-world scenarios the other machine learning models perform better in terms of predictiveness, logistic regression can sometimes still be a better model in terms of predictiveness. In my experience through classes and work projects, a logistic regression model is actually superior to the more sophisticated machine learning techniques of Gradient Boosted Trees and Random Forests under a few scenarios with respect to the AUC (area under the curve) performance metric.</p>
+<p>The first scenario I’ve come across is when the sample size is relatively small. The machine learning techniques tend to work very well when there is more data to help effectively learn the functional relationship between the data you have and the target outcome. I would say this would be the situation when your sample size is in the magnitude of a few hundreds or less. After that point, other machine learning techniques perform at their expected capacity.</p>
+<p>The second scenario where logistic regression can prove better than tree based methods is if one is willing to both select the covariates that strongly relate to the outcome of interest and also identify how each covariate functionally relates to the outcome. To expand on what I mean by “how each covariate functionally relates to the outcome”, some examples of functional relationships are the usual linear relationship, quadratic relationship, or sinusoidal relationship. In mathematical terms you can propose the following models:</p>
+<p><span class="math inline">\(Linear: \log(\frac{\pi_i}{1 - \pi_i}) = x_i\beta\)</span></p>
+<p><span class="math inline">\(Quadratic: \log(\frac{\pi_i}{1 - \pi_i}) = x_i\beta_1 + x_i^2\beta_2\)</span></p>
+<p><span class="math inline">\(Sinusoidal: \log(\frac{\pi_i}{1 - \pi_i}) = sin(x_i)\beta\)</span></p>
+<p>Choosing a functional relationship alone produces infinite possibilities for one to sort through in addition to just choosing which covariates to include in one’s analysis. The strength of tree based approaches is that they learn these relationships with enough data, but of course the tree won’t be as accurate as if one were to explicitly identify that “true” relationship when training a logistic regression. However, identifying the “true” functional relationship between the outcome and covariates is rather impractical when one has many different covariates to consider at once. So once again, when the data becomes sufficiently large, it is more practical to use a Gradient Boosted Tree model or Random Forest model.</p>
+<p>The advantages and shortfalls of logistic regression compared to other machine learning techniques naturally extend to any generalized linear model such as linear regression. To be clear, I am <strong>NOT</strong> saying that in these scenarios generalized linear models will <strong>ALWAYS</strong> surpass the newer machine learning models and algorithms, but rather that these scenarios <strong>ALLOW</strong> generalized linear models to shine just as well, if not better, than their other machine learning counterparts in terms of predictiveness.</p>
+</section>
+</section>
+<section id="a-novel-application-problem" class="level1">
+<h1>A Novel Application Problem</h1>
+<p>Suppose that one is starting an online clothing store selling clothes, shoes, and accessories. They have the production cost of each product and wish to know what markup percentage is optimal for generating the most revenue. The data is set up such that we have many offers for products on sale for different markup percentages and it is recorded whether the sale was made or not. From past data, it is plausible that the type of product (clothes, shoes, accessories) has an affect on whether a sale is made.</p>
+<p>Defining and estimating the optimal markup percentage is the novel part of the analysis that I think differentiates this analysis from typical logistic regression analyses. If the problem seems somewhat uninspiring, I obfuscated the real application for privacy reasons. This simplified problem does target the core methods and ideas for that application.</p>
+<p>Before jumping into the analysis or looking at the data, it is imperative to decide whether the analysis is attempting to optimize prediction or inference. Although inference and prediction are similar goals and a way Because of the optimization scheme I outline in a later section, I believe having an unbiased estimate of <span class="math inline">\(\pi_i\)</span> and <span class="math inline">\(\beta_{markup}\)</span> is the main goal, so I interpret this as predominantly an inference problem because of that.</p>
+</section>
+<section id="simulating-toy-data" class="level1">
+<h1>Simulating toy data</h1>
+<p>Before proceeding with the analysis we shall simulate a toy data set in R that will fit the problem. We will use the following logistic regression model to simulate data:</p>
+<p>From this set up, we can propose the following logistic regression model:</p>
+<p><span class="math display">\[
+\log(\frac{\pi_i}{1 - \pi_i}) = \beta_0 + x_{markup} * \beta_{markup} +
+x_{cost} * \beta_{cost} + x_{type=shoes} * \beta_{type=shoes} + x_{type = clothes}*\beta_{type = clothes}
+\]</span></p>
+<p>where <span class="math inline">\(x_{markup}\)</span> is the markup percentage above 0 (above 100 is allowed), <span class="math inline">\(x_{cost}\)</span> is cost in dollars, <span class="math inline">\(x_{type=shoes}\)</span> is 1 when product <span class="math inline">\(i\)</span> is shoes and 0 otherwise, and similarly <span class="math inline">\(x_{type = clothes}\)</span> is 1 when product <span class="math inline">\(i\)</span> is clothes and 0 otherwise. When product <span class="math inline">\(i\)</span> is accessories, both <span class="math inline">\(x_{type=shoes}\)</span> and <span class="math inline">\(x_{type = clothes}\)</span> are 0. The way that <span class="math inline">\(x_{type}\)</span> is encoded is known as the dummy variable encoding common in statistics (which is different from the one-hot encoding more prevalent in the machine learning field). The outcome of interest <span class="math inline">\(Y_i\)</span> is a binary variable where 1 indicates the product was sold and 0 the product was not sold, and it follows that <span class="math inline">\(\pi_i\)</span> is the probability that product <span class="math inline">\(i\)</span> is sold or not. To clarify about the <span class="math inline">\(x_{markup}\)</span> covariate, if <span class="math inline">\(x_{markup} = 20\)</span> then the product was marked up <span class="math inline">\(20\%\)</span>.</p>
+<p>I chose the values for true parameters <span class="math inline">\(\pmb \beta\)</span> that I felt gave a good spread of the true probabilities while also being representative of the expected behavior in the example problem described to me. I arbitrarily chose a decently large sample size of 3000 to ensure proper estimation.</p>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb2"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="do">## True parameter values</span></span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a><span class="fu">set.seed</span>(<span class="dv">2013</span>)</span>
+<span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a>sample_size <span class="ot">&lt;-</span> <span class="dv">3000</span></span>
+<span id="cb2-6"><a href="#cb2-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-7"><a href="#cb2-7" aria-hidden="true" tabindex="-1"></a>true_beta <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="dv">2</span>, <span class="co"># intercept</span></span>
+<span id="cb2-8"><a href="#cb2-8" aria-hidden="true" tabindex="-1"></a>               <span class="sc">-</span><span class="fl">0.2</span>, <span class="co"># markup</span></span>
+<span id="cb2-9"><a href="#cb2-9" aria-hidden="true" tabindex="-1"></a>               <span class="fl">0.002</span>, <span class="co"># cost</span></span>
+<span id="cb2-10"><a href="#cb2-10" aria-hidden="true" tabindex="-1"></a>               <span class="dv">1</span>, <span class="co"># type=clothes</span></span>
+<span id="cb2-11"><a href="#cb2-11" aria-hidden="true" tabindex="-1"></a>               <span class="fl">1.5</span> )<span class="co"># type=shoes</span></span>
+<span id="cb2-12"><a href="#cb2-12" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-13"><a href="#cb2-13" aria-hidden="true" tabindex="-1"></a><span class="do">### Simulate data</span></span>
+<span id="cb2-14"><a href="#cb2-14" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-15"><a href="#cb2-15" aria-hidden="true" tabindex="-1"></a>type <span class="ot">&lt;-</span> <span class="fu">sample</span>(<span class="fu">c</span>(<span class="st">"accessories"</span>, <span class="st">"clothes"</span>, <span class="st">"shoes"</span>), </span>
+<span id="cb2-16"><a href="#cb2-16" aria-hidden="true" tabindex="-1"></a>               <span class="at">size =</span> sample_size,</span>
+<span id="cb2-17"><a href="#cb2-17" aria-hidden="true" tabindex="-1"></a>               <span class="at">replace =</span> <span class="cn">TRUE</span>,</span>
+<span id="cb2-18"><a href="#cb2-18" aria-hidden="true" tabindex="-1"></a>               <span class="at">prob =</span> <span class="fu">c</span>(<span class="fl">0.3</span>, <span class="fl">0.5</span>, <span class="fl">0.2</span>))</span>
+<span id="cb2-19"><a href="#cb2-19" aria-hidden="true" tabindex="-1"></a>cost <span class="ot">&lt;-</span> <span class="fu">rnorm</span>(sample_size, <span class="at">mean =</span> <span class="dv">2000</span>, <span class="at">sd =</span> <span class="dv">400</span>)</span>
+<span id="cb2-20"><a href="#cb2-20" aria-hidden="true" tabindex="-1"></a>markup <span class="ot">&lt;-</span> <span class="fu">runif</span>(sample_size, <span class="at">min =</span> <span class="dv">20</span>, <span class="at">max =</span> <span class="dv">120</span>)</span>
+<span id="cb2-21"><a href="#cb2-21" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-22"><a href="#cb2-22" aria-hidden="true" tabindex="-1"></a><span class="do">## make sure markup and cost are above 0</span></span>
+<span id="cb2-23"><a href="#cb2-23" aria-hidden="true" tabindex="-1"></a>markup <span class="ot">&lt;-</span> <span class="fu">ifelse</span>(markup <span class="sc">&lt;=</span> <span class="dv">0</span>, <span class="dv">10</span>, markup)</span>
+<span id="cb2-24"><a href="#cb2-24" aria-hidden="true" tabindex="-1"></a>cost <span class="ot">&lt;-</span> <span class="fu">ifelse</span>(cost <span class="sc">&lt;=</span> <span class="dv">0</span>, <span class="dv">2000</span>, cost)</span>
+<span id="cb2-25"><a href="#cb2-25" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-26"><a href="#cb2-26" aria-hidden="true" tabindex="-1"></a><span class="co"># convert type into a factor variable to prepare for analysis</span></span>
+<span id="cb2-27"><a href="#cb2-27" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-28"><a href="#cb2-28" aria-hidden="true" tabindex="-1"></a>type <span class="ot">&lt;-</span> <span class="fu">factor</span>(type, <span class="at">levels =</span> <span class="fu">c</span>(<span class="st">"accessories"</span>, <span class="st">"clothes"</span>, <span class="st">"shoes"</span>))</span>
+<span id="cb2-29"><a href="#cb2-29" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-30"><a href="#cb2-30" aria-hidden="true" tabindex="-1"></a>x_df <span class="ot">&lt;-</span> <span class="fu">data.frame</span>(<span class="at">markup =</span> markup, <span class="at">cost =</span> cost, <span class="at">type =</span> type)</span>
+<span id="cb2-31"><a href="#cb2-31" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-32"><a href="#cb2-32" aria-hidden="true" tabindex="-1"></a><span class="co"># get x_matrix</span></span>
+<span id="cb2-33"><a href="#cb2-33" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-34"><a href="#cb2-34" aria-hidden="true" tabindex="-1"></a>x_matrix <span class="ot">&lt;-</span> <span class="fu">model.matrix</span>(<span class="sc">~</span> <span class="dv">1</span> <span class="sc">+</span> markup <span class="sc">+</span> cost <span class="sc">+</span> type, <span class="at">data =</span> x_df)</span>
+<span id="cb2-35"><a href="#cb2-35" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-36"><a href="#cb2-36" aria-hidden="true" tabindex="-1"></a><span class="co">#simulated log-odds per person</span></span>
+<span id="cb2-37"><a href="#cb2-37" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-38"><a href="#cb2-38" aria-hidden="true" tabindex="-1"></a>log_odds <span class="ot">&lt;-</span> x_matrix <span class="sc">%*%</span> true_beta</span>
+<span id="cb2-39"><a href="#cb2-39" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-40"><a href="#cb2-40" aria-hidden="true" tabindex="-1"></a><span class="co">#convert log_odds to probabilities</span></span>
+<span id="cb2-41"><a href="#cb2-41" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-42"><a href="#cb2-42" aria-hidden="true" tabindex="-1"></a>inverse_logit <span class="ot">&lt;-</span> <span class="cf">function</span>(x){(<span class="dv">1</span> <span class="sc">+</span> <span class="fu">exp</span>(<span class="sc">-</span>x))<span class="sc">^-</span><span class="dv">1</span>}</span>
+<span id="cb2-43"><a href="#cb2-43" aria-hidden="true" tabindex="-1"></a>true_probs <span class="ot">&lt;-</span> <span class="fu">inverse_logit</span>(log_odds)</span>
+<span id="cb2-44"><a href="#cb2-44" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-45"><a href="#cb2-45" aria-hidden="true" tabindex="-1"></a><span class="co"># get the outcome</span></span>
+<span id="cb2-46"><a href="#cb2-46" aria-hidden="true" tabindex="-1"></a>sold <span class="ot">&lt;-</span> <span class="fu">rbinom</span>(sample_size, <span class="dv">1</span>, true_probs)</span>
+<span id="cb2-47"><a href="#cb2-47" aria-hidden="true" tabindex="-1"></a>x_df<span class="sc">$</span>sold <span class="ot">&lt;-</span> sold</span>
+<span id="cb2-48"><a href="#cb2-48" aria-hidden="true" tabindex="-1"></a><span class="co"># x_df$true_probs &lt;- c(true_probs)</span></span>
+<span id="cb2-49"><a href="#cb2-49" aria-hidden="true" tabindex="-1"></a><span class="co"># x_df$true_log_odds &lt;- c(log_odds)</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</div>
+<p>Here are the first few rows of the data set to get an idea of how the data is organized:</p>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb3"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="fu">head</span>(x_df, <span class="dv">5</span>) <span class="sc">%&gt;%</span></span>
+<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">kable</span>() <span class="sc">%&gt;%</span></span>
+<span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">kable_styling</span>()</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output-display">
+<table class="table caption-top table-sm table-striped small">
+<thead>
+<tr class="header">
+<th style="text-align: right;" data-quarto-table-cell-role="th">markup</th>
+<th style="text-align: right;" data-quarto-table-cell-role="th">cost</th>
+<th style="text-align: left;" data-quarto-table-cell-role="th">type</th>
+<th style="text-align: right;" data-quarto-table-cell-role="th">sold</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: right;">106.39550</td>
+<td style="text-align: right;">2233.739</td>
+<td style="text-align: left;">clothes</td>
+<td style="text-align: right;">0</td>
+</tr>
+<tr class="even">
+<td style="text-align: right;">34.87069</td>
+<td style="text-align: right;">1786.943</td>
+<td style="text-align: left;">shoes</td>
+<td style="text-align: right;">1</td>
+</tr>
+<tr class="odd">
+<td style="text-align: right;">42.20465</td>
+<td style="text-align: right;">1646.098</td>
+<td style="text-align: left;">accessories</td>
+<td style="text-align: right;">0</td>
+</tr>
+<tr class="even">
+<td style="text-align: right;">21.46863</td>
+<td style="text-align: right;">1793.615</td>
+<td style="text-align: left;">accessories</td>
+<td style="text-align: right;">1</td>
+</tr>
+<tr class="odd">
+<td style="text-align: right;">42.81934</td>
+<td style="text-align: right;">2247.883</td>
+<td style="text-align: left;">clothes</td>
+<td style="text-align: right;">0</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+</section>
+<section id="example-logistic-regression-analysis" class="level1">
+<h1>Example Logistic Regression Analysis</h1>
+<section id="quick-exploratory-analysis-of-the-data-set" class="level2">
+<h2 class="anchored" data-anchor-id="quick-exploratory-analysis-of-the-data-set">Quick Exploratory analysis of the Data Set</h2>
+<p>When starting an analysis, it’s important to first summarize and get a feel of the data. This is a useful and important step as it informs what are reasonable models for the data and indicates the quality of the data.</p>
+<div class="cell" data-layout-nrow="2">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb4"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a>x_df <span class="sc">%&gt;%</span> </span>
+<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">tbl_summary</span>(</span>
+<span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a>    <span class="at">include =</span> <span class="fu">c</span>(markup, cost, type, sold),</span>
+<span id="cb4-4"><a href="#cb4-4" aria-hidden="true" tabindex="-1"></a>    <span class="at">type =</span> <span class="fu">list</span>(<span class="fu">all_continuous</span>() <span class="sc">~</span> <span class="st">"continuous2"</span>),</span>
+<span id="cb4-5"><a href="#cb4-5" aria-hidden="true" tabindex="-1"></a>    <span class="at">statistic =</span> <span class="fu">list</span>(</span>
+<span id="cb4-6"><a href="#cb4-6" aria-hidden="true" tabindex="-1"></a>      <span class="fu">all_continuous</span>() <span class="sc">~</span> <span class="fu">c</span>(<span class="st">"{mean} ({sd})"</span>, <span class="st">"{median} ({p25}, {p75})"</span>, <span class="st">"[{min}, {max}]"</span>)</span>
+<span id="cb4-7"><a href="#cb4-7" aria-hidden="true" tabindex="-1"></a>    ),</span>
+<span id="cb4-8"><a href="#cb4-8" aria-hidden="true" tabindex="-1"></a>    <span class="at">by =</span> type)</span>
+<span id="cb4-9"><a href="#cb4-9" aria-hidden="true" tabindex="-1"></a>x_df <span class="sc">%&gt;%</span></span>
+<span id="cb4-10"><a href="#cb4-10" aria-hidden="true" tabindex="-1"></a>  <span class="fu">tbl_summary</span>(</span>
+<span id="cb4-11"><a href="#cb4-11" aria-hidden="true" tabindex="-1"></a>    <span class="at">include =</span> <span class="fu">c</span>(markup, cost, sold),</span>
+<span id="cb4-12"><a href="#cb4-12" aria-hidden="true" tabindex="-1"></a>    <span class="at">type =</span> <span class="fu">list</span>(<span class="fu">all_continuous</span>() <span class="sc">~</span> <span class="st">"continuous2"</span>),</span>
+<span id="cb4-13"><a href="#cb4-13" aria-hidden="true" tabindex="-1"></a>    <span class="at">statistic =</span> <span class="fu">list</span>(</span>
+<span id="cb4-14"><a href="#cb4-14" aria-hidden="true" tabindex="-1"></a>      <span class="fu">all_continuous</span>() <span class="sc">~</span> <span class="fu">c</span>(<span class="st">"{mean} ({sd})"</span>, <span class="st">"{median} ({p25}, {p75})"</span>, <span class="st">"[{min}, {max}]"</span>)</span>
+<span id="cb4-15"><a href="#cb4-15" aria-hidden="true" tabindex="-1"></a>    ),</span>
+<span id="cb4-16"><a href="#cb4-16" aria-hidden="true" tabindex="-1"></a>    <span class="at">by =</span> sold)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div id="tbl-summ" class="quarto-layout-panel anchored">
+<figure class="quarto-float quarto-float-tbl figure">
+<figcaption class="quarto-float-caption-top quarto-float-caption quarto-float-tbl" id="tbl-summ-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Table&nbsp;1: Summary Tables
+</figcaption>
+<div aria-describedby="tbl-summ-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<div class="quarto-layout-row">
+<div class="cell-output-display quarto-layout-cell-subref quarto-layout-cell" data-ref-parent="tbl-summ" style="flex-basis: 100.0%;justify-content: center;">
+<div id="dozzpvrzwh" style="padding-left:0px;padding-right:0px;padding-top:10px;padding-bottom:10px;overflow-x:auto;overflow-y:auto;width:auto;height:auto;">
+<style>#dozzpvrzwh table {
+  font-family: system-ui, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji';
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+#dozzpvrzwh thead, #dozzpvrzwh tbody, #dozzpvrzwh tfoot, #dozzpvrzwh tr, #dozzpvrzwh td, #dozzpvrzwh th {
+  border-style: none;
+}
+
+#dozzpvrzwh p {
+  margin: 0;
+  padding: 0;
+}
+
+#dozzpvrzwh .gt_table {
+  display: table;
+  border-collapse: collapse;
+  line-height: normal;
+  margin-left: auto;
+  margin-right: auto;
+  color: #333333;
+  font-size: 16px;
+  font-weight: normal;
+  font-style: normal;
+  background-color: #FFFFFF;
+  width: auto;
+  border-top-style: solid;
+  border-top-width: 2px;
+  border-top-color: #A8A8A8;
+  border-right-style: none;
+  border-right-width: 2px;
+  border-right-color: #D3D3D3;
+  border-bottom-style: solid;
+  border-bottom-width: 2px;
+  border-bottom-color: #A8A8A8;
+  border-left-style: none;
+  border-left-width: 2px;
+  border-left-color: #D3D3D3;
+}
+
+#dozzpvrzwh .gt_caption {
+  padding-top: 4px;
+  padding-bottom: 4px;
+}
+
+#dozzpvrzwh .gt_title {
+  color: #333333;
+  font-size: 125%;
+  font-weight: initial;
+  padding-top: 4px;
+  padding-bottom: 4px;
+  padding-left: 5px;
+  padding-right: 5px;
+  border-bottom-color: #FFFFFF;
+  border-bottom-width: 0;
+}
+
+#dozzpvrzwh .gt_subtitle {
+  color: #333333;
+  font-size: 85%;
+  font-weight: initial;
+  padding-top: 3px;
+  padding-bottom: 5px;
+  padding-left: 5px;
+  padding-right: 5px;
+  border-top-color: #FFFFFF;
+  border-top-width: 0;
+}
+
+#dozzpvrzwh .gt_heading {
+  background-color: #FFFFFF;
+  text-align: center;
+  border-bottom-color: #FFFFFF;
+  border-left-style: none;
+  border-left-width: 1px;
+  border-left-color: #D3D3D3;
+  border-right-style: none;
+  border-right-width: 1px;
+  border-right-color: #D3D3D3;
+}
+
+#dozzpvrzwh .gt_bottom_border {
+  border-bottom-style: solid;
+  border-bottom-width: 2px;
+  border-bottom-color: #D3D3D3;
+}
+
+#dozzpvrzwh .gt_col_headings {
+  border-top-style: solid;
+  border-top-width: 2px;
+  border-top-color: #D3D3D3;
+  border-bottom-style: solid;
+  border-bottom-width: 2px;
+  border-bottom-color: #D3D3D3;
+  border-left-style: none;
+  border-left-width: 1px;
+  border-left-color: #D3D3D3;
+  border-right-style: none;
+  border-right-width: 1px;
+  border-right-color: #D3D3D3;
+}
+
+#dozzpvrzwh .gt_col_heading {
+  color: #333333;
+  background-color: #FFFFFF;
+  font-size: 100%;
+  font-weight: normal;
+  text-transform: inherit;
+  border-left-style: none;
+  border-left-width: 1px;
+  border-left-color: #D3D3D3;
+  border-right-style: none;
+  border-right-width: 1px;
+  border-right-color: #D3D3D3;
+  vertical-align: bottom;
+  padding-top: 5px;
+  padding-bottom: 6px;
+  padding-left: 5px;
+  padding-right: 5px;
+  overflow-x: hidden;
+}
+
+#dozzpvrzwh .gt_column_spanner_outer {
+  color: #333333;
+  background-color: #FFFFFF;
+  font-size: 100%;
+  font-weight: normal;
+  text-transform: inherit;
+  padding-top: 0;
+  padding-bottom: 0;
+  padding-left: 4px;
+  padding-right: 4px;
+}
+
+#dozzpvrzwh .gt_column_spanner_outer:first-child {
+  padding-left: 0;
+}
+
+#dozzpvrzwh .gt_column_spanner_outer:last-child {
+  padding-right: 0;
+}
+
+#dozzpvrzwh .gt_column_spanner {
+  border-bottom-style: solid;
+  border-bottom-width: 2px;
+  border-bottom-color: #D3D3D3;
+  vertical-align: bottom;
+  padding-top: 5px;
+  padding-bottom: 5px;
+  overflow-x: hidden;
+  display: inline-block;
+  width: 100%;
+}
+
+#dozzpvrzwh .gt_spanner_row {
+  border-bottom-style: hidden;
+}
+
+#dozzpvrzwh .gt_group_heading {
+  padding-top: 8px;
+  padding-bottom: 8px;
+  padding-left: 5px;
+  padding-right: 5px;
+  color: #333333;
+  background-color: #FFFFFF;
+  font-size: 100%;
+  font-weight: initial;
+  text-transform: inherit;
+  border-top-style: solid;
+  border-top-width: 2px;
+  border-top-color: #D3D3D3;
+  border-bottom-style: solid;
+  border-bottom-width: 2px;
+  border-bottom-color: #D3D3D3;
+  border-left-style: none;
+  border-left-width: 1px;
+  border-left-color: #D3D3D3;
+  border-right-style: none;
+  border-right-width: 1px;
+  border-right-color: #D3D3D3;
+  vertical-align: middle;
+  text-align: left;
+}
+
+#dozzpvrzwh .gt_empty_group_heading {
+  padding: 0.5px;
+  color: #333333;
+  background-color: #FFFFFF;
+  font-size: 100%;
+  font-weight: initial;
+  border-top-style: solid;
+  border-top-width: 2px;
+  border-top-color: #D3D3D3;
+  border-bottom-style: solid;
+  border-bottom-width: 2px;
+  border-bottom-color: #D3D3D3;
+  vertical-align: middle;
+}
+
+#dozzpvrzwh .gt_from_md > :first-child {
+  margin-top: 0;
+}
+
+#dozzpvrzwh .gt_from_md > :last-child {
+  margin-bottom: 0;
+}
+
+#dozzpvrzwh .gt_row {
+  padding-top: 8px;
+  padding-bottom: 8px;
+  padding-left: 5px;
+  padding-right: 5px;
+  margin: 10px;
+  border-top-style: solid;
+  border-top-width: 1px;
+  border-top-color: #D3D3D3;
+  border-left-style: none;
+  border-left-width: 1px;
+  border-left-color: #D3D3D3;
+  border-right-style: none;
+  border-right-width: 1px;
+  border-right-color: #D3D3D3;
+  vertical-align: middle;
+  overflow-x: hidden;
+}
+
+#dozzpvrzwh .gt_stub {
+  color: #333333;
+  background-color: #FFFFFF;
+  font-size: 100%;
+  font-weight: initial;
+  text-transform: inherit;
+  border-right-style: solid;
+  border-right-width: 2px;
+  border-right-color: #D3D3D3;
+  padding-left: 5px;
+  padding-right: 5px;
+}
+
+#dozzpvrzwh .gt_stub_row_group {
+  color: #333333;
+  background-color: #FFFFFF;
+  font-size: 100%;
+  font-weight: initial;
+  text-transform: inherit;
+  border-right-style: solid;
+  border-right-width: 2px;
+  border-right-color: #D3D3D3;
+  padding-left: 5px;
+  padding-right: 5px;
+  vertical-align: top;
+}
+
+#dozzpvrzwh .gt_row_group_first td {
+  border-top-width: 2px;
+}
+
+#dozzpvrzwh .gt_row_group_first th {
+  border-top-width: 2px;
+}
+
+#dozzpvrzwh .gt_summary_row {
+  color: #333333;
+  background-color: #FFFFFF;
+  text-transform: inherit;
+  padding-top: 8px;
+  padding-bottom: 8px;
+  padding-left: 5px;
+  padding-right: 5px;
+}
+
+#dozzpvrzwh .gt_first_summary_row {
+  border-top-style: solid;
+  border-top-color: #D3D3D3;
+}
+
+#dozzpvrzwh .gt_first_summary_row.thick {
+  border-top-width: 2px;
+}
+
+#dozzpvrzwh .gt_last_summary_row {
+  padding-top: 8px;
+  padding-bottom: 8px;
+  padding-left: 5px;
+  padding-right: 5px;
+  border-bottom-style: solid;
+  border-bottom-width: 2px;
+  border-bottom-color: #D3D3D3;
+}
+
+#dozzpvrzwh .gt_grand_summary_row {
+  color: #333333;
+  background-color: #FFFFFF;
+  text-transform: inherit;
+  padding-top: 8px;
+  padding-bottom: 8px;
+  padding-left: 5px;
+  padding-right: 5px;
+}
+
+#dozzpvrzwh .gt_first_grand_summary_row {
+  padding-top: 8px;
+  padding-bottom: 8px;
+  padding-left: 5px;
+  padding-right: 5px;
+  border-top-style: double;
+  border-top-width: 6px;
+  border-top-color: #D3D3D3;
+}
+
+#dozzpvrzwh .gt_last_grand_summary_row_top {
+  padding-top: 8px;
+  padding-bottom: 8px;
+  padding-left: 5px;
+  padding-right: 5px;
+  border-bottom-style: double;
+  border-bottom-width: 6px;
+  border-bottom-color: #D3D3D3;
+}
+
+#dozzpvrzwh .gt_striped {
+  background-color: rgba(128, 128, 128, 0.05);
+}
+
+#dozzpvrzwh .gt_table_body {
+  border-top-style: solid;
+  border-top-width: 2px;
+  border-top-color: #D3D3D3;
+  border-bottom-style: solid;
+  border-bottom-width: 2px;
+  border-bottom-color: #D3D3D3;
+}
+
+#dozzpvrzwh .gt_footnotes {
+  color: #333333;
+  background-color: #FFFFFF;
+  border-bottom-style: none;
+  border-bottom-width: 2px;
+  border-bottom-color: #D3D3D3;
+  border-left-style: none;
+  border-left-width: 2px;
+  border-left-color: #D3D3D3;
+  border-right-style: none;
+  border-right-width: 2px;
+  border-right-color: #D3D3D3;
+}
+
+#dozzpvrzwh .gt_footnote {
+  margin: 0px;
+  font-size: 90%;
+  padding-top: 4px;
+  padding-bottom: 4px;
+  padding-left: 5px;
+  padding-right: 5px;
+}
+
+#dozzpvrzwh .gt_sourcenotes {
+  color: #333333;
+  background-color: #FFFFFF;
+  border-bottom-style: none;
+  border-bottom-width: 2px;
+  border-bottom-color: #D3D3D3;
+  border-left-style: none;
+  border-left-width: 2px;
+  border-left-color: #D3D3D3;
+  border-right-style: none;
+  border-right-width: 2px;
+  border-right-color: #D3D3D3;
+}
+
+#dozzpvrzwh .gt_sourcenote {
+  font-size: 90%;
+  padding-top: 4px;
+  padding-bottom: 4px;
+  padding-left: 5px;
+  padding-right: 5px;
+}
+
+#dozzpvrzwh .gt_left {
+  text-align: left;
+}
+
+#dozzpvrzwh .gt_center {
+  text-align: center;
+}
+
+#dozzpvrzwh .gt_right {
+  text-align: right;
+  font-variant-numeric: tabular-nums;
+}
+
+#dozzpvrzwh .gt_font_normal {
+  font-weight: normal;
+}
+
+#dozzpvrzwh .gt_font_bold {
+  font-weight: bold;
+}
+
+#dozzpvrzwh .gt_font_italic {
+  font-style: italic;
+}
+
+#dozzpvrzwh .gt_super {
+  font-size: 65%;
+}
+
+#dozzpvrzwh .gt_footnote_marks {
+  font-size: 75%;
+  vertical-align: 0.4em;
+  position: initial;
+}
+
+#dozzpvrzwh .gt_asterisk {
+  font-size: 100%;
+  vertical-align: 0;
+}
+
+#dozzpvrzwh .gt_indent_1 {
+  text-indent: 5px;
+}
+
+#dozzpvrzwh .gt_indent_2 {
+  text-indent: 10px;
+}
+
+#dozzpvrzwh .gt_indent_3 {
+  text-indent: 15px;
+}
+
+#dozzpvrzwh .gt_indent_4 {
+  text-indent: 20px;
+}
+
+#dozzpvrzwh .gt_indent_5 {
+  text-indent: 25px;
+}
+
+#dozzpvrzwh .katex-display {
+  display: inline-flex !important;
+  margin-bottom: 0.75em !important;
+}
+
+#dozzpvrzwh div.Reactable > div.rt-table > div.rt-thead > div.rt-tr.rt-tr-group-header > div.rt-th-group:after {
+  height: 0px !important;
+}
+</style>
+
+<div id="tbl-summ-1" class="gt_table do-not-create-environment quarto-float quarto-figure quarto-figure-center anchored" data-quarto-disable-processing="false" data-quarto-postprocess="true" data-quarto-bootstrap="false">
+<figure class="quarto-float quarto-subfloat-tbl figure">
+<figcaption class="quarto-float-caption-top quarto-subfloat-caption quarto-subfloat-tbl" id="tbl-summ-1-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+(a) Summary by Type
+</figcaption>
+<div aria-describedby="tbl-summ-1-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<table id="tbl-summ-1" class="gt_table do-not-create-environment caption-top table table-sm table-striped small" data-quarto-bootstrap="false">
+<colgroup>
+<col style="width: 25%">
+<col style="width: 25%">
+<col style="width: 25%">
+<col style="width: 25%">
+</colgroup>
+<thead>
+<tr class="gt_col_headings header">
+<th id="label" class="gt_col_heading gt_columns_bottom_border gt_left" style="text-align: left;" data-quarto-table-cell-role="th" scope="col"><strong>Characteristic</strong></th>
+<th id="stat_1" class="gt_col_heading gt_columns_bottom_border gt_center" style="text-align: left;" data-quarto-table-cell-role="th" scope="col"><strong>accessories</strong><br>
+N = 871<span class="gt_footnote_marks" style="white-space:nowrap;font-style:italic;font-weight:normal;line-height:0;"><sup>1</sup></span></th>
+<th id="stat_2" class="gt_col_heading gt_columns_bottom_border gt_center" style="text-align: left;" data-quarto-table-cell-role="th" scope="col"><strong>clothes</strong><br>
+N = 1,525<span class="gt_footnote_marks" style="white-space:nowrap;font-style:italic;font-weight:normal;line-height:0;"><sup>1</sup></span></th>
+<th id="stat_3" class="gt_col_heading gt_columns_bottom_border gt_center" style="text-align: left;" data-quarto-table-cell-role="th" scope="col"><strong>shoes</strong><br>
+N = 604<span class="gt_footnote_marks" style="white-space:nowrap;font-style:italic;font-weight:normal;line-height:0;"><sup>1</sup></span></th>
+</tr>
+</thead>
+<tbody class="gt_table_body">
+<tr class="odd">
+<td class="gt_row gt_left" style="text-align: left;" headers="label">markup</td>
+<td class="gt_row gt_center" style="text-align: left;" headers="stat_1"><br>
+</td>
+<td class="gt_row gt_center" style="text-align: left;" headers="stat_2"><br>
+</td>
+<td class="gt_row gt_center" style="text-align: left;" headers="stat_3"><br>
+</td>
+</tr>
+<tr class="even">
+<td class="gt_row gt_left" style="text-align: left;" headers="label">&nbsp;&nbsp;&nbsp;&nbsp;Mean (SD)</td>
+<td class="gt_row gt_center" style="text-align: left;" headers="stat_1">70 (28)</td>
+<td class="gt_row gt_center" style="text-align: left;" headers="stat_2">68 (29)</td>
+<td class="gt_row gt_center" style="text-align: left;" headers="stat_3">69 (29)</td>
+</tr>
+<tr class="odd">
+<td class="gt_row gt_left" style="text-align: left;" headers="label">&nbsp;&nbsp;&nbsp;&nbsp;Median (Q1, Q3)</td>
+<td class="gt_row gt_center" style="text-align: left;" headers="stat_1">70 (45, 93)</td>
+<td class="gt_row gt_center" style="text-align: left;" headers="stat_2">67 (43, 92)</td>
+<td class="gt_row gt_center" style="text-align: left;" headers="stat_3">68 (44, 92)</td>
+</tr>
+<tr class="even">
+<td class="gt_row gt_left" style="text-align: left;" headers="label">&nbsp;&nbsp;&nbsp;&nbsp;[Min, Max]</td>
+<td class="gt_row gt_center" style="text-align: left;" headers="stat_1">[20, 120]</td>
+<td class="gt_row gt_center" style="text-align: left;" headers="stat_2">[20, 120]</td>
+<td class="gt_row gt_center" style="text-align: left;" headers="stat_3">[20, 120]</td>
+</tr>
+<tr class="odd">
+<td class="gt_row gt_left" style="text-align: left;" headers="label">cost</td>
+<td class="gt_row gt_center" style="text-align: left;" headers="stat_1"><br>
+</td>
+<td class="gt_row gt_center" style="text-align: left;" headers="stat_2"><br>
+</td>
+<td class="gt_row gt_center" style="text-align: left;" headers="stat_3"><br>
+</td>
+</tr>
+<tr class="even">
+<td class="gt_row gt_left" style="text-align: left;" headers="label">&nbsp;&nbsp;&nbsp;&nbsp;Mean (SD)</td>
+<td class="gt_row gt_center" style="text-align: left;" headers="stat_1">1,990 (386)</td>
+<td class="gt_row gt_center" style="text-align: left;" headers="stat_2">2,022 (404)</td>
+<td class="gt_row gt_center" style="text-align: left;" headers="stat_3">2,014 (404)</td>
+</tr>
+<tr class="odd">
+<td class="gt_row gt_left" style="text-align: left;" headers="label">&nbsp;&nbsp;&nbsp;&nbsp;Median (Q1, Q3)</td>
+<td class="gt_row gt_center" style="text-align: left;" headers="stat_1">1,984 (1,731, 2,246)</td>
+<td class="gt_row gt_center" style="text-align: left;" headers="stat_2">2,033 (1,750, 2,297)</td>
+<td class="gt_row gt_center" style="text-align: left;" headers="stat_3">2,006 (1,734, 2,305)</td>
+</tr>
+<tr class="even">
+<td class="gt_row gt_left" style="text-align: left;" headers="label">&nbsp;&nbsp;&nbsp;&nbsp;[Min, Max]</td>
+<td class="gt_row gt_center" style="text-align: left;" headers="stat_1">[712, 3,263]</td>
+<td class="gt_row gt_center" style="text-align: left;" headers="stat_2">[533, 3,587]</td>
+<td class="gt_row gt_center" style="text-align: left;" headers="stat_3">[688, 3,153]</td>
+</tr>
+<tr class="odd">
+<td class="gt_row gt_left" style="text-align: left;" headers="label">sold</td>
+<td class="gt_row gt_center" style="text-align: left;" headers="stat_1">82 (9.4%)</td>
+<td class="gt_row gt_center" style="text-align: left;" headers="stat_2">242 (16%)</td>
+<td class="gt_row gt_center" style="text-align: left;" headers="stat_3">118 (20%)</td>
+</tr>
+</tbody><tfoot>
+<tr class="gt_footnotes odd">
+<td colspan="4" class="gt_footnote" style="text-align: left;"><span class="gt_footnote_marks" style="white-space:nowrap;font-style:italic;font-weight:normal;line-height:0;"><sup>1</sup></span> n (%)</td>
+</tr>
+</tfoot>
+
+</table>
+</div>
+</figure>
+</div>
+
+</div>
+</div>
+</div>
+<div class="quarto-layout-row">
+<div class="cell-output-display quarto-layout-cell-subref quarto-layout-cell" data-ref-parent="tbl-summ" style="flex-basis: 100.0%;justify-content: center;">
+<div id="jieefxmxbc" style="padding-left:0px;padding-right:0px;padding-top:10px;padding-bottom:10px;overflow-x:auto;overflow-y:auto;width:auto;height:auto;">
+<style>#jieefxmxbc table {
+  font-family: system-ui, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji';
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+#jieefxmxbc thead, #jieefxmxbc tbody, #jieefxmxbc tfoot, #jieefxmxbc tr, #jieefxmxbc td, #jieefxmxbc th {
+  border-style: none;
+}
+
+#jieefxmxbc p {
+  margin: 0;
+  padding: 0;
+}
+
+#jieefxmxbc .gt_table {
+  display: table;
+  border-collapse: collapse;
+  line-height: normal;
+  margin-left: auto;
+  margin-right: auto;
+  color: #333333;
+  font-size: 16px;
+  font-weight: normal;
+  font-style: normal;
+  background-color: #FFFFFF;
+  width: auto;
+  border-top-style: solid;
+  border-top-width: 2px;
+  border-top-color: #A8A8A8;
+  border-right-style: none;
+  border-right-width: 2px;
+  border-right-color: #D3D3D3;
+  border-bottom-style: solid;
+  border-bottom-width: 2px;
+  border-bottom-color: #A8A8A8;
+  border-left-style: none;
+  border-left-width: 2px;
+  border-left-color: #D3D3D3;
+}
+
+#jieefxmxbc .gt_caption {
+  padding-top: 4px;
+  padding-bottom: 4px;
+}
+
+#jieefxmxbc .gt_title {
+  color: #333333;
+  font-size: 125%;
+  font-weight: initial;
+  padding-top: 4px;
+  padding-bottom: 4px;
+  padding-left: 5px;
+  padding-right: 5px;
+  border-bottom-color: #FFFFFF;
+  border-bottom-width: 0;
+}
+
+#jieefxmxbc .gt_subtitle {
+  color: #333333;
+  font-size: 85%;
+  font-weight: initial;
+  padding-top: 3px;
+  padding-bottom: 5px;
+  padding-left: 5px;
+  padding-right: 5px;
+  border-top-color: #FFFFFF;
+  border-top-width: 0;
+}
+
+#jieefxmxbc .gt_heading {
+  background-color: #FFFFFF;
+  text-align: center;
+  border-bottom-color: #FFFFFF;
+  border-left-style: none;
+  border-left-width: 1px;
+  border-left-color: #D3D3D3;
+  border-right-style: none;
+  border-right-width: 1px;
+  border-right-color: #D3D3D3;
+}
+
+#jieefxmxbc .gt_bottom_border {
+  border-bottom-style: solid;
+  border-bottom-width: 2px;
+  border-bottom-color: #D3D3D3;
+}
+
+#jieefxmxbc .gt_col_headings {
+  border-top-style: solid;
+  border-top-width: 2px;
+  border-top-color: #D3D3D3;
+  border-bottom-style: solid;
+  border-bottom-width: 2px;
+  border-bottom-color: #D3D3D3;
+  border-left-style: none;
+  border-left-width: 1px;
+  border-left-color: #D3D3D3;
+  border-right-style: none;
+  border-right-width: 1px;
+  border-right-color: #D3D3D3;
+}
+
+#jieefxmxbc .gt_col_heading {
+  color: #333333;
+  background-color: #FFFFFF;
+  font-size: 100%;
+  font-weight: normal;
+  text-transform: inherit;
+  border-left-style: none;
+  border-left-width: 1px;
+  border-left-color: #D3D3D3;
+  border-right-style: none;
+  border-right-width: 1px;
+  border-right-color: #D3D3D3;
+  vertical-align: bottom;
+  padding-top: 5px;
+  padding-bottom: 6px;
+  padding-left: 5px;
+  padding-right: 5px;
+  overflow-x: hidden;
+}
+
+#jieefxmxbc .gt_column_spanner_outer {
+  color: #333333;
+  background-color: #FFFFFF;
+  font-size: 100%;
+  font-weight: normal;
+  text-transform: inherit;
+  padding-top: 0;
+  padding-bottom: 0;
+  padding-left: 4px;
+  padding-right: 4px;
+}
+
+#jieefxmxbc .gt_column_spanner_outer:first-child {
+  padding-left: 0;
+}
+
+#jieefxmxbc .gt_column_spanner_outer:last-child {
+  padding-right: 0;
+}
+
+#jieefxmxbc .gt_column_spanner {
+  border-bottom-style: solid;
+  border-bottom-width: 2px;
+  border-bottom-color: #D3D3D3;
+  vertical-align: bottom;
+  padding-top: 5px;
+  padding-bottom: 5px;
+  overflow-x: hidden;
+  display: inline-block;
+  width: 100%;
+}
+
+#jieefxmxbc .gt_spanner_row {
+  border-bottom-style: hidden;
+}
+
+#jieefxmxbc .gt_group_heading {
+  padding-top: 8px;
+  padding-bottom: 8px;
+  padding-left: 5px;
+  padding-right: 5px;
+  color: #333333;
+  background-color: #FFFFFF;
+  font-size: 100%;
+  font-weight: initial;
+  text-transform: inherit;
+  border-top-style: solid;
+  border-top-width: 2px;
+  border-top-color: #D3D3D3;
+  border-bottom-style: solid;
+  border-bottom-width: 2px;
+  border-bottom-color: #D3D3D3;
+  border-left-style: none;
+  border-left-width: 1px;
+  border-left-color: #D3D3D3;
+  border-right-style: none;
+  border-right-width: 1px;
+  border-right-color: #D3D3D3;
+  vertical-align: middle;
+  text-align: left;
+}
+
+#jieefxmxbc .gt_empty_group_heading {
+  padding: 0.5px;
+  color: #333333;
+  background-color: #FFFFFF;
+  font-size: 100%;
+  font-weight: initial;
+  border-top-style: solid;
+  border-top-width: 2px;
+  border-top-color: #D3D3D3;
+  border-bottom-style: solid;
+  border-bottom-width: 2px;
+  border-bottom-color: #D3D3D3;
+  vertical-align: middle;
+}
+
+#jieefxmxbc .gt_from_md > :first-child {
+  margin-top: 0;
+}
+
+#jieefxmxbc .gt_from_md > :last-child {
+  margin-bottom: 0;
+}
+
+#jieefxmxbc .gt_row {
+  padding-top: 8px;
+  padding-bottom: 8px;
+  padding-left: 5px;
+  padding-right: 5px;
+  margin: 10px;
+  border-top-style: solid;
+  border-top-width: 1px;
+  border-top-color: #D3D3D3;
+  border-left-style: none;
+  border-left-width: 1px;
+  border-left-color: #D3D3D3;
+  border-right-style: none;
+  border-right-width: 1px;
+  border-right-color: #D3D3D3;
+  vertical-align: middle;
+  overflow-x: hidden;
+}
+
+#jieefxmxbc .gt_stub {
+  color: #333333;
+  background-color: #FFFFFF;
+  font-size: 100%;
+  font-weight: initial;
+  text-transform: inherit;
+  border-right-style: solid;
+  border-right-width: 2px;
+  border-right-color: #D3D3D3;
+  padding-left: 5px;
+  padding-right: 5px;
+}
+
+#jieefxmxbc .gt_stub_row_group {
+  color: #333333;
+  background-color: #FFFFFF;
+  font-size: 100%;
+  font-weight: initial;
+  text-transform: inherit;
+  border-right-style: solid;
+  border-right-width: 2px;
+  border-right-color: #D3D3D3;
+  padding-left: 5px;
+  padding-right: 5px;
+  vertical-align: top;
+}
+
+#jieefxmxbc .gt_row_group_first td {
+  border-top-width: 2px;
+}
+
+#jieefxmxbc .gt_row_group_first th {
+  border-top-width: 2px;
+}
+
+#jieefxmxbc .gt_summary_row {
+  color: #333333;
+  background-color: #FFFFFF;
+  text-transform: inherit;
+  padding-top: 8px;
+  padding-bottom: 8px;
+  padding-left: 5px;
+  padding-right: 5px;
+}
+
+#jieefxmxbc .gt_first_summary_row {
+  border-top-style: solid;
+  border-top-color: #D3D3D3;
+}
+
+#jieefxmxbc .gt_first_summary_row.thick {
+  border-top-width: 2px;
+}
+
+#jieefxmxbc .gt_last_summary_row {
+  padding-top: 8px;
+  padding-bottom: 8px;
+  padding-left: 5px;
+  padding-right: 5px;
+  border-bottom-style: solid;
+  border-bottom-width: 2px;
+  border-bottom-color: #D3D3D3;
+}
+
+#jieefxmxbc .gt_grand_summary_row {
+  color: #333333;
+  background-color: #FFFFFF;
+  text-transform: inherit;
+  padding-top: 8px;
+  padding-bottom: 8px;
+  padding-left: 5px;
+  padding-right: 5px;
+}
+
+#jieefxmxbc .gt_first_grand_summary_row {
+  padding-top: 8px;
+  padding-bottom: 8px;
+  padding-left: 5px;
+  padding-right: 5px;
+  border-top-style: double;
+  border-top-width: 6px;
+  border-top-color: #D3D3D3;
+}
+
+#jieefxmxbc .gt_last_grand_summary_row_top {
+  padding-top: 8px;
+  padding-bottom: 8px;
+  padding-left: 5px;
+  padding-right: 5px;
+  border-bottom-style: double;
+  border-bottom-width: 6px;
+  border-bottom-color: #D3D3D3;
+}
+
+#jieefxmxbc .gt_striped {
+  background-color: rgba(128, 128, 128, 0.05);
+}
+
+#jieefxmxbc .gt_table_body {
+  border-top-style: solid;
+  border-top-width: 2px;
+  border-top-color: #D3D3D3;
+  border-bottom-style: solid;
+  border-bottom-width: 2px;
+  border-bottom-color: #D3D3D3;
+}
+
+#jieefxmxbc .gt_footnotes {
+  color: #333333;
+  background-color: #FFFFFF;
+  border-bottom-style: none;
+  border-bottom-width: 2px;
+  border-bottom-color: #D3D3D3;
+  border-left-style: none;
+  border-left-width: 2px;
+  border-left-color: #D3D3D3;
+  border-right-style: none;
+  border-right-width: 2px;
+  border-right-color: #D3D3D3;
+}
+
+#jieefxmxbc .gt_footnote {
+  margin: 0px;
+  font-size: 90%;
+  padding-top: 4px;
+  padding-bottom: 4px;
+  padding-left: 5px;
+  padding-right: 5px;
+}
+
+#jieefxmxbc .gt_sourcenotes {
+  color: #333333;
+  background-color: #FFFFFF;
+  border-bottom-style: none;
+  border-bottom-width: 2px;
+  border-bottom-color: #D3D3D3;
+  border-left-style: none;
+  border-left-width: 2px;
+  border-left-color: #D3D3D3;
+  border-right-style: none;
+  border-right-width: 2px;
+  border-right-color: #D3D3D3;
+}
+
+#jieefxmxbc .gt_sourcenote {
+  font-size: 90%;
+  padding-top: 4px;
+  padding-bottom: 4px;
+  padding-left: 5px;
+  padding-right: 5px;
+}
+
+#jieefxmxbc .gt_left {
+  text-align: left;
+}
+
+#jieefxmxbc .gt_center {
+  text-align: center;
+}
+
+#jieefxmxbc .gt_right {
+  text-align: right;
+  font-variant-numeric: tabular-nums;
+}
+
+#jieefxmxbc .gt_font_normal {
+  font-weight: normal;
+}
+
+#jieefxmxbc .gt_font_bold {
+  font-weight: bold;
+}
+
+#jieefxmxbc .gt_font_italic {
+  font-style: italic;
+}
+
+#jieefxmxbc .gt_super {
+  font-size: 65%;
+}
+
+#jieefxmxbc .gt_footnote_marks {
+  font-size: 75%;
+  vertical-align: 0.4em;
+  position: initial;
+}
+
+#jieefxmxbc .gt_asterisk {
+  font-size: 100%;
+  vertical-align: 0;
+}
+
+#jieefxmxbc .gt_indent_1 {
+  text-indent: 5px;
+}
+
+#jieefxmxbc .gt_indent_2 {
+  text-indent: 10px;
+}
+
+#jieefxmxbc .gt_indent_3 {
+  text-indent: 15px;
+}
+
+#jieefxmxbc .gt_indent_4 {
+  text-indent: 20px;
+}
+
+#jieefxmxbc .gt_indent_5 {
+  text-indent: 25px;
+}
+
+#jieefxmxbc .katex-display {
+  display: inline-flex !important;
+  margin-bottom: 0.75em !important;
+}
+
+#jieefxmxbc div.Reactable > div.rt-table > div.rt-thead > div.rt-tr.rt-tr-group-header > div.rt-th-group:after {
+  height: 0px !important;
+}
+</style>
+
+<div id="tbl-summ-2" class="gt_table do-not-create-environment quarto-float quarto-figure quarto-figure-center anchored" data-quarto-disable-processing="false" data-quarto-postprocess="true" data-quarto-bootstrap="false">
+<figure class="quarto-float quarto-subfloat-tbl figure">
+<figcaption class="quarto-float-caption-top quarto-subfloat-caption quarto-subfloat-tbl" id="tbl-summ-2-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+(b) Summary by Sold
+</figcaption>
+<div aria-describedby="tbl-summ-2-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<table id="tbl-summ-2" class="gt_table do-not-create-environment caption-top table table-sm table-striped small" data-quarto-bootstrap="false">
+<colgroup>
+<col style="width: 33%">
+<col style="width: 33%">
+<col style="width: 33%">
+</colgroup>
+<thead>
+<tr class="gt_col_headings header">
+<th id="label" class="gt_col_heading gt_columns_bottom_border gt_left" style="text-align: left;" data-quarto-table-cell-role="th" scope="col"><strong>Characteristic</strong></th>
+<th id="stat_1" class="gt_col_heading gt_columns_bottom_border gt_center" style="text-align: left;" data-quarto-table-cell-role="th" scope="col"><strong>0</strong><br>
+N = 2,558</th>
+<th id="stat_2" class="gt_col_heading gt_columns_bottom_border gt_center" style="text-align: left;" data-quarto-table-cell-role="th" scope="col"><strong>1</strong><br>
+N = 442</th>
+</tr>
+</thead>
+<tbody class="gt_table_body">
+<tr class="odd">
+<td class="gt_row gt_left" style="text-align: left;" headers="label">markup</td>
+<td class="gt_row gt_center" style="text-align: left;" headers="stat_1"><br>
+</td>
+<td class="gt_row gt_center" style="text-align: left;" headers="stat_2"><br>
+</td>
+</tr>
+<tr class="even">
+<td class="gt_row gt_left" style="text-align: left;" headers="label">&nbsp;&nbsp;&nbsp;&nbsp;Mean (SD)</td>
+<td class="gt_row gt_center" style="text-align: left;" headers="stat_1">75 (26)</td>
+<td class="gt_row gt_center" style="text-align: left;" headers="stat_2">30 (8)</td>
+</tr>
+<tr class="odd">
+<td class="gt_row gt_left" style="text-align: left;" headers="label">&nbsp;&nbsp;&nbsp;&nbsp;Median (Q1, Q3)</td>
+<td class="gt_row gt_center" style="text-align: left;" headers="stat_1">76 (54, 96)</td>
+<td class="gt_row gt_center" style="text-align: left;" headers="stat_2">28 (24, 35)</td>
+</tr>
+<tr class="even">
+<td class="gt_row gt_left" style="text-align: left;" headers="label">&nbsp;&nbsp;&nbsp;&nbsp;[Min, Max]</td>
+<td class="gt_row gt_center" style="text-align: left;" headers="stat_1">[21, 120]</td>
+<td class="gt_row gt_center" style="text-align: left;" headers="stat_2">[20, 57]</td>
+</tr>
+<tr class="odd">
+<td class="gt_row gt_left" style="text-align: left;" headers="label">cost</td>
+<td class="gt_row gt_center" style="text-align: left;" headers="stat_1"><br>
+</td>
+<td class="gt_row gt_center" style="text-align: left;" headers="stat_2"><br>
+</td>
+</tr>
+<tr class="even">
+<td class="gt_row gt_left" style="text-align: left;" headers="label">&nbsp;&nbsp;&nbsp;&nbsp;Mean (SD)</td>
+<td class="gt_row gt_center" style="text-align: left;" headers="stat_1">1,992 (395)</td>
+<td class="gt_row gt_center" style="text-align: left;" headers="stat_2">2,123 (404)</td>
+</tr>
+<tr class="odd">
+<td class="gt_row gt_left" style="text-align: left;" headers="label">&nbsp;&nbsp;&nbsp;&nbsp;Median (Q1, Q3)</td>
+<td class="gt_row gt_center" style="text-align: left;" headers="stat_1">1,991 (1,728, 2,258)</td>
+<td class="gt_row gt_center" style="text-align: left;" headers="stat_2">2,129 (1,827, 2,405)</td>
+</tr>
+<tr class="even">
+<td class="gt_row gt_left" style="text-align: left;" headers="label">&nbsp;&nbsp;&nbsp;&nbsp;[Min, Max]</td>
+<td class="gt_row gt_center" style="text-align: left;" headers="stat_1">[533, 3,587]</td>
+<td class="gt_row gt_center" style="text-align: left;" headers="stat_2">[1,023, 3,353]</td>
+</tr>
+</tbody>
+</table>
+</div>
+</figure>
+</div>
+
+</div>
+</div>
+</div>
+</div>
+</figure>
+</div>
+</div>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb5"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="fu">plot</span>(markup, cost, </span>
+<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a>     <span class="at">main =</span> <span class="st">"cost vs markup"</span>, </span>
+<span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a>     <span class="at">ylab =</span> <span class="st">"cost of production ($)"</span>, </span>
+<span id="cb5-4"><a href="#cb5-4" aria-hidden="true" tabindex="-1"></a>     <span class="at">xlab =</span> <span class="st">"markup of product (%)"</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output-display">
+<div id="fig-comp" class="quarto-float quarto-figure quarto-figure-center anchored">
+<figure class="quarto-float quarto-float-fig figure">
+<div aria-describedby="fig-comp-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<img src="index_files/figure-html/fig-comp-1.png" class="img-fluid figure-img" width="672">
+</div>
+<figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-comp-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Figure&nbsp;1: Comparing cost and markup
+</figcaption>
+</figure>
+</div>
+</div>
+</div>
+<p>The first table summarizes the different covariates and outcome by type. Inspecting the average and quartiles of markup and cost between the different types, we don’t notice any difference in the distributions. This implies that type is associated with neither the cost nor markup, which is a best case scenario for a logistic regression analysis. The proportion of successful sales is different among the product types with clothes and shoe products selling at a higher rate than the accessories. This implies that there may be an association between type and product sales. Clearly, there is an imbalance in the distribution of type in the data set, but we have enough cases of each product type such that including type in the logistic regression model shouldn’t be a problem.</p>
+<p>The second table summarizes markup and the cost variables by whether the product sold (the 1 group) or not (the 0 group). Comparing these two groups, we can clearly see that markup is lower in the groups that sold and indicates a negative association between sales and markup. The distribution of cost shifts about 100 dollars higher in the group that sold and thus suggests a positive association between cost and sales.</p>
+<p>Finally, in the scatter plot comparing cost and markup, we observe random spread of the points. There is no indication of a linear or other functional relationship between markup and cost, which is an ideal scenario for logistic regression.</p>
+</section>
+<section id="building-a-logistic-regression-model" class="level2">
+<h2 class="anchored" data-anchor-id="building-a-logistic-regression-model">Building a logistic regression model</h2>
+<p>Fitting a logistic regression model in R is a simple one line of code. Since we know what the true generating parameters are above, let’s double check our work by comparing the fitted values to the true parameters.</p>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb6"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a>fit <span class="ot">&lt;-</span> <span class="fu">glm</span>(sold <span class="sc">~</span> <span class="dv">1</span> <span class="sc">+</span> markup <span class="sc">+</span> cost <span class="sc">+</span> type, </span>
+<span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a>           <span class="at">data =</span> x_df,</span>
+<span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a>           <span class="at">family =</span> binomial)</span>
+<span id="cb6-4"><a href="#cb6-4" aria-hidden="true" tabindex="-1"></a>ci <span class="ot">&lt;-</span> <span class="fu">confint</span>(fit)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stderr">
+<pre><code>Waiting for profiling to be done...</code></pre>
+</div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb8"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a>result <span class="ot">&lt;-</span> <span class="fu">data.frame</span>(<span class="at">truth =</span> true_beta, </span>
+<span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a>                     <span class="at">est =</span> <span class="fu">coef</span>(fit),</span>
+<span id="cb8-3"><a href="#cb8-3" aria-hidden="true" tabindex="-1"></a>                     <span class="at">ci_lwr =</span> ci[,<span class="dv">1</span>],</span>
+<span id="cb8-4"><a href="#cb8-4" aria-hidden="true" tabindex="-1"></a>                     <span class="at">ci_upr =</span> ci[,<span class="dv">2</span>])</span>
+<span id="cb8-5"><a href="#cb8-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-6"><a href="#cb8-6" aria-hidden="true" tabindex="-1"></a><span class="fu">kable</span>(result, <span class="at">digits =</span> <span class="dv">4</span>) <span class="sc">%&gt;%</span> </span>
+<span id="cb8-7"><a href="#cb8-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">kable_styling</span>()</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div id="tbl-truefit" class="cell quarto-float quarto-figure quarto-figure-center anchored">
+<figure class="quarto-float quarto-float-tbl figure">
+<figcaption class="quarto-float-caption-top quarto-float-caption quarto-float-tbl" id="tbl-truefit-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Table&nbsp;2: Comparing estimates to true values. Estimates are on the log-odds scale
+</figcaption>
+<div aria-describedby="tbl-truefit-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<div class="cell-output-display">
+<table class="table do-not-create-environment cell caption-top table-sm table-striped small">
+<thead>
+<tr class="header">
+<th style="text-align: left;" data-quarto-table-cell-role="th"></th>
+<th style="text-align: right;" data-quarto-table-cell-role="th">truth</th>
+<th style="text-align: right;" data-quarto-table-cell-role="th">est</th>
+<th style="text-align: right;" data-quarto-table-cell-role="th">ci_lwr</th>
+<th style="text-align: right;" data-quarto-table-cell-role="th">ci_upr</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: left;">(Intercept)</td>
+<td style="text-align: right;">2.000</td>
+<td style="text-align: right;">1.7716</td>
+<td style="text-align: right;">0.7778</td>
+<td style="text-align: right;">2.7816</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">markup</td>
+<td style="text-align: right;">-0.200</td>
+<td style="text-align: right;">-0.2045</td>
+<td style="text-align: right;">-0.2272</td>
+<td style="text-align: right;">-0.1837</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">cost</td>
+<td style="text-align: right;">0.002</td>
+<td style="text-align: right;">0.0021</td>
+<td style="text-align: right;">0.0017</td>
+<td style="text-align: right;">0.0026</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">typeclothes</td>
+<td style="text-align: right;">1.000</td>
+<td style="text-align: right;">0.8584</td>
+<td style="text-align: right;">0.4595</td>
+<td style="text-align: right;">1.2656</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">typeshoes</td>
+<td style="text-align: right;">1.500</td>
+<td style="text-align: right;">1.8053</td>
+<td style="text-align: right;">1.3052</td>
+<td style="text-align: right;">2.3199</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+</figure>
+</div>
+</div>
+<p>As expected with this rather large sample size, the estimates are fairly close to the true values and are well within the 95% confidence intervals. All of the parameter estimates are statistically significant as 0 is not within the confidence intervals, so this is a convincing model. At this step, one would normally interpret these values as odds ratios, but that is not the goal of this analysis, so I will skip the interpretation.</p>
+<p>When building a logistic regression model, one usually has to consider a few different models to find the best fit to the data. Let’s consider three other logistic regression models. One without type in the model but all other variables in the model:</p>
+<p><span class="math display">\[
+\log(\frac{\pi_i}{1 - \pi_i}) = \beta_0 + x_{markup} * \beta_{markup} +
+x_{cost} * \beta_{cost}
+\]</span></p>
+<p>a second model with a quadratic term for markup and including all the other variables:</p>
+<p><span class="math display">\[
+\log(\frac{\pi_i}{1 - \pi_i}) = \beta_0 + x_{markup} * \beta_{markup} + x_{markup}^2 * \beta_{markup^2} +
+x_{cost} * \beta_{cost} + x_{type=shoes} * \beta_{type=shoes} + x_{type = clothes}*\beta_{type = clothes}
+\]</span></p>
+<p>and finally a simple model with just markup:</p>
+<p><span class="math display">\[
+\log(\frac{\pi_i}{1 - \pi_i}) = \beta_0 + x_{markup} * \beta_{markup}
+\]</span></p>
+<p>There are many model selection criteria to choose from and which one to use depends on the goal of the analysis. In this application, the goal is estimation and inference, so I would personally advocate for the Bayesian Information Criterion (BIC). The BIC is a quantity that expresses how well the proposed model fits the data while also balancing how many parameters are in a model. More parameters in a model results in a better fit to the data but too many parameters results in overfitting. The problem with an overfit model is the lack of generalizability to new data. Please refer to the BIC() documentation to see the formula for its calculation. BIC favors having less parameters in a model as compared to it’s counterpart the Akaike Information Criterion (AIC). Therefore, the BIC is sometimes the preferred model selection criterion when the goal is to identify what covariates to go into a model.</p>
+<p>Lower values of BIC indicate a better statistical model for the data. A difference of at least 2 is the typical threshold to consider one model superior the other. For differences of less than 2 the models are about equivalent and the statistician must decide which model is superior.</p>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb9"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a>fit1 <span class="ot">&lt;-</span> <span class="fu">glm</span>(sold <span class="sc">~</span> <span class="dv">1</span> <span class="sc">+</span> markup <span class="sc">+</span> cost, </span>
+<span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a>           <span class="at">data =</span> x_df,</span>
+<span id="cb9-3"><a href="#cb9-3" aria-hidden="true" tabindex="-1"></a>           <span class="at">family =</span> binomial)</span>
+<span id="cb9-4"><a href="#cb9-4" aria-hidden="true" tabindex="-1"></a>fit2 <span class="ot">&lt;-</span> <span class="fu">glm</span>(sold <span class="sc">~</span> <span class="dv">1</span> <span class="sc">+</span> markup <span class="sc">+</span> <span class="fu">I</span>(markup<span class="sc">^</span><span class="dv">2</span>) <span class="sc">+</span> cost <span class="sc">+</span> type, </span>
+<span id="cb9-5"><a href="#cb9-5" aria-hidden="true" tabindex="-1"></a>           <span class="at">data =</span> x_df,</span>
+<span id="cb9-6"><a href="#cb9-6" aria-hidden="true" tabindex="-1"></a>           <span class="at">family =</span> binomial)</span>
+<span id="cb9-7"><a href="#cb9-7" aria-hidden="true" tabindex="-1"></a>fit3 <span class="ot">&lt;-</span> <span class="fu">glm</span>(sold <span class="sc">~</span> markup, <span class="at">data =</span> x_df, <span class="at">family =</span> binomial)</span>
+<span id="cb9-8"><a href="#cb9-8" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-9"><a href="#cb9-9" aria-hidden="true" tabindex="-1"></a>df_model_selection <span class="ot">&lt;-</span> <span class="fu">data.frame</span>(<span class="at">model =</span> <span class="fu">c</span>(<span class="st">"True_model"</span>, <span class="st">"no_type"</span>, <span class="st">"quadratic_markup"</span>, <span class="st">"Simple_markup"</span>), </span>
+<span id="cb9-10"><a href="#cb9-10" aria-hidden="true" tabindex="-1"></a>                                 <span class="at">bic =</span> <span class="fu">c</span>(<span class="fu">BIC</span>(fit), <span class="fu">BIC</span>(fit1), <span class="fu">BIC</span>(fit2), <span class="fu">BIC</span>(fit3))</span>
+<span id="cb9-11"><a href="#cb9-11" aria-hidden="true" tabindex="-1"></a>                                 ) </span>
+<span id="cb9-12"><a href="#cb9-12" aria-hidden="true" tabindex="-1"></a>df_model_selection <span class="sc">%&gt;%</span>    </span>
+<span id="cb9-13"><a href="#cb9-13" aria-hidden="true" tabindex="-1"></a>  <span class="fu">kable</span>(<span class="at">digits =</span> <span class="dv">2</span>, <span class="at">caption =</span> <span class="st">"Smaller BIC indicates better model"</span>) <span class="sc">%&gt;%</span>  </span>
+<span id="cb9-14"><a href="#cb9-14" aria-hidden="true" tabindex="-1"></a>  <span class="fu">kable_styling</span>()</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div id="tbl-modselect" class="cell quarto-float quarto-figure quarto-figure-center anchored">
+<figure class="quarto-float quarto-float-tbl figure">
+<figcaption class="quarto-float-caption-top quarto-float-caption quarto-float-tbl" id="tbl-modselect-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Table&nbsp;3: Comparing Logistic Regression Models
+</figcaption>
+<div aria-describedby="tbl-modselect-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<div class="cell-output-display">
+<table class="table do-not-create-environment cell caption-top table-sm table-striped small">
+<caption>Smaller BIC indicates better model</caption>
+<thead>
+<tr class="header">
+<th style="text-align: left;" data-quarto-table-cell-role="th">model</th>
+<th style="text-align: right;" data-quarto-table-cell-role="th">bic</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: left;">True_model</td>
+<td style="text-align: right;">927.72</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">no_type</td>
+<td style="text-align: right;">964.57</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">quadratic_markup</td>
+<td style="text-align: right;">935.31</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Simple_markup</td>
+<td style="text-align: right;">1046.51</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+</figure>
+</div>
+</div>
+<p>Upon inspecting the BIC values, the true model is unsurprisingly the lowest BIC and thus the best model. Disregarding our knowledge of the true data generating model, the model chosen at this step strongly translates the trends observed in the exploratory data analysis step, and thus highlights the importance of exploring the data before building models. The simple model with just markup is clearly the worst model with the highest BIC, so although the simple model would drastically simplify our optimal estimation of <span class="math inline">\(\pi_i\)</span> in the next step, the data indicates a more complex relationship between the outcome and covariates is more appropriate.</p>
+<p>Although we only inspect 4 models here, usually one would explore many more models and spend the bulk of their time trying to figure out the best model. More complex relationships like interactions and different functional transformations of continuous variables could be considered. Based on the exploratory analysis, this does not seem necessary in this analysis.</p>
+</section>
+<section id="assessing-model-assumptions" class="level2">
+<h2 class="anchored" data-anchor-id="assessing-model-assumptions">Assessing Model Assumptions</h2>
+<p>Assessing whether the model assumptions are violated is often overlooked when fitting a logistic regression model. The main ones to assess are linearity of covariates (assumption 2), independent sampling (assumption 3), and multicollinearity (assumption 4). Perfect separation (assumption 5) is normally a warning from R if that occurs.</p>
+<p>Based on the exploratory analysis earlier, multicollinearity is not likely not an issue in this data set. We know this for a fact because I generated the data independently. The exploratory analysis revealed that there wasn’t any clear relationship between pairs of the covariates, and all of the parameters in the model are statistically significant. These are both great signs that multicollinearity is not present. However, to formally check for multicollinearity, one can check the Variance Inflation Factors (VIFs) in the covariates. I’ll skip this step for now but one can read more on VIF theory here: https://online.stat.psu.edu/stat462/node/180/ and how to calculate it using the <code>car</code> package in R here: https://www.r-bloggers.com/2023/12/exploring-variance-inflation-factor-vif-in-r-a-practical-guide/.</p>
+<p>I will note though that if one adds higher order terms in the regression, for example</p>
+<p><span class="math display">\[
+\log(\frac{\pi_i}{1 - \pi_i}) = \beta_0 + x_{markup} * \beta_{markup} + x_{markup}^2 * \beta_{markup^2}
+\]</span> then instead of the VIF one will need to inspect the Generalized Variance Inflation Factor (GVIF).</p>
+<p>The hardest assumption to verify is the linearity assumption. This only applies to continuous covariates which are markup and cost in this example. We can use the <code>binnedplot</code> function in the <code>arm</code> package to assess this. What this function does is bin or discretize the continuous variable into equally spaced segments. Within each segment, calculate the residual for the observations via:</p>
+<p><span class="math display">\[
+  residual_i = y_i - \hat \pi_i
+\]</span> where <span class="math inline">\(\hat \pi_i\)</span> is calculated from a proposed logistic regression model. We inspect the plot to make sure that the residuals are randomly scattered around the <span class="math inline">\(y = 0\)</span> horizontal line, there is no pattern in the residuals, and that at most ~5% of the residuals are outside of the confidence interval lines.</p>
+<p>These binned residuals plots assume a large sample size for the statistical properties to hold. Specifically <strong>if the sample size is large within each bin</strong>, then the expected value of these residuals is 0 with known standard errors due to the Lindeberg-Feller central limit theorem. My personal rule-of-thumb is at least 30 observations to be reasonably confident in the approximation, but the more the better. Unfortunately, the binned plots from the arm package don’t throw warnings when the bins have small sample size, so some caution is needed when interpretting these plots. In addition to large sample sizes, for values of <span class="math inline">\(\hat \pi_i\)</span> close to 0 or 1, the statistical theory does not hold, so bins with mostly very low or very high predicted values of <span class="math inline">\(\hat \pi_i\)</span> are not as informative.</p>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb10"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a><span class="do">## example on how the binned residual plot is constructed</span></span>
+<span id="cb10-2"><a href="#cb10-2" aria-hidden="true" tabindex="-1"></a>rng <span class="ot">&lt;-</span> <span class="fu">range</span>(x_df<span class="sc">$</span>cost) <span class="co"># min, max of markup</span></span>
+<span id="cb10-3"><a href="#cb10-3" aria-hidden="true" tabindex="-1"></a><span class="do">## break up range into 3 equal parts</span></span>
+<span id="cb10-4"><a href="#cb10-4" aria-hidden="true" tabindex="-1"></a>breakpoints <span class="ot">&lt;-</span> <span class="fu">seq</span>(<span class="at">from =</span> rng[<span class="dv">1</span>],</span>
+<span id="cb10-5"><a href="#cb10-5" aria-hidden="true" tabindex="-1"></a>                   <span class="at">to =</span> rng[<span class="dv">2</span>],</span>
+<span id="cb10-6"><a href="#cb10-6" aria-hidden="true" tabindex="-1"></a>                   <span class="at">by =</span> <span class="fu">diff</span>(rng<span class="sc">/</span><span class="dv">3</span>))</span>
+<span id="cb10-7"><a href="#cb10-7" aria-hidden="true" tabindex="-1"></a>midpoints <span class="ot">&lt;-</span> (breakpoints[<span class="sc">-</span><span class="dv">1</span>] <span class="sc">+</span> breakpoints[<span class="sc">-</span><span class="fu">length</span>(breakpoints)]) <span class="sc">/</span> <span class="dv">2</span></span>
+<span id="cb10-8"><a href="#cb10-8" aria-hidden="true" tabindex="-1"></a>res <span class="ot">&lt;-</span> x_df<span class="sc">$</span>sold <span class="sc">-</span> <span class="fu">predict</span>(fit, <span class="at">type =</span> <span class="st">'response'</span>)</span>
+<span id="cb10-9"><a href="#cb10-9" aria-hidden="true" tabindex="-1"></a>res_df <span class="ot">&lt;-</span> <span class="fu">data.frame</span>(<span class="at">res =</span> res,</span>
+<span id="cb10-10"><a href="#cb10-10" aria-hidden="true" tabindex="-1"></a>           <span class="at">bp =</span> <span class="fu">cut</span>(x_df<span class="sc">$</span>cost, <span class="at">breaks =</span> breakpoints))</span>
+<span id="cb10-11"><a href="#cb10-11" aria-hidden="true" tabindex="-1"></a>res_ave <span class="ot">&lt;-</span> <span class="fu">aggregate</span>(res <span class="sc">~</span> bp,</span>
+<span id="cb10-12"><a href="#cb10-12" aria-hidden="true" tabindex="-1"></a>                     <span class="at">data =</span> res_df,</span>
+<span id="cb10-13"><a href="#cb10-13" aria-hidden="true" tabindex="-1"></a>                     <span class="at">FUN =</span> mean)</span>
+<span id="cb10-14"><a href="#cb10-14" aria-hidden="true" tabindex="-1"></a><span class="fu">plot</span>(<span class="at">x =</span> x_df<span class="sc">$</span>cost, <span class="at">y =</span> res, </span>
+<span id="cb10-15"><a href="#cb10-15" aria-hidden="true" tabindex="-1"></a>     <span class="at">xlab =</span> <span class="st">"cost"</span>,</span>
+<span id="cb10-16"><a href="#cb10-16" aria-hidden="true" tabindex="-1"></a>     <span class="at">ylab =</span> <span class="st">"Residuals: observed - predicted"</span>,</span>
+<span id="cb10-17"><a href="#cb10-17" aria-hidden="true" tabindex="-1"></a>     <span class="at">main  =</span> <span class="st">"How a binned residual plot is constructed"</span>,</span>
+<span id="cb10-18"><a href="#cb10-18" aria-hidden="true" tabindex="-1"></a>     <span class="at">pch =</span> <span class="dv">16</span>)</span>
+<span id="cb10-19"><a href="#cb10-19" aria-hidden="true" tabindex="-1"></a><span class="fu">points</span>(<span class="at">x =</span> midpoints, <span class="at">y =</span> res_ave<span class="sc">$</span>res, </span>
+<span id="cb10-20"><a href="#cb10-20" aria-hidden="true" tabindex="-1"></a>       <span class="at">pch =</span> <span class="dv">16</span>, <span class="at">cex =</span> <span class="fl">1.2</span>,</span>
+<span id="cb10-21"><a href="#cb10-21" aria-hidden="true" tabindex="-1"></a>       <span class="at">col =</span> <span class="st">'red'</span>)</span>
+<span id="cb10-22"><a href="#cb10-22" aria-hidden="true" tabindex="-1"></a><span class="fu">abline</span>(<span class="at">v =</span> breakpoints, <span class="at">col =</span> <span class="st">'red'</span>)</span>
+<span id="cb10-23"><a href="#cb10-23" aria-hidden="true" tabindex="-1"></a><span class="fu">legend</span>(<span class="st">"topright"</span>, </span>
+<span id="cb10-24"><a href="#cb10-24" aria-hidden="true" tabindex="-1"></a>       <span class="at">legend =</span> <span class="fu">c</span>(<span class="st">"observed_residual"</span>,</span>
+<span id="cb10-25"><a href="#cb10-25" aria-hidden="true" tabindex="-1"></a>                  <span class="st">"average_residual"</span>),</span>
+<span id="cb10-26"><a href="#cb10-26" aria-hidden="true" tabindex="-1"></a>       <span class="at">col =</span> <span class="fu">c</span>(<span class="st">'black'</span>, <span class="st">'red'</span>),</span>
+<span id="cb10-27"><a href="#cb10-27" aria-hidden="true" tabindex="-1"></a>       <span class="at">pch =</span> <span class="dv">16</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="index_files/figure-html/unnamed-chunk-4-1.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
+</div>
+</div>
+<p>Let’s look at several binned residual plots to assess whether our proposed model is reasonable.</p>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb11"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a>res <span class="ot">&lt;-</span> <span class="fu">residuals</span>(fit, <span class="at">type =</span> <span class="st">"response"</span>)</span>
+<span id="cb11-2"><a href="#cb11-2" aria-hidden="true" tabindex="-1"></a><span class="fu">binnedplot</span>(<span class="at">x =</span> <span class="fu">fitted</span>(fit),</span>
+<span id="cb11-3"><a href="#cb11-3" aria-hidden="true" tabindex="-1"></a>           <span class="at">y =</span> res, </span>
+<span id="cb11-4"><a href="#cb11-4" aria-hidden="true" tabindex="-1"></a>           <span class="at">nclass=</span><span class="cn">NULL</span>, </span>
+<span id="cb11-5"><a href="#cb11-5" aria-hidden="true" tabindex="-1"></a>           <span class="at">xlab=</span><span class="st">"Expected Values"</span>, </span>
+<span id="cb11-6"><a href="#cb11-6" aria-hidden="true" tabindex="-1"></a>           <span class="at">ylab=</span><span class="st">"Average residual"</span>, </span>
+<span id="cb11-7"><a href="#cb11-7" aria-hidden="true" tabindex="-1"></a>           <span class="at">main=</span><span class="st">"Binned residual plot"</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="index_files/figure-html/unnamed-chunk-5-1.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
+</div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb12"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a><span class="fu">binnedplot</span>(<span class="at">x =</span> x_df<span class="sc">$</span>markup,</span>
+<span id="cb12-2"><a href="#cb12-2" aria-hidden="true" tabindex="-1"></a>           <span class="at">y =</span> res, </span>
+<span id="cb12-3"><a href="#cb12-3" aria-hidden="true" tabindex="-1"></a>           <span class="at">nclass=</span><span class="cn">NULL</span>, </span>
+<span id="cb12-4"><a href="#cb12-4" aria-hidden="true" tabindex="-1"></a>           <span class="at">xlab=</span><span class="st">"Binned markup"</span>, </span>
+<span id="cb12-5"><a href="#cb12-5" aria-hidden="true" tabindex="-1"></a>           <span class="at">ylab=</span><span class="st">"Average residual"</span>, </span>
+<span id="cb12-6"><a href="#cb12-6" aria-hidden="true" tabindex="-1"></a>           <span class="at">main=</span><span class="st">"Binned residual plot of markup"</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="index_files/figure-html/unnamed-chunk-5-2.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
+</div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb13"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a><span class="fu">binnedplot</span>(<span class="at">x =</span> x_df<span class="sc">$</span>cost,</span>
+<span id="cb13-2"><a href="#cb13-2" aria-hidden="true" tabindex="-1"></a>           <span class="at">y =</span> res, </span>
+<span id="cb13-3"><a href="#cb13-3" aria-hidden="true" tabindex="-1"></a>           <span class="at">nclass=</span><span class="cn">NULL</span>, </span>
+<span id="cb13-4"><a href="#cb13-4" aria-hidden="true" tabindex="-1"></a>           <span class="at">xlab=</span><span class="st">"Binned cost"</span>, </span>
+<span id="cb13-5"><a href="#cb13-5" aria-hidden="true" tabindex="-1"></a>           <span class="at">ylab=</span><span class="st">"Average residual"</span>, </span>
+<span id="cb13-6"><a href="#cb13-6" aria-hidden="true" tabindex="-1"></a>           <span class="at">main=</span><span class="st">"Binned residual plot of cost"</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="index_files/figure-html/unnamed-chunk-5-3.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
+</div>
+</div>
+</section>
+</section>
+<section id="optimizing-the-expected-returns-expected-revenue" class="level1">
+<h1>Optimizing the Expected Returns (Expected Revenue)</h1>
+<section id="relationship-between-x_markup-and-pi_i" class="level2">
+<h2 class="anchored" data-anchor-id="relationship-between-x_markup-and-pi_i">Relationship between <span class="math inline">\(x_{markup}\)</span> and <span class="math inline">\(\pi_i\)</span></h2>
+<p>Now that we have decided on a logistic regression model, let’s explore the relationship between markup and the probability of selling the product. The relationship between markup and the log-odds might be linear, but when we invert the problem to get the relationship between markup and the probability it is certainly non-linear. To produce this non-linear relationship, we can invert the log-odds back to the probability scale through the following formula:</p>
+<p><span class="math display">\[
+\pi_i = (1 + \exp[-(\beta_0 + x_{markup} * \beta_{markup} +
+x_{cost} * \beta_{cost} + x_{type=shoes} * \beta_{type=shoes} + x_{type = clothes}*\beta_{type = clothes})])^{-1}
+\]</span></p>
+<p>We are specifically interested in how markup relates to the probability of selling, but we have the other data variables in the formula. Before exploring how the probability of selling changes over a range of values for markup, it is pertinent to choose some representative values for cost and type. To start with, let’s set the cost level to be the observed average cost level and let type be the most common type in the data set to provide a curve.</p>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb14"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb14-1"><a href="#cb14-1" aria-hidden="true" tabindex="-1"></a><span class="do">## there isn't a mode function in base R</span></span>
+<span id="cb14-2"><a href="#cb14-2" aria-hidden="true" tabindex="-1"></a>getMode <span class="ot">&lt;-</span> <span class="cf">function</span>(x){</span>
+<span id="cb14-3"><a href="#cb14-3" aria-hidden="true" tabindex="-1"></a>  lx <span class="ot">&lt;-</span> <span class="fu">levels</span>(x)</span>
+<span id="cb14-4"><a href="#cb14-4" aria-hidden="true" tabindex="-1"></a>  ux <span class="ot">&lt;-</span> <span class="fu">unique</span>(lx)</span>
+<span id="cb14-5"><a href="#cb14-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">factor</span>(ux[<span class="fu">which.max</span>(<span class="fu">tabulate</span>(<span class="fu">match</span>(lx, ux)))], <span class="at">levels =</span> lx)</span>
+<span id="cb14-6"><a href="#cb14-6" aria-hidden="true" tabindex="-1"></a>}</span>
+<span id="cb14-7"><a href="#cb14-7" aria-hidden="true" tabindex="-1"></a>range_markup <span class="ot">&lt;-</span> <span class="fu">seq</span>(<span class="at">from =</span> <span class="dv">0</span>, <span class="at">to =</span> <span class="dv">75</span>, <span class="at">by =</span> <span class="dv">1</span>)</span>
+<span id="cb14-8"><a href="#cb14-8" aria-hidden="true" tabindex="-1"></a>mode_type <span class="ot">&lt;-</span> <span class="fu">getMode</span>(x_df<span class="sc">$</span>type)</span>
+<span id="cb14-9"><a href="#cb14-9" aria-hidden="true" tabindex="-1"></a>mean_cost <span class="ot">&lt;-</span> <span class="fu">mean</span>(x_df<span class="sc">$</span>cost)</span>
+<span id="cb14-10"><a href="#cb14-10" aria-hidden="true" tabindex="-1"></a>new_x_df <span class="ot">&lt;-</span> <span class="fu">data.frame</span>(<span class="st">"markup"</span> <span class="ot">=</span> range_markup,</span>
+<span id="cb14-11"><a href="#cb14-11" aria-hidden="true" tabindex="-1"></a>                       <span class="st">"cost"</span> <span class="ot">=</span> mean_cost,</span>
+<span id="cb14-12"><a href="#cb14-12" aria-hidden="true" tabindex="-1"></a>                       <span class="st">"type"</span> <span class="ot">=</span> mode_type)</span>
+<span id="cb14-13"><a href="#cb14-13" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb14-14"><a href="#cb14-14" aria-hidden="true" tabindex="-1"></a>preds <span class="ot">&lt;-</span> <span class="fu">predict</span>(fit, <span class="at">newdata =</span> new_x_df, <span class="at">se.fit =</span> <span class="cn">TRUE</span>)</span>
+<span id="cb14-15"><a href="#cb14-15" aria-hidden="true" tabindex="-1"></a>preds_ci_upr <span class="ot">&lt;-</span> preds<span class="sc">$</span>fit <span class="sc">+</span> <span class="fu">qnorm</span>(<span class="fl">0.975</span>)<span class="sc">*</span>preds<span class="sc">$</span>se.fit</span>
+<span id="cb14-16"><a href="#cb14-16" aria-hidden="true" tabindex="-1"></a>preds_ci_lwr <span class="ot">&lt;-</span> preds<span class="sc">$</span>fit <span class="sc">-</span> <span class="fu">qnorm</span>(<span class="fl">0.975</span>)<span class="sc">*</span>preds<span class="sc">$</span>se.fit</span>
+<span id="cb14-17"><a href="#cb14-17" aria-hidden="true" tabindex="-1"></a>probs_df <span class="ot">&lt;-</span> <span class="fu">data.frame</span>(<span class="at">pred_prob =</span> <span class="fu">inverse_logit</span>(preds<span class="sc">$</span>fit),</span>
+<span id="cb14-18"><a href="#cb14-18" aria-hidden="true" tabindex="-1"></a>                       <span class="at">pred_prob_lwr =</span> <span class="fu">inverse_logit</span>(preds_ci_lwr),</span>
+<span id="cb14-19"><a href="#cb14-19" aria-hidden="true" tabindex="-1"></a>                       <span class="at">pred_prob_upr =</span> <span class="fu">inverse_logit</span>(preds_ci_upr),</span>
+<span id="cb14-20"><a href="#cb14-20" aria-hidden="true" tabindex="-1"></a>                       <span class="at">markup =</span> range_markup)</span>
+<span id="cb14-21"><a href="#cb14-21" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb14-22"><a href="#cb14-22" aria-hidden="true" tabindex="-1"></a>true_probs <span class="ot">&lt;-</span> <span class="fu">model.matrix</span>(<span class="sc">~</span> markup <span class="sc">+</span> cost <span class="sc">+</span> type, <span class="at">data =</span> new_x_df) <span class="sc">%*%</span> true_beta</span>
+<span id="cb14-23"><a href="#cb14-23" aria-hidden="true" tabindex="-1"></a>probs_df<span class="sc">$</span>true_probs <span class="ot">&lt;-</span> <span class="fu">inverse_logit</span>(true_probs)</span>
+<span id="cb14-24"><a href="#cb14-24" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb14-25"><a href="#cb14-25" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb14-26"><a href="#cb14-26" aria-hidden="true" tabindex="-1"></a><span class="fu">ggplot</span>(probs_df) <span class="sc">+</span> </span>
+<span id="cb14-27"><a href="#cb14-27" aria-hidden="true" tabindex="-1"></a>  <span class="do">## probability curve predicted from logistic regression in black</span></span>
+<span id="cb14-28"><a href="#cb14-28" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_line</span>(<span class="fu">aes</span>(<span class="at">x =</span> markup, <span class="at">y =</span> pred_prob)) <span class="sc">+</span> </span>
+<span id="cb14-29"><a href="#cb14-29" aria-hidden="true" tabindex="-1"></a>  <span class="do">## 95% wald CI in red</span></span>
+<span id="cb14-30"><a href="#cb14-30" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_line</span>(<span class="fu">aes</span>(<span class="at">x =</span> markup, <span class="at">y =</span> pred_prob_upr), <span class="at">col =</span> <span class="st">"red"</span>) <span class="sc">+</span> </span>
+<span id="cb14-31"><a href="#cb14-31" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_line</span>(<span class="fu">aes</span>(<span class="at">x =</span> markup, <span class="at">y =</span> pred_prob_lwr), <span class="at">col =</span> <span class="st">"red"</span>) <span class="sc">+</span> </span>
+<span id="cb14-32"><a href="#cb14-32" aria-hidden="true" tabindex="-1"></a>  <span class="do">## probability curve using true values will be in blue</span></span>
+<span id="cb14-33"><a href="#cb14-33" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_line</span>(<span class="fu">aes</span>(<span class="at">x =</span> markup, <span class="at">y =</span> true_probs), <span class="at">col =</span> <span class="st">"blue"</span>) <span class="sc">+</span> </span>
+<span id="cb14-34"><a href="#cb14-34" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ggtitle</span>(<span class="fu">paste0</span>(<span class="st">"Probablity of Selling Product vs markup percentage"</span>),</span>
+<span id="cb14-35"><a href="#cb14-35" aria-hidden="true" tabindex="-1"></a>          <span class="at">subtitle =</span> <span class="fu">paste0</span>(<span class="st">"type = "</span>, mode_type[<span class="dv">1</span>], </span>
+<span id="cb14-36"><a href="#cb14-36" aria-hidden="true" tabindex="-1"></a>                            <span class="st">"  cost = "</span>, </span>
+<span id="cb14-37"><a href="#cb14-37" aria-hidden="true" tabindex="-1"></a>                            <span class="fu">round</span>(mean_cost[<span class="dv">1</span>], <span class="at">digits =</span> <span class="dv">2</span>)</span>
+<span id="cb14-38"><a href="#cb14-38" aria-hidden="true" tabindex="-1"></a>                            )</span>
+<span id="cb14-39"><a href="#cb14-39" aria-hidden="true" tabindex="-1"></a>  ) <span class="sc">+</span> </span>
+<span id="cb14-40"><a href="#cb14-40" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(<span class="at">x =</span> <span class="st">"markup (%)"</span>, <span class="at">y =</span> <span class="st">"Probability of Selling Product"</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="index_files/figure-html/unnamed-chunk-6-1.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
+</div>
+</div>
+<p>As expected, due to how well our estimates of the parameters are, the estimated probability curve in black is mostly overlapped by expected probabilities calculated from the true parameters in blue. As we can see from the graph above, the probability of selling decreases as markup increases. This isn’t surprising given that the true parameter for markup is -0.02.</p>
+<p>Let’s plot the differences between the true and predicted probabilities to really show how small the difference in magnitude is. We can see that the probabilities only differ at most by 0.02. Depending on the application context, this can be a meaningful difference or not, but for this application let’s assume that an underestimation of 0.02 is a reasonably close estimate.</p>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb15"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb15-1"><a href="#cb15-1" aria-hidden="true" tabindex="-1"></a><span class="fu">plot</span>(<span class="at">x =</span> probs_df<span class="sc">$</span>markup, </span>
+<span id="cb15-2"><a href="#cb15-2" aria-hidden="true" tabindex="-1"></a>     <span class="at">y =</span> probs_df<span class="sc">$</span>true_probs <span class="sc">-</span> probs_df<span class="sc">$</span>pred_prob,</span>
+<span id="cb15-3"><a href="#cb15-3" aria-hidden="true" tabindex="-1"></a>     <span class="at">type =</span> <span class="st">'h'</span>,</span>
+<span id="cb15-4"><a href="#cb15-4" aria-hidden="true" tabindex="-1"></a>     <span class="at">ylab =</span> <span class="st">"True Prob - Pred Prob"</span>,</span>
+<span id="cb15-5"><a href="#cb15-5" aria-hidden="true" tabindex="-1"></a>     <span class="at">xlab =</span> <span class="st">"markup"</span>,</span>
+<span id="cb15-6"><a href="#cb15-6" aria-hidden="true" tabindex="-1"></a>     <span class="at">main =</span> <span class="st">"Difference between True and Predicted Probabilities"</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output-display">
+<div id="fig-diffprob" class="quarto-float quarto-figure quarto-figure-center anchored">
+<figure class="quarto-float quarto-float-fig figure">
+<div aria-describedby="fig-diffprob-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<img src="index_files/figure-html/fig-diffprob-1.png" class="img-fluid figure-img" width="672">
+</div>
+<figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-diffprob-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Figure&nbsp;2: Differences between predicted probability and true probability
+</figcaption>
+</figure>
+</div>
+</div>
+</div>
+</section>
+<section id="calculating-the-optimal-markup" class="level2">
+<h2 class="anchored" data-anchor-id="calculating-the-optimal-markup">Calculating the Optimal markup</h2>
+<p>We can propose the following function to express a balance between optimizing cost markup while increasing the probability of successfully selling the product:</p>
+<p><span class="math inline">\(f(x_{markup}) = (1 + \frac{x_{markup}}{100})x_{cost} \pi_i\)</span></p>
+<p>This function is derived from the idea of the expected total revenue generated by a new product. The new products total revenue is expressed as <span class="math inline">\((1 + \frac{x_{markup}}{100})*x_{cost}\)</span> and the expected value of a new observation <span class="math inline">\(Y_i\)</span> is <span class="math inline">\(\pi_i\)</span> because <span class="math inline">\(Y_i\)</span> is a Bernoulli random variable (see appendix for small derivation). Thus, the expected total revenue generated from this product is the multiplication of these two quantities.</p>
+<p>The calculation of <span class="math inline">\(\pi_i\)</span> depends on <span class="math inline">\(x_{markup}\)</span> and <span class="math inline">\(x_{cost}\)</span>.</p>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb16"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb16-1"><a href="#cb16-1" aria-hidden="true" tabindex="-1"></a>expected_return <span class="ot">&lt;-</span> <span class="cf">function</span>(markup, cost, type, fit, <span class="at">log =</span> <span class="cn">FALSE</span>){</span>
+<span id="cb16-2"><a href="#cb16-2" aria-hidden="true" tabindex="-1"></a>  new_data <span class="ot">&lt;-</span> <span class="fu">data.frame</span>(<span class="at">markup =</span> markup,</span>
+<span id="cb16-3"><a href="#cb16-3" aria-hidden="true" tabindex="-1"></a>                         <span class="at">cost =</span> cost,</span>
+<span id="cb16-4"><a href="#cb16-4" aria-hidden="true" tabindex="-1"></a>                         <span class="at">type =</span> type)</span>
+<span id="cb16-5"><a href="#cb16-5" aria-hidden="true" tabindex="-1"></a>  <span class="co"># if(markup &lt; 0){</span></span>
+<span id="cb16-6"><a href="#cb16-6" aria-hidden="true" tabindex="-1"></a>  <span class="co">#   return(-Inf)</span></span>
+<span id="cb16-7"><a href="#cb16-7" aria-hidden="true" tabindex="-1"></a>  <span class="co"># }</span></span>
+<span id="cb16-8"><a href="#cb16-8" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb16-9"><a href="#cb16-9" aria-hidden="true" tabindex="-1"></a>  <span class="cf">if</span>(log){</span>
+<span id="cb16-10"><a href="#cb16-10" aria-hidden="true" tabindex="-1"></a>   <span class="do">### doing optimization on the log scale is more stable, if markup &gt; 0</span></span>
+<span id="cb16-11"><a href="#cb16-11" aria-hidden="true" tabindex="-1"></a>    <span class="fu">log</span>(<span class="dv">1</span> <span class="sc">+</span> markup<span class="sc">/</span><span class="dv">100</span>) <span class="sc">+</span> <span class="fu">log</span>(cost) <span class="sc">+</span> </span>
+<span id="cb16-12"><a href="#cb16-12" aria-hidden="true" tabindex="-1"></a>      <span class="fu">log</span>(<span class="fu">predict</span>(fit, <span class="at">newdata =</span> new_data, <span class="at">type =</span> <span class="st">"response"</span>))</span>
+<span id="cb16-13"><a href="#cb16-13" aria-hidden="true" tabindex="-1"></a>  }<span class="cf">else</span>{</span>
+<span id="cb16-14"><a href="#cb16-14" aria-hidden="true" tabindex="-1"></a>   (<span class="dv">1</span> <span class="sc">+</span> markup<span class="sc">/</span><span class="dv">100</span>)<span class="sc">*</span>cost <span class="sc">*</span> <span class="co">#total sale price</span></span>
+<span id="cb16-15"><a href="#cb16-15" aria-hidden="true" tabindex="-1"></a>    <span class="fu">predict</span>(fit, <span class="at">newdata =</span> new_data, <span class="at">type =</span> <span class="st">"response"</span>) <span class="co">#prob success </span></span>
+<span id="cb16-16"><a href="#cb16-16" aria-hidden="true" tabindex="-1"></a>  }</span>
+<span id="cb16-17"><a href="#cb16-17" aria-hidden="true" tabindex="-1"></a>}</span>
+<span id="cb16-18"><a href="#cb16-18" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb16-19"><a href="#cb16-19" aria-hidden="true" tabindex="-1"></a>optimal_vals <span class="ot">&lt;-</span> <span class="fu">optim</span>(<span class="at">par =</span> <span class="dv">50</span>, </span>
+<span id="cb16-20"><a href="#cb16-20" aria-hidden="true" tabindex="-1"></a>      <span class="at">fn =</span> expected_return, </span>
+<span id="cb16-21"><a href="#cb16-21" aria-hidden="true" tabindex="-1"></a>      <span class="at">method =</span> <span class="st">"BFGS"</span>,</span>
+<span id="cb16-22"><a href="#cb16-22" aria-hidden="true" tabindex="-1"></a>      <span class="at">control =</span> <span class="fu">list</span>(<span class="at">fnscale =</span> <span class="sc">-</span><span class="dv">1</span>), <span class="co"># do maximization not minimization</span></span>
+<span id="cb16-23"><a href="#cb16-23" aria-hidden="true" tabindex="-1"></a>      <span class="co"># These params don't change</span></span>
+<span id="cb16-24"><a href="#cb16-24" aria-hidden="true" tabindex="-1"></a>      <span class="at">cost =</span> mean_cost[<span class="dv">1</span>], <span class="at">type =</span> mode_type[<span class="dv">1</span>], <span class="at">fit =</span> fit </span>
+<span id="cb16-25"><a href="#cb16-25" aria-hidden="true" tabindex="-1"></a>      )</span>
+<span id="cb16-26"><a href="#cb16-26" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb16-27"><a href="#cb16-27" aria-hidden="true" tabindex="-1"></a><span class="cf">if</span>(optimal_vals<span class="sc">$</span>convergence <span class="sc">!=</span> <span class="dv">0</span>){</span>
+<span id="cb16-28"><a href="#cb16-28" aria-hidden="true" tabindex="-1"></a>  <span class="fu">stop</span>(<span class="st">"The numerical optimization did not converge"</span>)</span>
+<span id="cb16-29"><a href="#cb16-29" aria-hidden="true" tabindex="-1"></a>}<span class="cf">else</span>{</span>
+<span id="cb16-30"><a href="#cb16-30" aria-hidden="true" tabindex="-1"></a>  new_data <span class="ot">&lt;-</span> <span class="fu">data.frame</span>(<span class="at">markup =</span> optimal_vals<span class="sc">$</span>par,</span>
+<span id="cb16-31"><a href="#cb16-31" aria-hidden="true" tabindex="-1"></a>                         <span class="at">cost =</span> mean_cost[<span class="dv">1</span>],</span>
+<span id="cb16-32"><a href="#cb16-32" aria-hidden="true" tabindex="-1"></a>                         <span class="at">type =</span> mode_type[<span class="dv">1</span>])</span>
+<span id="cb16-33"><a href="#cb16-33" aria-hidden="true" tabindex="-1"></a>  optimal_prob_success <span class="ot">&lt;-</span> <span class="fu">inverse_logit</span>(<span class="fu">predict</span>(fit, new_data))</span>
+<span id="cb16-34"><a href="#cb16-34" aria-hidden="true" tabindex="-1"></a>  optimal_df <span class="ot">&lt;-</span> <span class="fu">data.frame</span>(<span class="at">optimal_markup =</span> optimal_vals<span class="sc">$</span>par,</span>
+<span id="cb16-35"><a href="#cb16-35" aria-hidden="true" tabindex="-1"></a>                           <span class="at">expected_total_cost =</span> optimal_vals<span class="sc">$</span>value,</span>
+<span id="cb16-36"><a href="#cb16-36" aria-hidden="true" tabindex="-1"></a>                           <span class="at">type =</span> mode_type[<span class="dv">1</span>],</span>
+<span id="cb16-37"><a href="#cb16-37" aria-hidden="true" tabindex="-1"></a>                           <span class="at">cost =</span> mean_cost[<span class="dv">1</span>],</span>
+<span id="cb16-38"><a href="#cb16-38" aria-hidden="true" tabindex="-1"></a>                           <span class="at">prob_success =</span> optimal_prob_success)</span>
+<span id="cb16-39"><a href="#cb16-39" aria-hidden="true" tabindex="-1"></a>  <span class="fu">kable</span>(optimal_df, <span class="at">digits =</span> <span class="dv">3</span>, <span class="at">align =</span> <span class="st">'c'</span>) <span class="sc">%&gt;%</span></span>
+<span id="cb16-40"><a href="#cb16-40" aria-hidden="true" tabindex="-1"></a>    <span class="fu">kable_styling</span>()</span>
+<span id="cb16-41"><a href="#cb16-41" aria-hidden="true" tabindex="-1"></a>}</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output-display">
+<table class="table caption-top table-sm table-striped small">
+<thead>
+<tr class="header">
+<th style="text-align: center;" data-quarto-table-cell-role="th">optimal_markup</th>
+<th style="text-align: center;" data-quarto-table-cell-role="th">expected_total_cost</th>
+<th style="text-align: center;" data-quarto-table-cell-role="th">type</th>
+<th style="text-align: center;" data-quarto-table-cell-role="th">cost</th>
+<th style="text-align: center;" data-quarto-table-cell-role="th">prob_success</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: center;">14.48</td>
+<td style="text-align: center;">2203.908</td>
+<td style="text-align: center;">accessories</td>
+<td style="text-align: center;">2011.027</td>
+<td style="text-align: center;">0.957</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+<p>From this analysis, we find that for an accessory product that costs of $2011.03 to produce, the optimal markup is about 14.48 percent. This results in a total revenue generated of $2203.91.</p>
+<p>Although our formula calculates an optimal markup of 14.48 percent, we need to keep in mind that the range of markup in the data set are values between 20 and 120 percent. Thus, a markup of 14.48 percent is outside the region covered by the data. I would suggest collecting more data in this range before widely adopting this decision rule.</p>
+<p>In this section we only looked at one specific combination of covariates. Of course, we may want to consider cases with combinations of product costs and product types. To explore these different scenarios more easily, I’ve created a Rshiny dashboard that’ll be linked below when it’s done.</p>
+</section>
+<section id="hypothetical-impact-of-optimal-markup-strategy" class="level2">
+<h2 class="anchored" data-anchor-id="hypothetical-impact-of-optimal-markup-strategy">Hypothetical Impact of Optimal Markup strategy</h2>
+<p>Let’s assess the business impact of this optimal markup strategy is in terms of two important outcomes:</p>
+<ol type="1">
+<li><p>The change in successful sales compared to the observed sales data</p></li>
+<li><p>The change in revenue generated compared to the observed revenue</p></li>
+</ol>
+<p>For each point in our data set, we will substitute the observed optimal markup strategy with the optimal markup and check the change in sales and revenue.</p>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb17"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb17-1"><a href="#cb17-1" aria-hidden="true" tabindex="-1"></a>calc_optimal_markup <span class="ot">&lt;-</span> <span class="cf">function</span>(cost, type, fit){</span>
+<span id="cb17-2"><a href="#cb17-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">optim</span>(<span class="at">par =</span> <span class="dv">50</span>, </span>
+<span id="cb17-3"><a href="#cb17-3" aria-hidden="true" tabindex="-1"></a>      <span class="at">fn =</span> expected_return, </span>
+<span id="cb17-4"><a href="#cb17-4" aria-hidden="true" tabindex="-1"></a>      <span class="at">method =</span> <span class="st">"BFGS"</span>,</span>
+<span id="cb17-5"><a href="#cb17-5" aria-hidden="true" tabindex="-1"></a>      <span class="at">control =</span> <span class="fu">list</span>(<span class="at">fnscale =</span> <span class="sc">-</span><span class="dv">1</span>), <span class="co"># do maximization not minimization</span></span>
+<span id="cb17-6"><a href="#cb17-6" aria-hidden="true" tabindex="-1"></a>      <span class="co"># These params don't change</span></span>
+<span id="cb17-7"><a href="#cb17-7" aria-hidden="true" tabindex="-1"></a>      <span class="at">cost =</span> cost, <span class="at">type =</span> type, <span class="at">fit =</span> fit </span>
+<span id="cb17-8"><a href="#cb17-8" aria-hidden="true" tabindex="-1"></a>      )  </span>
+<span id="cb17-9"><a href="#cb17-9" aria-hidden="true" tabindex="-1"></a>}</span>
+<span id="cb17-10"><a href="#cb17-10" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb17-11"><a href="#cb17-11" aria-hidden="true" tabindex="-1"></a>optimal_markups <span class="ot">&lt;-</span> <span class="fu">mapply</span>(calc_optimal_markup, </span>
+<span id="cb17-12"><a href="#cb17-12" aria-hidden="true" tabindex="-1"></a>                          <span class="at">cost =</span> x_df<span class="sc">$</span>cost, </span>
+<span id="cb17-13"><a href="#cb17-13" aria-hidden="true" tabindex="-1"></a>                          <span class="at">type =</span> x_df<span class="sc">$</span>type, </span>
+<span id="cb17-14"><a href="#cb17-14" aria-hidden="true" tabindex="-1"></a>                          <span class="at">MoreArgs =</span> <span class="fu">list</span>(<span class="at">fit =</span> fit))</span>
+<span id="cb17-15"><a href="#cb17-15" aria-hidden="true" tabindex="-1"></a>optimal_x_df <span class="ot">&lt;-</span> x_df</span>
+<span id="cb17-16"><a href="#cb17-16" aria-hidden="true" tabindex="-1"></a>optimal_x_df<span class="sc">$</span>markup <span class="ot">&lt;-</span> <span class="fu">unlist</span>(optimal_markups[<span class="dv">1</span>,])</span>
+<span id="cb17-17"><a href="#cb17-17" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb17-18"><a href="#cb17-18" aria-hidden="true" tabindex="-1"></a><span class="fu">hist</span>(optimal_x_df<span class="sc">$</span>markup)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="index_files/figure-html/unnamed-chunk-8-1.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
+</div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb18"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb18-1"><a href="#cb18-1" aria-hidden="true" tabindex="-1"></a>hypothetical_probs <span class="ot">&lt;-</span> <span class="fu">predict</span>(fit, </span>
+<span id="cb18-2"><a href="#cb18-2" aria-hidden="true" tabindex="-1"></a>                              <span class="at">newdata =</span> optimal_x_df, </span>
+<span id="cb18-3"><a href="#cb18-3" aria-hidden="true" tabindex="-1"></a>                              <span class="at">type =</span> <span class="st">'response'</span>)</span>
+<span id="cb18-4"><a href="#cb18-4" aria-hidden="true" tabindex="-1"></a>est_probs <span class="ot">&lt;-</span> <span class="fu">predict</span>(fit, <span class="at">newdata =</span> x_df, <span class="at">type =</span> <span class="st">'response'</span>)</span>
+<span id="cb18-5"><a href="#cb18-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb18-6"><a href="#cb18-6" aria-hidden="true" tabindex="-1"></a><span class="fu">set.seed</span>(<span class="dv">2013</span>)</span>
+<span id="cb18-7"><a href="#cb18-7" aria-hidden="true" tabindex="-1"></a>expected_results <span class="ot">&lt;-</span> <span class="fu">replicate</span>(<span class="dv">5000</span>,</span>
+<span id="cb18-8"><a href="#cb18-8" aria-hidden="true" tabindex="-1"></a>          <span class="at">expr =</span> {</span>
+<span id="cb18-9"><a href="#cb18-9" aria-hidden="true" tabindex="-1"></a>            hypothetical_success <span class="ot">&lt;-</span> <span class="fu">rbinom</span>(sample_size, <span class="dv">1</span>, hypothetical_probs)</span>
+<span id="cb18-10"><a href="#cb18-10" aria-hidden="true" tabindex="-1"></a>            <span class="fu">c</span>(<span class="at">change_sales =</span> <span class="fu">sum</span>(hypothetical_success) <span class="sc">-</span> <span class="fu">sum</span>(x_df<span class="sc">$</span>sold),</span>
+<span id="cb18-11"><a href="#cb18-11" aria-hidden="true" tabindex="-1"></a>              <span class="at">change_rev =</span> <span class="fu">sum</span>(hypothetical_success <span class="sc">*</span> (<span class="dv">1</span> <span class="sc">+</span> optimal_x_df<span class="sc">$</span>markup<span class="sc">/</span><span class="dv">100</span>)<span class="sc">*</span>x_df<span class="sc">$</span>cost) <span class="sc">-</span> </span>
+<span id="cb18-12"><a href="#cb18-12" aria-hidden="true" tabindex="-1"></a>                           <span class="fu">sum</span>(x_df<span class="sc">$</span>sold <span class="sc">*</span> (<span class="dv">1</span> <span class="sc">+</span> x_df<span class="sc">$</span>markup<span class="sc">/</span><span class="dv">100</span>)<span class="sc">*</span>x_df<span class="sc">$</span>cost)</span>
+<span id="cb18-13"><a href="#cb18-13" aria-hidden="true" tabindex="-1"></a>            )</span>
+<span id="cb18-14"><a href="#cb18-14" aria-hidden="true" tabindex="-1"></a>          })</span>
+<span id="cb18-15"><a href="#cb18-15" aria-hidden="true" tabindex="-1"></a>obs_revenue <span class="ot">&lt;-</span> <span class="fu">sum</span>(x_df<span class="sc">$</span>sold <span class="sc">*</span> (<span class="dv">1</span> <span class="sc">+</span> x_df<span class="sc">$</span>markup<span class="sc">/</span><span class="dv">100</span>)<span class="sc">*</span>x_df<span class="sc">$</span>cost)</span>
+<span id="cb18-16"><a href="#cb18-16" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb18-17"><a href="#cb18-17" aria-hidden="true" tabindex="-1"></a>optimal_results <span class="ot">&lt;-</span> <span class="fu">data.frame</span>(<span class="at">ave_change_sales =</span> <span class="fu">mean</span>(expected_results[<span class="dv">1</span>,]),</span>
+<span id="cb18-18"><a href="#cb18-18" aria-hidden="true" tabindex="-1"></a>                              <span class="at">ave_change_revenue =</span> <span class="fu">mean</span>(expected_results[<span class="dv">2</span>,]),</span>
+<span id="cb18-19"><a href="#cb18-19" aria-hidden="true" tabindex="-1"></a>                              <span class="at">ave_percent_change_sales =</span> <span class="fu">mean</span>(expected_results[<span class="dv">1</span>,])<span class="sc">/</span><span class="fu">sum</span>(x_df<span class="sc">$</span>sold),</span>
+<span id="cb18-20"><a href="#cb18-20" aria-hidden="true" tabindex="-1"></a>                              <span class="at">ave_percent_change_revenue =</span> <span class="fu">mean</span>(expected_results[<span class="dv">2</span>,]) <span class="sc">/</span> obs_revenue)</span>
+<span id="cb18-21"><a href="#cb18-21" aria-hidden="true" tabindex="-1"></a>optimal_results</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>  ave_change_sales ave_change_revenue ave_percent_change_sales
+1         2433.894            5664458                 5.506547
+  ave_percent_change_revenue
+1                     4.6332</code></pre>
+</div>
+</div>
+</section>
+</section>
+<section id="discussion" class="level1">
+<h1>Discussion</h1>
+<p>Easy to extend to</p>
+</section>
+<section id="appendix-deriving-expected-revenue-formula" class="level1">
+<h1>Appendix: Deriving expected revenue formula</h1>
+<p>First, we calculate that <span class="math inline">\((1 + \frac{x_{markup}}{100})x_{cost}\)</span> would be the sales price of the item (ignoring any taxes).</p>
+<p>Next let’s derive a simple random variable <span class="math inline">\(Z_i\)</span> to represent the revenue generated from each sale. Consider the random variable <span class="math inline">\(Z_i\)</span> which is a transformation of our previous outcome variable <span class="math inline">\(Y_i\)</span>:</p>
+<p><span class="math display">\[Z_i = (1 + \frac{x_{markup}}{100})x_{cost} Y_i\]</span></p>
+<p>A straightforward application of deriving shows that</p>
+<p><span class="math display">\[\mathbb E(Z_i) = (1 + \frac{x_{markup}}{100})x_{cost} \mathbb E(Y_i) =  (1 + \frac{x_{markup}}{100})x_{cost} \pi_i\]</span></p>
+<p>We have a (maximum-likelihood) estimate of <span class="math inline">\(\pi_i\)</span> that we will denote as <span class="math inline">\(\hat \pi_i\)</span>. Thus our (maximum-likelihood) estimate of <span class="math inline">\(E(Z_i)\)</span> is</p>
+<p><span class="math inline">\(\widehat{\mathbb E(Z_i)} = (1 + \frac{x_{markup}}{100})x_{cost} \hat \pi_i\)</span>.</p>
+<p>For the more statistically rigorous, the expectations here are conditional on the covariates in the logistic regression model and <span class="math inline">\(\widehat{\mathbb E(Z_i)}\)</span> is a maximum-likelihood estimator of <span class="math inline">\(\mathbb E(Z_i)\)</span>.</p>
+</section>
+<section id="session-info-and-bibliography" class="level1">
+<h1>Session Info and Bibliography</h1>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb20"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb20-1"><a href="#cb20-1" aria-hidden="true" tabindex="-1"></a><span class="fu">sessionInfo</span>()</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>R version 4.5.2 (2025-10-31 ucrt)
+Platform: x86_64-w64-mingw32/x64
+Running under: Windows 11 x64 (build 26100)
+
+Matrix products: default
+  LAPACK version 3.12.1
+
+locale:
+[1] LC_COLLATE=English_United States.utf8 
+[2] LC_CTYPE=en_US.UTF-8                  
+[3] LC_MONETARY=English_United States.utf8
+[4] LC_NUMERIC=C                          
+[5] LC_TIME=English_United States.utf8    
+
+time zone: Pacific/Honolulu
+tzcode source: internal
+
+attached base packages:
+[1] stats     graphics  grDevices utils     datasets  methods   base     
+
+other attached packages:
+[1] ggplot2_4.0.1    dplyr_1.1.4      gtsummary_2.5.0  arm_1.14-4      
+[5] lme4_1.1-38      Matrix_1.7-4     MASS_7.3-65      kableExtra_1.4.0
+[9] knitr_1.51      
+
+loaded via a namespace (and not attached):
+ [1] gt_1.2.0           sass_0.4.10        tidyr_1.3.2        generics_0.1.4    
+ [5] xml2_1.5.1         stringi_1.8.7      lattice_0.22-7     digest_0.6.39     
+ [9] magrittr_2.0.4     evaluate_1.0.5     grid_4.5.2         RColorBrewer_1.1-3
+[13] cards_0.7.1        fastmap_1.2.0      jsonlite_2.0.0     purrr_1.2.0       
+[17] viridisLite_0.4.2  scales_1.4.0       textshaping_1.0.4  abind_1.4-8       
+[21] reformulas_0.4.3   Rdpack_2.6.4       cli_3.6.5          rlang_1.1.6       
+[25] rbibutils_2.4      litedown_0.9       commonmark_2.0.0   splines_4.5.2     
+[29] base64enc_0.1-3    withr_3.0.2        yaml_2.3.12        otel_0.2.0        
+[33] tools_4.5.2        nloptr_2.2.1       coda_0.19-4.1      minqa_1.2.8       
+[37] boot_1.3-32        vctrs_0.6.5        R6_2.6.1           lifecycle_1.0.4   
+[41] stringr_1.6.0      fs_1.6.6           htmlwidgets_1.6.4  pkgconfig_2.0.3   
+[45] gtable_0.3.6       pillar_1.11.1      glue_1.8.0         Rcpp_1.1.0        
+[49] systemfonts_1.3.1  xfun_0.55          tibble_3.3.0       tidyselect_1.2.1  
+[53] rstudioapi_0.17.1  farver_2.1.2       htmltools_0.5.9    nlme_3.1-168      
+[57] labeling_0.4.3     rmarkdown_2.30     svglite_2.2.2      compiler_4.5.2    
+[61] S7_0.2.1           markdown_2.0      </code></pre>
+</div>
+</div>
+
+
+</section>
+
+
+<div id="quarto-appendix" class="default"><section id="footnotes" class="footnotes footnotes-end-of-document" role="doc-endnotes"><h2 class="anchored quarto-appendix-heading">Footnotes</h2>
+
+<ol>
+<li id="fn1"><p>There is an extension of logistic regression to group level data where the outcome is the number of successes observed and is modeled as a binomial random variable.<a href="#fnref1" class="footnote-back" role="doc-backlink">↩︎</a></p></li>
+</ol>
+</section></div></main> <!-- /main -->
+<script id="quarto-html-after-body" type="application/javascript">
+  window.document.addEventListener("DOMContentLoaded", function (event) {
+    // Ensure there is a toggle, if there isn't float one in the top right
+    if (window.document.querySelector('.quarto-color-scheme-toggle') === null) {
+      const a = window.document.createElement('a');
+      a.classList.add('top-right');
+      a.classList.add('quarto-color-scheme-toggle');
+      a.href = "";
+      a.onclick = function() { try { window.quartoToggleColorScheme(); } catch {} return false; };
+      const i = window.document.createElement("i");
+      i.classList.add('bi');
+      a.appendChild(i);
+      window.document.body.appendChild(a);
+    }
+    setColorSchemeToggle(hasAlternateSentinel())
+    const icon = "";
+    const anchorJS = new window.AnchorJS();
+    anchorJS.options = {
+      placement: 'right',
+      icon: icon
+    };
+    anchorJS.add('.anchored');
+    const isCodeAnnotation = (el) => {
+      for (const clz of el.classList) {
+        if (clz.startsWith('code-annotation-')) {                     
+          return true;
+        }
+      }
+      return false;
+    }
+    const onCopySuccess = function(e) {
+      // button target
+      const button = e.trigger;
+      // don't keep focus
+      button.blur();
+      // flash "checked"
+      button.classList.add('code-copy-button-checked');
+      var currentTitle = button.getAttribute("title");
+      button.setAttribute("title", "Copied!");
+      let tooltip;
+      if (window.bootstrap) {
+        button.setAttribute("data-bs-toggle", "tooltip");
+        button.setAttribute("data-bs-placement", "left");
+        button.setAttribute("data-bs-title", "Copied!");
+        tooltip = new bootstrap.Tooltip(button, 
+          { trigger: "manual", 
+            customClass: "code-copy-button-tooltip",
+            offset: [0, -8]});
+        tooltip.show();    
+      }
+      setTimeout(function() {
+        if (tooltip) {
+          tooltip.hide();
+          button.removeAttribute("data-bs-title");
+          button.removeAttribute("data-bs-toggle");
+          button.removeAttribute("data-bs-placement");
+        }
+        button.setAttribute("title", currentTitle);
+        button.classList.remove('code-copy-button-checked');
+      }, 1000);
+      // clear code selection
+      e.clearSelection();
+    }
+    const getTextToCopy = function(trigger) {
+      const outerScaffold = trigger.parentElement.cloneNode(true);
+      const codeEl = outerScaffold.querySelector('code');
+      for (const childEl of codeEl.children) {
+        if (isCodeAnnotation(childEl)) {
+          childEl.remove();
+        }
+      }
+      return codeEl.innerText;
+    }
+    const clipboard = new window.ClipboardJS('.code-copy-button:not([data-in-quarto-modal])', {
+      text: getTextToCopy
+    });
+    clipboard.on('success', onCopySuccess);
+    if (window.document.getElementById('quarto-embedded-source-code-modal')) {
+      const clipboardModal = new window.ClipboardJS('.code-copy-button[data-in-quarto-modal]', {
+        text: getTextToCopy,
+        container: window.document.getElementById('quarto-embedded-source-code-modal')
+      });
+      clipboardModal.on('success', onCopySuccess);
+    }
+      var localhostRegex = new RegExp(/^(?:http|https):\/\/localhost\:?[0-9]*\//);
+      var mailtoRegex = new RegExp(/^mailto:/);
+        var filterRegex = new RegExp("https:\/\/your-website-url\.example\.com");
+      var isInternal = (href) => {
+          return filterRegex.test(href) || localhostRegex.test(href) || mailtoRegex.test(href);
+      }
+      // Inspect non-navigation links and adorn them if external
+     var links = window.document.querySelectorAll('a[href]:not(.nav-link):not(.navbar-brand):not(.toc-action):not(.sidebar-link):not(.sidebar-item-toggle):not(.pagination-link):not(.no-external):not([aria-hidden]):not(.dropdown-item):not(.quarto-navigation-tool):not(.about-link)');
+      for (var i=0; i<links.length; i++) {
+        const link = links[i];
+        if (!isInternal(link.href)) {
+          // undo the damage that might have been done by quarto-nav.js in the case of
+          // links that we want to consider external
+          if (link.dataset.originalHref !== undefined) {
+            link.href = link.dataset.originalHref;
+          }
+        }
+      }
+    function tippyHover(el, contentFn, onTriggerFn, onUntriggerFn) {
+      const config = {
+        allowHTML: true,
+        maxWidth: 500,
+        delay: 100,
+        arrow: false,
+        appendTo: function(el) {
+            return el.parentElement;
+        },
+        interactive: true,
+        interactiveBorder: 10,
+        theme: 'quarto',
+        placement: 'bottom-start',
+      };
+      if (contentFn) {
+        config.content = contentFn;
+      }
+      if (onTriggerFn) {
+        config.onTrigger = onTriggerFn;
+      }
+      if (onUntriggerFn) {
+        config.onUntrigger = onUntriggerFn;
+      }
+      window.tippy(el, config); 
+    }
+    const noterefs = window.document.querySelectorAll('a[role="doc-noteref"]');
+    for (var i=0; i<noterefs.length; i++) {
+      const ref = noterefs[i];
+      tippyHover(ref, function() {
+        // use id or data attribute instead here
+        let href = ref.getAttribute('data-footnote-href') || ref.getAttribute('href');
+        try { href = new URL(href).hash; } catch {}
+        const id = href.replace(/^#\/?/, "");
+        const note = window.document.getElementById(id);
+        if (note) {
+          return note.innerHTML;
+        } else {
+          return "";
+        }
+      });
+    }
+    const xrefs = window.document.querySelectorAll('a.quarto-xref');
+    const processXRef = (id, note) => {
+      // Strip column container classes
+      const stripColumnClz = (el) => {
+        el.classList.remove("page-full", "page-columns");
+        if (el.children) {
+          for (const child of el.children) {
+            stripColumnClz(child);
+          }
+        }
+      }
+      stripColumnClz(note)
+      if (id === null || id.startsWith('sec-')) {
+        // Special case sections, only their first couple elements
+        const container = document.createElement("div");
+        if (note.children && note.children.length > 2) {
+          container.appendChild(note.children[0].cloneNode(true));
+          for (let i = 1; i < note.children.length; i++) {
+            const child = note.children[i];
+            if (child.tagName === "P" && child.innerText === "") {
+              continue;
+            } else {
+              container.appendChild(child.cloneNode(true));
+              break;
+            }
+          }
+          if (window.Quarto?.typesetMath) {
+            window.Quarto.typesetMath(container);
+          }
+          return container.innerHTML
+        } else {
+          if (window.Quarto?.typesetMath) {
+            window.Quarto.typesetMath(note);
+          }
+          return note.innerHTML;
+        }
+      } else {
+        // Remove any anchor links if they are present
+        const anchorLink = note.querySelector('a.anchorjs-link');
+        if (anchorLink) {
+          anchorLink.remove();
+        }
+        if (window.Quarto?.typesetMath) {
+          window.Quarto.typesetMath(note);
+        }
+        if (note.classList.contains("callout")) {
+          return note.outerHTML;
+        } else {
+          return note.innerHTML;
+        }
+      }
+    }
+    for (var i=0; i<xrefs.length; i++) {
+      const xref = xrefs[i];
+      tippyHover(xref, undefined, function(instance) {
+        instance.disable();
+        let url = xref.getAttribute('href');
+        let hash = undefined; 
+        if (url.startsWith('#')) {
+          hash = url;
+        } else {
+          try { hash = new URL(url).hash; } catch {}
+        }
+        if (hash) {
+          const id = hash.replace(/^#\/?/, "");
+          const note = window.document.getElementById(id);
+          if (note !== null) {
+            try {
+              const html = processXRef(id, note.cloneNode(true));
+              instance.setContent(html);
+            } finally {
+              instance.enable();
+              instance.show();
+            }
+          } else {
+            // See if we can fetch this
+            fetch(url.split('#')[0])
+            .then(res => res.text())
+            .then(html => {
+              const parser = new DOMParser();
+              const htmlDoc = parser.parseFromString(html, "text/html");
+              const note = htmlDoc.getElementById(id);
+              if (note !== null) {
+                const html = processXRef(id, note);
+                instance.setContent(html);
+              } 
+            }).finally(() => {
+              instance.enable();
+              instance.show();
+            });
+          }
+        } else {
+          // See if we can fetch a full url (with no hash to target)
+          // This is a special case and we should probably do some content thinning / targeting
+          fetch(url)
+          .then(res => res.text())
+          .then(html => {
+            const parser = new DOMParser();
+            const htmlDoc = parser.parseFromString(html, "text/html");
+            const note = htmlDoc.querySelector('main.content');
+            if (note !== null) {
+              // This should only happen for chapter cross references
+              // (since there is no id in the URL)
+              // remove the first header
+              if (note.children.length > 0 && note.children[0].tagName === "HEADER") {
+                note.children[0].remove();
+              }
+              const html = processXRef(null, note);
+              instance.setContent(html);
+            } 
+          }).finally(() => {
+            instance.enable();
+            instance.show();
+          });
+        }
+      }, function(instance) {
+      });
+    }
+        let selectedAnnoteEl;
+        const selectorForAnnotation = ( cell, annotation) => {
+          let cellAttr = 'data-code-cell="' + cell + '"';
+          let lineAttr = 'data-code-annotation="' +  annotation + '"';
+          const selector = 'span[' + cellAttr + '][' + lineAttr + ']';
+          return selector;
+        }
+        const selectCodeLines = (annoteEl) => {
+          const doc = window.document;
+          const targetCell = annoteEl.getAttribute("data-target-cell");
+          const targetAnnotation = annoteEl.getAttribute("data-target-annotation");
+          const annoteSpan = window.document.querySelector(selectorForAnnotation(targetCell, targetAnnotation));
+          const lines = annoteSpan.getAttribute("data-code-lines").split(",");
+          const lineIds = lines.map((line) => {
+            return targetCell + "-" + line;
+          })
+          let top = null;
+          let height = null;
+          let parent = null;
+          if (lineIds.length > 0) {
+              //compute the position of the single el (top and bottom and make a div)
+              const el = window.document.getElementById(lineIds[0]);
+              top = el.offsetTop;
+              height = el.offsetHeight;
+              parent = el.parentElement.parentElement;
+            if (lineIds.length > 1) {
+              const lastEl = window.document.getElementById(lineIds[lineIds.length - 1]);
+              const bottom = lastEl.offsetTop + lastEl.offsetHeight;
+              height = bottom - top;
+            }
+            if (top !== null && height !== null && parent !== null) {
+              // cook up a div (if necessary) and position it 
+              let div = window.document.getElementById("code-annotation-line-highlight");
+              if (div === null) {
+                div = window.document.createElement("div");
+                div.setAttribute("id", "code-annotation-line-highlight");
+                div.style.position = 'absolute';
+                parent.appendChild(div);
+              }
+              div.style.top = top - 2 + "px";
+              div.style.height = height + 4 + "px";
+              div.style.left = 0;
+              let gutterDiv = window.document.getElementById("code-annotation-line-highlight-gutter");
+              if (gutterDiv === null) {
+                gutterDiv = window.document.createElement("div");
+                gutterDiv.setAttribute("id", "code-annotation-line-highlight-gutter");
+                gutterDiv.style.position = 'absolute';
+                const codeCell = window.document.getElementById(targetCell);
+                const gutter = codeCell.querySelector('.code-annotation-gutter');
+                gutter.appendChild(gutterDiv);
+              }
+              gutterDiv.style.top = top - 2 + "px";
+              gutterDiv.style.height = height + 4 + "px";
+            }
+            selectedAnnoteEl = annoteEl;
+          }
+        };
+        const unselectCodeLines = () => {
+          const elementsIds = ["code-annotation-line-highlight", "code-annotation-line-highlight-gutter"];
+          elementsIds.forEach((elId) => {
+            const div = window.document.getElementById(elId);
+            if (div) {
+              div.remove();
+            }
+          });
+          selectedAnnoteEl = undefined;
+        };
+          // Handle positioning of the toggle
+      window.addEventListener(
+        "resize",
+        throttle(() => {
+          elRect = undefined;
+          if (selectedAnnoteEl) {
+            selectCodeLines(selectedAnnoteEl);
+          }
+        }, 10)
+      );
+      function throttle(fn, ms) {
+      let throttle = false;
+      let timer;
+        return (...args) => {
+          if(!throttle) { // first call gets through
+              fn.apply(this, args);
+              throttle = true;
+          } else { // all the others get throttled
+              if(timer) clearTimeout(timer); // cancel #2
+              timer = setTimeout(() => {
+                fn.apply(this, args);
+                timer = throttle = false;
+              }, ms);
+          }
+        };
+      }
+        // Attach click handler to the DT
+        const annoteDls = window.document.querySelectorAll('dt[data-target-cell]');
+        for (const annoteDlNode of annoteDls) {
+          annoteDlNode.addEventListener('click', (event) => {
+            const clickedEl = event.target;
+            if (clickedEl !== selectedAnnoteEl) {
+              unselectCodeLines();
+              const activeEl = window.document.querySelector('dt[data-target-cell].code-annotation-active');
+              if (activeEl) {
+                activeEl.classList.remove('code-annotation-active');
+              }
+              selectCodeLines(clickedEl);
+              clickedEl.classList.add('code-annotation-active');
+            } else {
+              // Unselect the line
+              unselectCodeLines();
+              clickedEl.classList.remove('code-annotation-active');
+            }
+          });
+        }
+    const findCites = (el) => {
+      const parentEl = el.parentElement;
+      if (parentEl) {
+        const cites = parentEl.dataset.cites;
+        if (cites) {
+          return {
+            el,
+            cites: cites.split(' ')
+          };
+        } else {
+          return findCites(el.parentElement)
+        }
+      } else {
+        return undefined;
+      }
+    };
+    var bibliorefs = window.document.querySelectorAll('a[role="doc-biblioref"]');
+    for (var i=0; i<bibliorefs.length; i++) {
+      const ref = bibliorefs[i];
+      const citeInfo = findCites(ref);
+      if (citeInfo) {
+        tippyHover(citeInfo.el, function() {
+          var popup = window.document.createElement('div');
+          citeInfo.cites.forEach(function(cite) {
+            var citeDiv = window.document.createElement('div');
+            citeDiv.classList.add('hanging-indent');
+            citeDiv.classList.add('csl-entry');
+            var biblioDiv = window.document.getElementById('ref-' + cite);
+            if (biblioDiv) {
+              citeDiv.innerHTML = biblioDiv.innerHTML;
+            }
+            popup.appendChild(citeDiv);
+          });
+          return popup.innerHTML;
+        });
+      }
+    }
+  });
+  </script>
+</div> <!-- /content -->
+<footer class="footer">
+  <div class="nav-footer">
+    <div class="nav-footer-left">
+      &nbsp;
+    </div>   
+    <div class="nav-footer-center">
+<p>© 2026, Joshua-Michael Tomiyama</p>
+<div class="cookie-consent-footer"><a href="#" id="open_preferences_center">Cookie Preferences</a></div></div>
+    <div class="nav-footer-right">
+      &nbsp;
+    </div>
+  </div>
+</footer>
+
+
+
+
+</body></html>
