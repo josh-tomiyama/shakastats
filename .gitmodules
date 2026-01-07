@@ -1,0 +1,3 @@
+[submodule "projects/optimizingExpectedReturns"]
+	path = projects/optimizingExpectedReturns
+	url = https://github.com/josh-tomiyama/optimizingExpectedReturns.git

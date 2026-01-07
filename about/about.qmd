@@ -1,0 +1,29 @@
+---
+title: "Joshua-Michael Tomiyama"
+image: "../beach.png"
+about:
+  template: trestles
+  links:
+    - icon: linkedin
+      text: LinkedIn
+      href: https://www.linkedin.com/in/joshuatomiyama/
+    - icon: github
+      text: Github
+      href: https://github.com/josh-tomiyama/
+engine: knitr
+---
+
+Aloha! My name is Joshua-Michael Tomiyama, but please call me Josh for short. I am a data scientist who specializes in building machine learning models on the admissions and enrollment of undergraduate students to improve higher education outcomes.
+
+In addition to my work experience, I have an expansive range of academic research experience primarily in Bayesian statistics. Topics I've studied include: 
+
+  * spatio-temporal modeling of infectious diseases 
+  * approximate Bayesian algorithm development
+  * Bayesian non-parametric models
+  * model selection criteria for hierarchical models 
+
+My vision for this blog is to highlight interesting analyses I've encountered, to explain complex statistical methods and concepts, and to document my journey learning new technical skills.
+
+If you have any interesting topics or further inquiries about me or this blog please feel free to contact me at shakastats13@gmail.com. 
+
+Mahalo for stopping by &#x1F919;&#x1F3fe;

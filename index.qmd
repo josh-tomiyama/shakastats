@@ -1,0 +1,16 @@
+---
+title: "Welcome to ShakaStats"
+image: "shaka2.png"
+about:
+  template: jolla
+  links:
+    - icon: linkedin
+      text: LinkedIn
+      href: https://www.linkedin.com/in/joshuatomiyama/
+    - icon: github
+      text: Github
+      href: https://github.com/josh-tomiyama/
+  image-shape: round
+  image-width: 150px
+---
+Bringing knowledge about statistics, machine learning, and data analysis software with a &#x1F919;&#x1F3fe;

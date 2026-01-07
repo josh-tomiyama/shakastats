@@ -1,0 +1,37 @@
+project:
+  type: website
+
+website:
+  description: "A blog built with Quarto"
+  site-url: https://your-website-url.example.com # you must change this appropriately for RSS feeds to work properly
+  title: "ShakaStats"
+  search: 
+    location: navbar
+    type: overlay
+  navbar:
+    right:
+      - text: "About"
+        href: "./about/about.qmd"
+      - text: "Projects"
+        href: "./projects/project_listing.qmd"
+      - text: "Blog" 
+        href: "./blog/blog_listing.qmd"
+      - icon: github
+        href: https://github.com/josh-tomiyama/
+  cookie-consent:
+    type: express
+    style: headline
+    palette: dark
+  page-footer: 
+    center: "&copy; 2026, Joshua-Michael Tomiyama" 
+    
+format:
+  html:
+    theme:
+      dark: darkly
+      light: flatly
+    respect-user-color-scheme: true
+    css: styles.css
+
+editor: visual
+
