@@ -7,6 +7,8 @@
   },
   {
     "listing": "/blog/blog_listing.html",
-    "items": []
+    "items": [
+      "/blog/journey.html"
+    ]
   }
 ]

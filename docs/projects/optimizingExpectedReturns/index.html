@@ -1121,7 +1121,7 @@ Table&nbsp;1: Summary Tables
 }
 </style>
 
-<div id="tbl-summ-1" class="gt_table do-not-create-environment quarto-float quarto-figure quarto-figure-center anchored" data-quarto-bootstrap="false" data-quarto-postprocess="true" data-quarto-disable-processing="false">
+<div id="tbl-summ-1" class="gt_table do-not-create-environment quarto-float quarto-figure quarto-figure-center anchored" data-quarto-disable-processing="false" data-quarto-postprocess="true" data-quarto-bootstrap="false">
 <figure class="quarto-float quarto-subfloat-tbl figure">
 <figcaption class="quarto-float-caption-top quarto-subfloat-caption quarto-subfloat-tbl" id="tbl-summ-1-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
 (a) Summary by Sold
@@ -1646,7 +1646,7 @@ N = 442</th>
 }
 </style>
 
-<div id="tbl-summ-2" class="gt_table do-not-create-environment quarto-float quarto-figure quarto-figure-center anchored" data-quarto-bootstrap="false" data-quarto-postprocess="true" data-quarto-disable-processing="false">
+<div id="tbl-summ-2" class="gt_table do-not-create-environment quarto-float quarto-figure quarto-figure-center anchored" data-quarto-disable-processing="false" data-quarto-postprocess="true" data-quarto-bootstrap="false">
 <figure class="quarto-float quarto-subfloat-tbl figure">
 <figcaption class="quarto-float-caption-top quarto-subfloat-caption quarto-subfloat-tbl" id="tbl-summ-2-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
 (b) Summary by Type
@@ -2180,7 +2180,7 @@ f(x_{markup}) = (1 + \frac{x_{markup}}{100})x_{cost} \pi_i
 <li><p>Whether a maximum value actually exists</p></li>
 <li><p>What value of <span class="math inline">\(x_{markup}\)</span> maximizes the function.</p></li>
 </ol>
-<p>The first part is rather easy to show with a graph below. Cost is set to the observed average cost in the data set (2011.0274138) and type is set to the most common type of product in the data set accessories.</p>
+<p>The first part is rather easy to show with a graph below. Cost is set to the observed average cost in the data set (2011.03) and type is set to the most common type of product in the data set (accessories).</p>
 <div class="cell">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb14"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb14-1"><a href="#cb14-1" aria-hidden="true" tabindex="-1"></a>expected_return <span class="ot">&lt;-</span> <span class="cf">function</span>(markup, cost, type, fit, <span class="at">log =</span> <span class="cn">FALSE</span>){</span>
 <span id="cb14-2"><a href="#cb14-2" aria-hidden="true" tabindex="-1"></a>  new_data <span class="ot">&lt;-</span> <span class="fu">data.frame</span>(<span class="at">markup =</span> markup,</span>
@@ -2232,7 +2232,7 @@ Figure&nbsp;8: An absolute maximum expected revenue exists at markup = ~20 with 
 </div>
 </div>
 </div>
-<p>From the graph above, it is clear that a maximum occurs around where markup is ~20% and the expected revenue is about ~2100. To calculate the exact value for the optimal markup and expected revenue, we will need to use a numerical optimization algorithm. In R, we can accomplish this using the <code>optim()</code> function. There are several different algorithms to choose from, in this case Broyden–Fletcher–Goldfarb–Shanno (BFGS) quasi-newton method is a great choice. Going into detail of the BFGS algorithm is beyond the scope of this project. The <a href="https://en.wikipedia.org/wiki/Broyden%E2%80%93Fletcher%E2%80%93Goldfarb%E2%80%93Shanno_algorithm">wikipedia page</a>{target =“_blank”} is an excellent starting point for more information.</p>
+<p>From the graph above, it is clear that a maximum occurs around where markup is ~20% and the expected revenue is about ~2100. To calculate the exact value for the optimal markup and expected revenue, we will need to use a numerical optimization algorithm. In R, we can accomplish this using the <code>optim()</code> function. There are several different algorithms to choose from, in this case Broyden–Fletcher–Goldfarb–Shanno (BFGS) quasi-newton method is a great choice. Going into detail of the BFGS algorithm is beyond the scope of this project. The <a href="https://en.wikipedia.org/wiki/Broyden%E2%80%93Fletcher%E2%80%93Goldfarb%E2%80%93Shanno_algorithm" target="_blank">wikipedia page</a> is an excellent starting point for more information.</p>
 <p>What is important to note about the numerical optimization algorithms in <code>optim()</code> is that they assume that the function is differentiable and continuous with respect to the input variable, in this case <span class="math inline">\(x_{markup}\)</span>. This is true for this specific logistic regression model, but can be not true depending on how you encode <span class="math inline">\(x_{markup}\)</span>. This is specifically troublesome for the tree-based machine learning models because they discretize continuous variables to build the model. Likewise, any logistic regression model that discretizes <span class="math inline">\(x_{markup}\)</span> would also not work with <code>optim()</code>.</p>
 <p>Important outputs to inspect from the <code>optim()</code> function is <code>par</code> which is the markup value where the maximum occurs, <code>value</code> which is maximum revenue value, and <code>convergence</code> which should be 0 so that you know that the algorithm completed successfully.</p>
 <div class="cell">
@@ -2264,7 +2264,7 @@ Figure&nbsp;8: An absolute maximum expected revenue exists at markup = ~20 with 
 <span id="cb15-26"><a href="#cb15-26" aria-hidden="true" tabindex="-1"></a>                           <span class="at">type =</span> mode_type[<span class="dv">1</span>],</span>
 <span id="cb15-27"><a href="#cb15-27" aria-hidden="true" tabindex="-1"></a>                           <span class="at">cost =</span> mean_cost[<span class="dv">1</span>],</span>
 <span id="cb15-28"><a href="#cb15-28" aria-hidden="true" tabindex="-1"></a>                           <span class="at">prob_success =</span> optimal_prob_success)</span>
-<span id="cb15-29"><a href="#cb15-29" aria-hidden="true" tabindex="-1"></a>  <span class="fu">kable</span>(optimal_df, <span class="at">digits =</span> <span class="dv">3</span>, <span class="at">align =</span> <span class="st">'c'</span>) <span class="sc">%&gt;%</span></span>
+<span id="cb15-29"><a href="#cb15-29" aria-hidden="true" tabindex="-1"></a>  <span class="fu">kable</span>(optimal_df, <span class="at">digits =</span> <span class="dv">2</span>, <span class="at">align =</span> <span class="st">'c'</span>) <span class="sc">%&gt;%</span></span>
 <span id="cb15-30"><a href="#cb15-30" aria-hidden="true" tabindex="-1"></a>    <span class="fu">kable_styling</span>()</span>
 <span id="cb15-31"><a href="#cb15-31" aria-hidden="true" tabindex="-1"></a>}</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output-display">
@@ -2281,10 +2281,10 @@ Figure&nbsp;8: An absolute maximum expected revenue exists at markup = ~20 with 
 <tbody>
 <tr class="odd">
 <td style="text-align: center;">14.48</td>
-<td style="text-align: center;">2203.908</td>
+<td style="text-align: center;">2203.91</td>
 <td style="text-align: center;">accessories</td>
-<td style="text-align: center;">2011.027</td>
-<td style="text-align: center;">0.957</td>
+<td style="text-align: center;">2011.03</td>
+<td style="text-align: center;">0.96</td>
 </tr>
 </tbody>
 </table>
@@ -2302,7 +2302,7 @@ Figure&nbsp;8: An absolute maximum expected revenue exists at markup = ~20 with 
 <li><p>The change in revenue generated compared to the observed revenue</p></li>
 </ol>
 <p>For each point in our data set, we will substitute the observed markup value with the optimal markup value and simulate whether the sale is successful or not. To account for extreme cases, such as when a 99% chance sale fails, I will replicate the experiment 5000 times and calculate the average successful sales and revenue generated and compare these values to the observed revenue and sales.</p>
-<p>Calculating the optimal markup for the entire data set is a bit slow, so I used the <code>future.apply</code> package in R to run the the calculation in parallel. Going into detail about the <code>future.apply</code> package and parallel computing in R is beyond the scope of this project, but I’ll make a blog post about it sometime in the future (pun not intended).</p>
+<p>Calculating the optimal markup for the entire data set is a bit slow, so I used the <code>future.apply</code> package in R to run the the calculation in parallel. Going into detail about the <code>future.apply</code> package and parallel computing in R is beyond the scope of this project, but I’ll make a blog post about it sometime in the future (pun semi-intended).</p>
 <div class="cell">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb16"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb16-1"><a href="#cb16-1" aria-hidden="true" tabindex="-1"></a>calc_optimal_markup <span class="ot">&lt;-</span> <span class="cf">function</span>(cost, type, fit){</span>
 <span id="cb16-2"><a href="#cb16-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">optim</span>(<span class="at">par =</span> <span class="dv">20</span>, </span>
@@ -2430,8 +2430,8 @@ Figure&nbsp;8: An absolute maximum expected revenue exists at markup = ~20 with 
 <section id="discussion-and-conclusion" class="level1">
 <h1>Discussion and Conclusion</h1>
 <p>In this project, we focused on developing a useful logistic regression model and using it to optimize some expected revenue, but it can be extended is several useful directions. First, it is easy to extend the expected revenue formula to take into account profit margins, sales taxes, and costs of storing products (especially if they are perishable products) by adjusting the formula used for optimization. Second, this model and optimization could identify unprofitable products. If the optimal markup is lower than the markup needed to produce a profit, then it would be wise to remove that product from inventory. Finally, one could also use the expected sales to strategize how much stock to keep for certain products.</p>
-<p>However, it is important to keep in mind the limitations of a statistical analysis for not only the logistic regression model but any model. Applying estimates from the model assume that the customer base is stable and comparable to the customers observed. For example, external economical factors such as increases in taxes or recessions can change customer behavior not consistent with the estimates of the model. Another consideration would be if one were to grow the customer base in a way that is not consistent with the observed data. If one were to put a discont on shoes for instance, then the consistent customer base may grow to include those specifically interested in shoes and therefore buy shoes at higher rate than the model predicts. Finally, one must also consider that implementing a new pricing strategy inherently changes the behavior of the customers and is not something that this model can consider. An example could be that if the optimal markup is higher than the previous price point customers bought products, then they may wait for a discount as they know the product can be sold for cheaper. Despite the limitations addressed here, collecting and incorporating data from these instances can always help improve these models.</p>
-<p>That’s it for this project. Mahalo for reading 🤙🏾!</p>
+<p>However, it is important to keep in mind the limitations of a statistical analysis for not only the logistic regression model but any model. Applying estimates from the model assume that the customer base is stable and comparable to the customers observed. For example, external economical factors such as increases in taxes or recessions can change customer behavior not consistent with the estimates of the model. Another consideration would be if one were to grow the customer base in a way that is not consistent with the observed data. If one were to put a discount on shoes for instance, then the consistent customer base may grow to include those specifically interested in shoes and therefore buy shoes at higher rate than the model predicts. Finally, one must also consider that implementing a new pricing strategy inherently changes the behavior of the customers and is not something that this model can consider. An example could be that if the optimal markup is higher than the previous price point customers bought products, then they may wait for a discount as they know the product can be sold for cheaper. Despite the limitations addressed here, collecting and incorporating data from these instances can always help improve these models.</p>
+<p>That’s it for this project. I hope this was an informative and intriguing read. I’d love to hear your thoughts in the comments below. Mahalo for reading 🤙🏾!</p>
 </section>
 
 

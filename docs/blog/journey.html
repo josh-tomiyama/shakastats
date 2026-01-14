@@ -6,9 +6,10 @@
 
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 
-<meta name="author" content="">
+<meta name="dcterms.date" content="2026-01-13">
+<meta name="description" content="Some tips for anyone else creating a Quarto website.">
 
-<title>Blog – ShakaStats</title>
+<title>First Post: My Journey to Launch Shakastats – ShakaStats</title>
 <style>
 code{white-space: pre-wrap;}
 span.smallcaps{font-variant: small-caps;}
@@ -31,8 +32,6 @@ ul.task-list li input[type="checkbox"] {
 <script src="../site_libs/quarto-search/fuse.min.js"></script>
 <script src="../site_libs/quarto-search/quarto-search.js"></script>
 <meta name="quarto:offset" content="../">
-<script src="../site_libs/quarto-listing/list.min.js"></script>
-<script src="../site_libs/quarto-listing/quarto-listing.js"></script>
 <script src="../site_libs/cookie-consent/cookie-consent.js"></script>
 <link href="../site_libs/cookie-consent/cookie-consent.css" rel="stylesheet">
 <script src="../site_libs/quarto-html/quarto.js" type="module"></script>
@@ -74,35 +73,6 @@ ul.task-list li input[type="checkbox"] {
     "search-label": "Search"
   }
 }</script>
-<script>
-
-  window.document.addEventListener("DOMContentLoaded", function (_event) {
-    const listingTargetEl = window.document.querySelector('#listing-listing .list');
-    if (!listingTargetEl) {
-      // No listing discovered, do not attach.
-      return; 
-    }
-
-    const options = {
-      valueNames: ['listing-date','listing-title','listing-author','listing-image','listing-description','listing-categories',{ data: ['index'] },{ data: ['categories'] },{ data: ['listing-date-sort'] },{ data: ['listing-file-modified-sort'] }],
-      
-      searchColumns: ["listing-date","listing-title","listing-author","listing-image","listing-description","listing-categories"],
-    };
-
-    window['quarto-listings'] = window['quarto-listings'] || {};
-    window['quarto-listings']['listing-listing'] = new List('listing-listing', options);
-
-    if (window['quarto-listing-loaded']) {
-      window['quarto-listing-loaded']();
-    }
-  });
-
-  window.addEventListener('hashchange',() => {
-    if (window['quarto-listing-loaded']) {
-      window['quarto-listing-loaded']();
-    }
-  })
-  </script>
 
 <script type="text/javascript" charset="UTF-8">
 document.addEventListener('DOMContentLoaded', function () {
@@ -122,40 +92,11 @@ cookieconsent.run({
 </script> 
   
 
-  <script src="https://cdnjs.cloudflare.com/polyfill/v3/polyfill.min.js?features=es6"></script>
-  <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml-full.js" type="text/javascript"></script>
-
-<script type="text/javascript">
-const typesetMath = (el) => {
-  if (window.MathJax) {
-    // MathJax Typeset
-    window.MathJax.typeset([el]);
-  } else if (window.katex) {
-    // KaTeX Render
-    var mathElements = el.getElementsByClassName("math");
-    var macros = [];
-    for (var i = 0; i < mathElements.length; i++) {
-      var texText = mathElements[i].firstChild;
-      if (mathElements[i].tagName == "SPAN" && texText && texText.data) {
-        window.katex.render(texText.data, mathElements[i], {
-          displayMode: mathElements[i].classList.contains('display'),
-          throwOnError: false,
-          macros: macros,
-          fleqn: false
-        });
-      }
-    }
-  }
-}
-window.Quarto = {
-  typesetMath
-};
-</script>
 
 <link rel="stylesheet" href="../styles.css">
-<link rel="alternate" type="application/rss+xml" title="ShakaStats" href="blog_listing.xml" data-external="1"></head>
+</head>
 
-<body class="nav-fixed quarto-dark"><script id="quarto-html-before-body" type="application/javascript">
+<body class="nav-fixed fullcontent quarto-dark"><script id="quarto-html-before-body" type="application/javascript">
     const toggleBodyColorMode = (bsSheetEl) => {
       const mode = bsSheetEl.getAttribute("data-mode");
       const bodyEl = window.document.querySelector("body");
@@ -327,7 +268,7 @@ window.Quarto = {
   </script>
 
 <div id="quarto-search-results"></div>
-  <header id="quarto-header" class="headroom fixed-top quarto-banner">
+  <header id="quarto-header" class="headroom fixed-top">
     <nav class="navbar navbar-expand-lg " data-bs-theme="dark">
       <div class="navbar-container container-fluid">
       <div class="navbar-brand-container mx-auto">
@@ -350,7 +291,7 @@ window.Quarto = {
 <span class="menu-text">Projects</span></a>
   </li>  
   <li class="nav-item">
-    <a class="nav-link active" href="../blog/blog_listing.html" aria-current="page"> 
+    <a class="nav-link" href="../blog/blog_listing.html"> 
 <span class="menu-text">Blog</span></a>
   </li>  
   <li class="nav-item dropdown ">
@@ -379,73 +320,79 @@ window.Quarto = {
     </nav>
 </header>
 <!-- content -->
-<header id="title-block-header" class="quarto-title-block default page-columns page-full">
-  <div class="quarto-title-banner page-columns page-full">
-    <div class="quarto-title column-page-left">
-      <h1 class="title">Blog</h1>
-                      </div>
-  </div>
-    
-  
-  <div class="quarto-title-meta column-page-left">
-
-      
-    
-      
-    </div>
-    
-  
-  </header><div id="quarto-content" class="quarto-container page-columns page-rows-contents page-layout-full page-navbar">
+<div id="quarto-content" class="quarto-container page-columns page-rows-contents page-layout-article page-navbar">
 <!-- sidebar -->
 <!-- margin-sidebar -->
-    <div id="quarto-margin-sidebar" class="sidebar margin-sidebar">
-        
-    <h5 class="quarto-listing-category-title">Categories</h5><div class="quarto-listing-category category-default"><div class="category" data-category="">All <span class="quarto-category-count">(1)</span></div><div class="category" data-category="TmV3cw==">News <span class="quarto-category-count">(1)</span></div></div></div>
+    
 <!-- main -->
-<main class="content quarto-banner-title-block column-page-left" id="quarto-document-content">
+<main class="content" id="quarto-document-content">
 
 
+<header id="title-block-header" class="quarto-title-block default">
+<div class="quarto-title">
+<h1 class="title">First Post: My Journey to Launch Shakastats</h1>
+  <div class="quarto-categories">
+    <div class="quarto-category">News</div>
+  </div>
+  </div>
 
-
-
-
-<p>Posts on methodological rabbits holes I’m digging into, new technologies I’m practicing, and news about the websites.</p>
-
-
-
-
-<div class="quarto-listing quarto-listing-container-default" id="listing-listing">
-<div class="list quarto-listing-default">
-<div class="quarto-post image-right" data-index="0" data-categories="TmV3cw==" data-listing-date-sort="1768298400000" data-listing-file-modified-sort="1768382849266" data-listing-date-modified-sort="NaN" data-listing-reading-time-sort="4" data-listing-word-count-sort="716">
-<div class="thumbnail"><a href="../blog/journey.html" class="no-external">
-
-<div class="listing-item-img-placeholder card-img-top" >&nbsp;</div>
-
-</a></div>
-<div class="body">
-<h3 class="no-anchor listing-title">
-<a href="../blog/journey.html" class="no-external">First Post: My Journey to Launch Shakastats</a>
-</h3>
-<div class="listing-categories">
-
-<div class="listing-category" onclick="window.quartoListingCategory('TmV3cw=='); return false;">News</div>
-
+<div>
+  <div class="description">
+    Some tips for anyone else creating a Quarto website.
+  </div>
 </div>
-<div class="delink listing-description"><a href="../blog/journey.html" class="no-external">
-<p>Some tips for anyone else creating a Quarto website.</p>
-</a></div>
-</div>
-<div class="metadata">
-<a href="../blog/journey.html" class="no-external">
-<div class="listing-date">
-January 13, 2026
-</div>
-</a>
-</div>
-</div>
-</div>
-<div class="listing-no-matching d-none">No matching items</div>
-</div></main> <!-- /main -->
+
+
+<div class="quarto-title-meta">
+
+    
+    <div>
+    <div class="quarto-title-meta-heading">Published</div>
+    <div class="quarto-title-meta-contents">
+      <p class="date">January 13, 2026</p>
+    </div>
+  </div>
+  
+    
+  </div>
+  
+
+
+</header>
+
+
+<p>Aloha! Welcome to shakastats my personal blog website to post nerdy statistical projects and posts. Getting this website up and running was a bit of a challenge and looking back took a lot longer than needed. I wanted to document my overall journey through developing this website and mistakes that I made so you don’t have to.</p>
+<section id="learning-how-to-effectively-write-quarto-documents" class="level1">
+<h1>Learning how to effectively write Quarto documents</h1>
+<p>This is the number one tip I can give anyone who is used to creating Rmarkdown documents but not quarto documents:</p>
+<p>SWITCH YOUR RSTUDIO EDITOR TO “SOURCE” NOT “VISUAL”.</p>
+<p>In my job, we often had to write Rmarkdown documents for ad-hoc reports and analyses. I even used Rmarkdown to submit my statistical theory assignments in graduate school. Needless to say, I was extremely comfortable with writing Rmarkdown documents and learned that Quarto is the new and improved version of Rmarkdown.</p>
+<p>But it felt extremely clunky… and that was due to visual mode.</p>
+<p>In visual mode, a lot of the source code gets “rendered” immediately and I often found myself fighting the visual rendering to produce what I wanted. At least once a day, I wished that I could just write all the source code and click a render button once I was done writing all the source code. By complete accident, I clicked on the source button at the top left of my Rstudio IDE and realized that this was exactly what I needed all along! Now I can zip through writing a file and double check the formatting/rendering once I have most of the code together. This was an embarrassingly obvious feature that cost me an embarrassing amount of development time… but I am very happy that I know this now!</p>
+</section>
+<section id="integrating-quarto-documents-into-a-hugo-website-dont-bother-with-it" class="level1">
+<h1>Integrating Quarto documents into a Hugo website… don’t bother with it</h1>
+<p>My first iteration of this website actually used Hugo instead of Quarto. Although I was comfortable with some basic Quarto and knew about it’s capability in creating websites, I wanted to use Hugo as it seems more prevalent outside of analysis circles. I gone through a few Hugo themes until I found one that I liked from the theme page… and it turns out the website format was pay walled.</p>
+<p>Instead of going through the pay wall with money, I tried to instead start with a basic, minimal hugo theme Gokarna. It was nice, but a little too basic and lacked some features I wanted for the website. Additionally, integrating Quarto documents into a Hugo website is admittedly just a few extra steps of rendering files to markdown, but it did feel like a wasted step every time I iterated a new version of the website.</p>
+<p>Then I finally pulled the trigger and dove deep into the Quarto documentation for creating a website. A lot of the features out of the box were really useful. In fact, this entire website (in its current iteration) uses a lot of the built in yaml features in Quarto. I haven’t needed to write any custom javascript/html/css yet, but it’s nice that I have this great base that I can iterate on instead of reinventing the wheel.</p>
+<p>Some features I particularly like about a Quarto website:</p>
+<ul>
+<li><p>Giscus Comments. No need to make a database, just use Github discussions.</p></li>
+<li><p>Adding a citation for reference at the bottom of an article.</p></li>
+<li><p>The categories filtering for articles</p></li>
+</ul>
+</section>
+<section id="new-features-that-i-hope-to-add-to-the-website" class="level1">
+<h1>New features that I hope to add to the website</h1>
+<p>One feature I hope to add is a “Preview of upcoming blog posts/articles” that I’m currently working on. I’m not sure how it would work out exactly, but I imagine some sort of schedule with expected posts dates could be useful. I would also hope that there could be a “suggestions” section where people could contribute future topics for projects/blog posts.</p>
+<p>Another feature is to get some sort of analytics service for my website so get a general idea if people are reading my content. I know Google Analytics exists, but my cursory reasearch online show open source analytics platforms Umami and Fathom Analytics exist.</p>
+<p>That’s all I currently have planned. Overall, moving everything into the Quarto ecosystem as well as making sure I develop in “Source” mode made writing the project so much smoother. Now my focus is mostly on content and not battling the website aspects, and I couldn’t be happier.</p>
+<p>Mahalo for reading 🤙🏾!</p>
+
+
+</section>
+
+</main> <!-- /main -->
 <script id="quarto-html-after-body" type="application/javascript">
   window.document.addEventListener("DOMContentLoaded", function (event) {
     // Ensure there is a toggle, if there isn't float one in the top right
