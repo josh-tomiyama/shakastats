@@ -18,7 +18,7 @@
     "href": "blog/blog_listing.html",
     "title": "Blog",
     "section": "",
-    "text": "Posts on methodological rabbits holes I’m digging into, new technologies I’m practicing, and news about the website.\n\n\n\n\n\n\n\n\n\n\n\n\n\n\nFirst Post: My Journey to Launch Shakastats\n\n\n\nNews\n\n\n\nSome tips for anyone else creating a Quarto website.\n\n\n\n\n\nJanuary 13, 2026\n\n\n\n\n\n\n\n\n\n\n\n\ntest post\n\n\n\n\n\n\n\n\nJanuary 13, 2026\n\n\nJosh Tomiyama\n\n\n\n\n\nNo matching items"
+    "text": "Posts on methodological rabbits holes I’m digging into, new technologies I’m practicing, and news about the website.\n\n\n\n\n\n\n\n\n\n\n\n\n\n\nFirst Post: My Journey to Launch Shakastats\n\n\n\nNews\n\n\n\nSome tips for anyone else creating a Quarto website.\n\n\n\n\n\nJanuary 13, 2026\n\n\n\n\n\nNo matching items"
   },
   {
     "objectID": "about/about.html",
@@ -96,12 +96,5 @@
     "title": "Logistic Regression Analysis Example: Optimizing Expected Revenue",
     "section": "Footnotes",
     "text": "Footnotes\n\n\nThere is an extension of logistic regression to group level data where the outcome is the number of successes observed and is modeled as a binomial random variable.↩︎\nThe penalty term for BIC is \\(\\log(n)n_{par}\\) where \\(n\\) is the sample size of the data and \\(n_{par}\\) is the number of parameters is larger then the penalty term of \\(2n_{par}\\) for AIC. Thus, BIC requires more evidence to add a new parameter into a model than AIC.↩︎"
-  },
-  {
-    "objectID": "blog/testpost.html",
-    "href": "blog/testpost.html",
-    "title": "test post",
-    "section": "",
-    "text": "This is just a test post"
   }
 ]
