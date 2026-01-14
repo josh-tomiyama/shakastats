@@ -1,0 +1,50 @@
+---
+title: "First Post: My Journey to Launch Shakastats"
+date: "2026-01-13"
+citation: false
+description: "Some tips for anyone else creating a Quarto website."
+categories:
+  - "News"
+---
+
+Aloha! Welcome to shakastats my personal blog website to post nerdy statistical projects and posts. Getting this website up and running was a bit of a challenge and looking back took a lot longer than needed. I wanted to document my overall journey through developing this website and mistakes that I made so you don't have to.
+
+# Learning how to effectively write Quarto documents
+
+This is the number one tip I can give anyone who is used to creating Rmarkdown documents but not quarto documents:
+
+SWITCH YOUR RSTUDIO EDITOR TO "SOURCE" NOT "VISUAL".
+
+In my job, we often had to write Rmarkdown documents for ad-hoc reports and analyses. I even used Rmarkdown to submit my statistical theory assignments in graduate school. Needless to say, I was extremely comfortable with writing Rmarkdown documents and learned that Quarto is the new and improved version of Rmarkdown.
+
+But it felt extremely clunky... and that was due to visual mode.
+
+In visual mode, a lot of the source code gets "rendered" immediately and I often found myself fighting the visual rendering to produce what I wanted. At least once a day, I wished that I could just write all the source code and click a render button once I was done writing all the source code. By complete accident, I clicked on the source button at the top left of my Rstudio IDE and realized that this was exactly what I needed all along! Now I can zip through writing a file and double check the formatting/rendering once I have most of the code together. This was an embarrassingly obvious feature that cost me an embarrassing amount of development time... but I am very happy that I know this now!
+
+# Integrating Quarto documents into a Hugo website... don't bother with it
+
+My first iteration of this website actually used Hugo instead of Quarto. Although I was comfortable with some basic Quarto and knew about it's capability in creating websites, I wanted to use Hugo as it seems more prevalent outside of analysis circles. I gone through a few Hugo themes until I found one that I liked from the theme page... and it turns out the website format was pay walled.
+
+Instead of going through the pay wall with money, I tried to instead start with a basic, minimal hugo theme Gokarna. It was nice, but a little too basic and lacked some features I wanted for the website. Additionally, integrating Quarto documents into a Hugo website is admittedly just a few extra steps of rendering files to markdown, but it did feel like a wasted step every time I iterated a new version of the website.
+
+Then I finally pulled the trigger and dove deep into the Quarto documentation for creating a website. A lot of the features out of the box were really useful. In fact, this entire website (in its current iteration) uses a lot of the built in yaml features in Quarto. I haven't needed to write any custom javascript/html/css yet, but it's nice that I have this great base that I can iterate on instead of reinventing the wheel.
+
+Some features I particularly like about a Quarto website:
+
+  - Giscus Comments. No need to make a database, just use Github discussions.
+  
+  - Adding a citation for reference at the bottom of an article.
+  
+  - The categories filtering for articles
+  
+
+# New features that I hope to add to the website
+
+One feature I hope to add is a "Preview of upcoming blog posts/articles" that I'm currently working on. I'm not sure how it would work out exactly, but I imagine some sort of schedule with expected posts dates could be useful. I would also hope that there could be a "suggestions" section where people could contribute future topics for projects/blog posts.
+
+Another feature is to get some sort of analytics service for my website so get a general idea if people are reading my content. I know Google Analytics exists, but my cursory reasearch online show open source analytics platforms Umami and Fathom Analytics exist.
+
+But that's it. Overall, moving everything into the Quarto ecosystem as well as making sure I develop in "Source" mode made writing the project so much smoother. Now my focus is mostly on content and not battling the website aspects, and I couldn't be happier.
+
+Mahalo for reading 🤙🏾!
+
