@@ -19,4 +19,4 @@ format:
     code-tools: false
 ---
 
-Posts on methodological rabbits holes I'm digging into, new technologies I'm practicing, and news about the websites.
+Posts on methodological rabbits holes I'm digging into, new technologies I'm practicing, and news about the website.
