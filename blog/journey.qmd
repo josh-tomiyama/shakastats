@@ -44,7 +44,7 @@ One feature I hope to add is a "Preview of upcoming blog posts/articles" that I'
 
 Another feature is to get some sort of analytics service for my website so get a general idea if people are reading my content. I know Google Analytics exists, but my cursory reasearch online show open source analytics platforms Umami and Fathom Analytics exist.
 
-But that's it. Overall, moving everything into the Quarto ecosystem as well as making sure I develop in "Source" mode made writing the project so much smoother. Now my focus is mostly on content and not battling the website aspects, and I couldn't be happier.
+That's all I currently have planned. Overall, moving everything into the Quarto ecosystem as well as making sure I develop in "Source" mode made writing the project so much smoother. Now my focus is mostly on content and not battling the website aspects, and I couldn't be happier.
 
 Mahalo for reading 🤙🏾!
 
