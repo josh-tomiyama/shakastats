@@ -24,6 +24,10 @@ In addition to my work experience, I have an expansive range of academic researc
 
 My vision for this blog is to highlight interesting analyses I've encountered, to explain complex statistical methods and concepts, and to document my journey learning new technical skills.
 
-If you have any interesting topics or further inquiries about me or this blog, please feel free to contact me at shakastats13\@gmail.com.
+If you have any interesting topics to share, further inquiries about me or this blog, or other suggestions on how to improve this blog, please feel free to contact me at:
+
+```         
+shakastats13@gmail.com
+```
 
 Mahalo for stopping by 🤙🏾

@@ -1,11 +1,32 @@
 # options specified here will apply to all posts in this folder
 
 # author for posts
-author: "Josh Tomiyama"
+author: 
+  - name: "Josh Tomiyama"
+    url: https://josh-tomiyama.github.io/shakastats
+
+# generate citation with site url
+citation: true
 
 # freeze computational output
+# be sure to set freeze to true when document is done
 # (see https://quarto.org/docs/projects/code-execution.html#freeze)
-freeze: true
+freeze: auto
 
 # Enable banner style title blocks
 title-block-banner: true
+
+# enable giscus comments that store comments in the discussion section of the given directory
+comments:
+  giscus: 
+    repo: josh-tomiyama/shakastats_comments
+
+
+format:
+  html:
+# allow users to toggle code folding as well as look at source
+    code-fold: false
+    code-tools: 
+        source: false
+        toggle: true
+        

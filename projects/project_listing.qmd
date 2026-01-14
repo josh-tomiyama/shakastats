@@ -12,4 +12,11 @@ listing:
   date-format: "long"
 page-layout: full
 title-block-banner: true
+citation: false
+format: 
+  html: 
+    comments: false
+    code-tools: false
 ---
+
+Selected projects to showcase my approach to analyses as well as highlight interesting problems.

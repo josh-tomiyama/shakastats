@@ -1,1 +1,23 @@
-author: "Joshua Tomiyama"
+# metadata for all files in projects folder
+
+# Author for documents
+author: 
+  - name: "Josh Tomiyama"
+    url: https://josh-tomiyama.github.io/shakastats
+
+# generate citation with site url
+citation: true
+
+
+# enable giscus comments that store comments in the discussion section of the given directory
+comments:
+  giscus: 
+    repo: josh-tomiyama/shakastats_comments
+    
+format:
+# allow users to toggle code folding as well as look at source
+  html:
+    code-fold: false
+    code-tools: 
+        source: false
+        toggle: true
