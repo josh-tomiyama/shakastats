@@ -28,7 +28,10 @@ website:
     style: headline
     palette: dark
   page-footer: 
-    center: "&copy; 2026, Joshua-Michael Tomiyama" 
+    center: "&copy; 2026, Joshua-Michael Tomiyama. Text and images are licensed under CC-BY-NC and any code by MIT."
+    right: 
+      - text: "License"
+        href: "LICENSE"  
     
 format:
   html:
