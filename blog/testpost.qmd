@@ -1,0 +1,7 @@
+---
+title: "test post"
+author: "Josh Tomiyama"
+date: "2026-01-13"
+---
+
+This is just a test post

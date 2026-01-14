@@ -56,5 +56,23 @@
   <guid>https://josh-tomiyama.github.io/shakastats/blog/journey.html</guid>
   <pubDate>Tue, 13 Jan 2026 10:00:00 GMT</pubDate>
 </item>
+<item>
+  <title>test post</title>
+  <dc:creator>Josh Tomiyama</dc:creator>
+  <link>https://josh-tomiyama.github.io/shakastats/blog/testpost.html</link>
+  <description><![CDATA[ 
+
+
+
+
+
+<p>This is just a test post</p>
+
+
+
+ ]]></description>
+  <guid>https://josh-tomiyama.github.io/shakastats/blog/testpost.html</guid>
+  <pubDate>Tue, 13 Jan 2026 10:00:00 GMT</pubDate>
+</item>
 </channel>
 </rss>
