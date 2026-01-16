@@ -12,5 +12,7 @@ about:
       href: https://github.com/josh-tomiyama/
   image-shape: round
   image-width: 150px
+freeze: auto
 ---
-Bringing knowledge about statistics, machine learning, and data analysis software with a &#x1F919;&#x1F3fe;
+
+Bringing knowledge about statistics, machine learning, and data analysis software with a 🤙🏾

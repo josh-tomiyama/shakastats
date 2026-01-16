@@ -11,6 +11,7 @@ about:
       text: Github
       href: https://github.com/josh-tomiyama/
 engine: knitr
+freeze: auto
 ---
 
 Aloha! My name is Joshua-Michael Tomiyama, but please call me Josh for short. I am a data scientist who specializes in building machine learning models on the admissions and enrollment of undergraduate students to improve higher education outcomes.
