@@ -7,7 +7,7 @@ categories:
   - "News"
 ---
 
-Aloha! Welcome to shakastats my personal blog website to post nerdy statistical projects and posts. Getting this website up and running was a bit of a challenge and looking back took a lot longer than needed. I wanted to document my overall journey through developing this website and mistakes that I made so you don't have to.
+Aloha! Welcome to shakastats my personal blog website to post nerdy statistical projects and posts. Getting this website up and running was a bit of a challenge and looking back took a lot longer than needed. Following the quarto documentation to get a website running is through and should land you on a similar website to what I have here, so I won't go into detail about writing a quarto website as that is already available there. What I do want to share in this post are some mistakes that slowed down my development process as well as some other software I considered but ultimately why I landed on using Quarto as the backbone for this website.
 
 # Learning how to effectively write Quarto documents
 
@@ -23,28 +23,26 @@ In visual mode, a lot of the source code gets "rendered" immediately and I often
 
 # Integrating Quarto documents into a Hugo website... don't bother with it
 
-My first iteration of this website actually used Hugo instead of Quarto. Although I was comfortable with some basic Quarto and knew about it's capability in creating websites, I wanted to use Hugo as it seems more prevalent outside of analysis circles. I gone through a few Hugo themes until I found one that I liked from the theme page... and it turns out the website format was pay walled.
+My first iteration of this website actually used Hugo instead of Quarto. Although I was comfortable with some basic Quarto and knew about it had some capability in creating websites, I wanted to use Hugo as it seems more prevalent outside of analysis circles. I gone through a few Hugo themes until I found one that I liked from the theme page... and it turns out the website format was pay walled.
 
-Instead of going through the pay wall with money, I tried to instead start with a basic, minimal hugo theme Gokarna. It was nice, but a little too basic and lacked some features I wanted for the website. Additionally, integrating Quarto documents into a Hugo website is admittedly just a few extra steps of rendering files to markdown, but it did feel like a wasted step every time I iterated a new version of the website.
+Instead of going through the pay wall with money, I tried to instead start with a basic, minimal Hugo theme Gokarna. It was nice, but a little too basic and lacked some features I wanted for the website. Additionally, integrating Quarto documents into a Hugo website is admittedly just a few extra steps of rendering files to markdown, but it did feel like a wasted step every time I iterated a new version of the website.
 
 Then I finally pulled the trigger and dove deep into the Quarto documentation for creating a website. A lot of the features out of the box were really useful. In fact, this entire website (in its current iteration) uses a lot of the built in yaml features in Quarto. I haven't needed to write any custom javascript/html/css yet, but it's nice that I have this great base that I can iterate on instead of reinventing the wheel.
 
 Some features I particularly like about a Quarto website:
 
-  - Giscus Comments. No need to make a database, just use Github discussions.
-  
-  - Adding a citation for reference at the bottom of an article.
-  
-  - The categories filtering for articles
-  
+-   Giscus Comments. No need to make a database, just use Github discussions.
+
+-   Adding a citation for reference at the bottom of an article.
+
+-   The categories filtering for articles
 
 # New features that I hope to add to the website
 
 One feature I hope to add is a "Preview of upcoming blog posts/articles" that I'm currently working on. I'm not sure how it would work out exactly, but I imagine some sort of schedule with expected posts dates could be useful. I would also hope that there could be a "suggestions" section where people could contribute future topics for projects/blog posts.
 
-Another feature is to get some sort of analytics service for my website so get a general idea if people are reading my content. I know Google Analytics exists, but my cursory reasearch online show open source analytics platforms Umami and Fathom Analytics exist.
+Another feature is to get some sort of analytics service for my website so get a general idea if people are reading my content. I know Google Analytics exists, but my cursory research online show open source analytics platforms Umami and Fathom Analytics exist.
 
 That's all I currently have planned. Overall, moving everything into the Quarto ecosystem as well as making sure I develop in "Source" mode made writing the project so much smoother. Now my focus is mostly on content and not battling the website aspects, and I couldn't be happier.
 
 Mahalo for reading 🤙🏾!
-
