@@ -2,7 +2,6 @@
   {
     "listing": "/projects/project_listing.html",
     "items": [
-      "/projects/logisticRegressionShiny/index.html",
       "/projects/logisticRegressionShiny/shinyApp.html",
       "/projects/optimizingExpectedReturns/index.html"
     ]
