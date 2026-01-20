@@ -10,7 +10,20 @@
 <atom:link href="https://josh-tomiyama.github.io/shakastats/projects/project_listing.xml" rel="self" type="application/rss+xml"/>
 <description>A blog about statistics, machine learning, and data analysis software</description>
 <generator>quarto-1.8.26</generator>
-<lastBuildDate>Tue, 13 Jan 2026 10:00:00 GMT</lastBuildDate>
+<lastBuildDate>Tue, 20 Jan 2026 10:00:00 GMT</lastBuildDate>
+<item>
+  <title>Supplemental Dashboard: Optimizing Expected Revenue</title>
+  <dc:creator>Josh Tomiyama</dc:creator>
+  <link>https://josh-tomiyama.github.io/shakastats/projects/logisticRegressionShiny/shinyApp.html</link>
+  <description><![CDATA[ undefined ]]></description>
+  <category>R Shiny</category>
+  <category>Dashboard</category>
+  <category>Machine Learning</category>
+  <category>Logistic Regression</category>
+  <category>Optimization</category>
+  <guid>https://josh-tomiyama.github.io/shakastats/projects/logisticRegressionShiny/shinyApp.html</guid>
+  <pubDate>Tue, 20 Jan 2026 10:00:00 GMT</pubDate>
+</item>
 <item>
   <title>Logistic Regression Analysis Example: Optimizing Expected Revenue</title>
   <dc:creator>Josh Tomiyama</dc:creator>
@@ -3177,7 +3190,7 @@ font-style: inherit;">kable_styling</span>()</span>
 </div>
 <p>From this analysis, we find that for an accessory product that costs of $2011.03 to produce, the optimal markup is about 14.48 percent. This results in a total revenue generated of $2203.91.</p>
 <p>Although our formula calculates an optimal markup of 14.48 percent, we need to keep in mind that the range of markup in the data set are values between 20 and 120 percent. Thus, a markup of 14.48 percent is outside the region covered by the data. I would suggest collecting more data in this range before widely adopting this decision rule.</p>
-<p>In this section we only looked at one specific combination of covariates where the product cost is equal to the average cost and the product type is the most common type in the data set. Of course, we may want to consider cases with combinations of product costs and product types. To explore these different scenarios more easily, I’ve created a Rshiny dashboard that’ll be linked below when it’s done.</p>
+<p>In this section we only looked at one specific combination of covariates where the product cost is equal to the average cost and the product type is the most common type in the data set. Of course, we may want to consider cases with combinations of product costs and product types. To explore these different scenarios more easily, I’ve created an <a href="../../projects/logisticRegressionShiny/shinyApp.html" target="_blank">R shiny dashboard</a>.</p>
 </section>
 <section id="hypothetical-impact-of-optimal-markup-strategy" class="level2">
 <h2 class="anchored" data-anchor-id="hypothetical-impact-of-optimal-markup-strategy">Hypothetical Impact of Optimal Markup strategy</h2>
@@ -3736,7 +3749,7 @@ Matrix products: default
 
 locale:
 [1] LC_COLLATE=English_United States.utf8 
-[2] LC_CTYPE=English_United States.utf8   
+[2] LC_CTYPE=en_US.UTF-8                  
 [3] LC_MONETARY=English_United States.utf8
 [4] LC_NUMERIC=C                          
 [5] LC_TIME=English_United States.utf8    
@@ -3798,14 +3811,6 @@ Optimizing Expected Revenue.”</span> January 13, 2026. <a href="https://josh-t
   <category>Optimization</category>
   <guid>https://josh-tomiyama.github.io/shakastats/projects/optimizingExpectedReturns/</guid>
   <pubDate>Tue, 13 Jan 2026 10:00:00 GMT</pubDate>
-</item>
-<item>
-  <title>Supplemental Dashboard: Optimizing Expected Revenue</title>
-  <dc:creator>Josh Tomiyama</dc:creator>
-  <link>https://josh-tomiyama.github.io/shakastats/projects/logisticRegressionShiny/shinyApp.html</link>
-  <description><![CDATA[ undefined ]]></description>
-  <guid>https://josh-tomiyama.github.io/shakastats/projects/logisticRegressionShiny/shinyApp.html</guid>
-  <pubDate>Tue, 20 Jan 2026 22:51:27 GMT</pubDate>
 </item>
 </channel>
 </rss>
