@@ -7,6 +7,8 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 
 <meta name="author" content="Josh Tomiyama">
+<meta name="dcterms.date" content="2026-01-20">
+<meta name="description" content="A dashboard to supplement and summarize the Optimizing Expected Revenue project">
 
 <title>Supplemental Dashboard: Optimizing Expected Revenue – ShakaStats</title>
 <style>
@@ -397,8 +399,20 @@ window.Quarto = {
 <header id="title-block-header" class="quarto-title-block default">
 <div class="quarto-title">
 <h1 class="title">Supplemental Dashboard: Optimizing Expected Revenue</h1>
-</div>
+  <div class="quarto-categories">
+    <div class="quarto-category">R Shiny</div>
+    <div class="quarto-category">Dashboard</div>
+    <div class="quarto-category">Machine Learning</div>
+    <div class="quarto-category">Logistic Regression</div>
+    <div class="quarto-category">Optimization</div>
+  </div>
+  </div>
 
+<div>
+  <div class="description">
+    A dashboard to supplement and summarize the Optimizing Expected Revenue project
+  </div>
+</div>
 
 
 <div class="quarto-title-meta">
@@ -410,6 +424,12 @@ window.Quarto = {
           </div>
   </div>
     
+    <div>
+    <div class="quarto-title-meta-heading">Published</div>
+    <div class="quarto-title-meta-contents">
+      <p class="date">January 20, 2026</p>
+    </div>
+  </div>
   
     
   </div>
@@ -425,6 +445,7 @@ window.Quarto = {
 <div id="tabset-1-1" class="tab-pane active" role="tabpanel" aria-labelledby="tabset-1-1-tab">
 <p>This dashboard is a supplement to the project article <a href="../../projects/optimizingExpectedReturns/index.html" target="_blank">“Logistic Regression Analysis Example: Optimizing Expected Revenue”</a>. More details on model building is discussed there, but results and general summary of the data are presented here.</p>
 <p>The dashboard below is created with R shinylive to allow publishing the application without using a dedicated server. Instead, the application will use the computing resources of the user viewing the app. <strong>This may result in a long loading times</strong>.</p>
+<p>Source code to run app locally is found <a href="https://github.com/josh-tomiyama/logisticRegressionShiny/tree/main/test" target="_blank">in this repository</a>.</p>
 </div>
 <div id="tabset-1-2" class="tab-pane" role="tabpanel" aria-labelledby="tabset-1-2-tab">
 <ul>
@@ -444,19 +465,21 @@ x_{cost} * \beta_{cost} + x_{type=shoes} * \beta_{type=shoes} + x_{type = clothe
 <div id="tabset-1-4" class="tab-pane" role="tabpanel" aria-labelledby="tabset-1-4-tab">
 <div class="cell">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb1"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(shiny)</span>
-<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(bslib)</span>
-<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(reactable)</span>
-<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(dplyr)</span>
-<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(ggplot2)</span>
-<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(future.apply)</span>
-<span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(scales)</span>
-<span id="cb1-8"><a href="#cb1-8" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(knitr)</span>
-<span id="cb1-9"><a href="#cb1-9" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(kableExtra)</span>
-<span id="cb1-10"><a href="#cb1-10" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(gt)</span>
-<span id="cb1-11"><a href="#cb1-11" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(gtsummary)</span>
-<span id="cb1-12"><a href="#cb1-12" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(plotly)</span>
-<span id="cb1-13"><a href="#cb1-13" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(bsicons)</span>
-<span id="cb1-14"><a href="#cb1-14" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(htmltools)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="co"># Note: shinylive does not need to be loaded, only installed locally</span></span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(shinylive)</span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(bslib)</span>
+<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(reactable)</span>
+<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(dplyr)</span>
+<span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(ggplot2)</span>
+<span id="cb1-8"><a href="#cb1-8" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(future.apply)</span>
+<span id="cb1-9"><a href="#cb1-9" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(scales)</span>
+<span id="cb1-10"><a href="#cb1-10" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(knitr)</span>
+<span id="cb1-11"><a href="#cb1-11" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(kableExtra)</span>
+<span id="cb1-12"><a href="#cb1-12" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(gt)</span>
+<span id="cb1-13"><a href="#cb1-13" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(gtsummary)</span>
+<span id="cb1-14"><a href="#cb1-14" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(plotly)</span>
+<span id="cb1-15"><a href="#cb1-15" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(bsicons)</span>
+<span id="cb1-16"><a href="#cb1-16" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(htmltools)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
 </div>
 </div>
@@ -1679,15 +1702,16 @@ shinyApp(ui = ui, server = server)</code></pre>
   }
   loadGiscus();
 </script>
-<div id="quarto-appendix" class="default"><section class="quarto-appendix-contents" id="quarto-citation"><h2 class="anchored quarto-appendix-heading">Citation</h2><div><div class="quarto-appendix-secondary-label">BibTeX citation:</div><pre class="sourceCode code-with-copy quarto-appendix-bibtex"><code class="sourceCode bibtex">@online{tomiyama,
+<div id="quarto-appendix" class="default"><section class="quarto-appendix-contents" id="quarto-citation"><h2 class="anchored quarto-appendix-heading">Citation</h2><div><div class="quarto-appendix-secondary-label">BibTeX citation:</div><pre class="sourceCode code-with-copy quarto-appendix-bibtex"><code class="sourceCode bibtex">@online{tomiyama2026,
   author = {Tomiyama, Josh},
   title = {Supplemental {Dashboard:} {Optimizing} {Expected} {Revenue}},
+  date = {2026-01-20},
   url = {https://josh-tomiyama.github.io/shakastats/projects/logisticRegressionShiny/shinyApp.html},
   langid = {en}
 }
-</code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre><div class="quarto-appendix-secondary-label">For attribution, please cite this work as:</div><div id="ref-tomiyama" class="csl-entry quarto-appendix-citeas" role="listitem">
-Tomiyama, Josh. n.d. <span>“Supplemental Dashboard: Optimizing Expected
-Revenue.”</span> <a href="https://josh-tomiyama.github.io/shakastats/projects/logisticRegressionShiny/shinyApp.html">https://josh-tomiyama.github.io/shakastats/projects/logisticRegressionShiny/shinyApp.html</a>.
+</code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre><div class="quarto-appendix-secondary-label">For attribution, please cite this work as:</div><div id="ref-tomiyama2026" class="csl-entry quarto-appendix-citeas" role="listitem">
+Tomiyama, Josh. 2026. <span>“Supplemental Dashboard: Optimizing Expected
+Revenue.”</span> January 20, 2026. <a href="https://josh-tomiyama.github.io/shakastats/projects/logisticRegressionShiny/shinyApp.html">https://josh-tomiyama.github.io/shakastats/projects/logisticRegressionShiny/shinyApp.html</a>.
 </div></div></section></div></div> <!-- /content -->
 <footer class="footer">
   <div class="nav-footer">
