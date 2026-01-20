@@ -21,7 +21,7 @@
 
 
 
-<p>Last Update: January 13, 2026</p>
+<p>Last Update: January 20, 2026</p>
 <p>All the packages used in this project are below.</p>
 <div class="cell">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb1" style="background: #f1f3f5;"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb1-1"><span class="fu" style="color: #4758AB;
@@ -973,7 +973,7 @@ Table&nbsp;1: Summary Tables
 }
 </style>
 
-<div id="tbl-summ-1" class="gt_table do-not-create-environment quarto-float quarto-figure quarto-figure-center anchored" data-quarto-bootstrap="false" data-quarto-postprocess="true" data-quarto-disable-processing="false">
+<div id="tbl-summ-1" class="gt_table do-not-create-environment quarto-float quarto-figure quarto-figure-center anchored" data-quarto-postprocess="true" data-quarto-bootstrap="false" data-quarto-disable-processing="false">
 <figure class="quarto-float quarto-subfloat-tbl figure">
 <figcaption class="quarto-float-caption-top quarto-subfloat-caption quarto-subfloat-tbl" id="tbl-summ-1-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
 (a) Summary by Sold
@@ -1498,7 +1498,7 @@ N = 442</th>
 }
 </style>
 
-<div id="tbl-summ-2" class="gt_table do-not-create-environment quarto-float quarto-figure quarto-figure-center anchored" data-quarto-bootstrap="false" data-quarto-postprocess="true" data-quarto-disable-processing="false">
+<div id="tbl-summ-2" class="gt_table do-not-create-environment quarto-float quarto-figure quarto-figure-center anchored" data-quarto-postprocess="true" data-quarto-bootstrap="false" data-quarto-disable-processing="false">
 <figure class="quarto-float quarto-subfloat-tbl figure">
 <figcaption class="quarto-float-caption-top quarto-subfloat-caption quarto-subfloat-tbl" id="tbl-summ-2-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
 (b) Summary by Type
@@ -2807,7 +2807,7 @@ background-color: null;
 font-style: italic;">### when doing optimization, the log scale is more stable if there are convergence issues</span></span>
 <span id="cb14-8">   <span class="do" style="color: #5E5E5E;
 background-color: null;
-font-style: italic;">### need to restrict if markup &gt; 0</span></span>
+font-style: italic;">### need to restrict to markup &gt; 0</span></span>
 <span id="cb14-9">    <span class="fu" style="color: #4758AB;
 background-color: null;
 font-style: inherit;">log</span>(<span class="dv" style="color: #AD0000;
@@ -3010,7 +3010,7 @@ background-color: null;
 font-style: inherit;">optim</span>(</span>
 <span id="cb15-2">      <span class="co" style="color: #5E5E5E;
 background-color: null;
-font-style: inherit;"># initical guess</span></span>
+font-style: inherit;"># initial guess</span></span>
 <span id="cb15-3">      <span class="at" style="color: #657422;
 background-color: null;
 font-style: inherit;">par =</span> <span class="dv" style="color: #AD0000;
@@ -3707,15 +3707,15 @@ font-style: inherit;">"Revenue Rounded to nearest 0.01 Million Dollars"</span>)<
 <p><img src="https://latex.codecogs.com/png.latex?%0Af'(x)%20=%20c_1%20%5Cleft%20%5B%20%5Cleft%20(%20%5Cfrac%7B1%7D%7B100%7D%20%5Cright%20)%20%5Cfrac%7B1%7D%7B1%20+%20%5Cexp%5B-(c_2%20+%20x%20%5Cbeta%20)%5D%7D%20+%20%5Cbeta%20(1%20+%20%5Cfrac%7Bx%7D%7B100%7D)%20%5Cleft%20(%20%5Cfrac%7B1%7D%7B1%20+%20%5Cexp%5B-(c_2%20+%20x%20*%20%5Cbeta%20)%5D%7D%20%5Cright%20)%20%5Cleft%20(%20%5Cfrac%7B%5Cexp%5B-(c_2%20+%20x%20*%20%5Cbeta%20)%5D%7D%7B1%20+%20%5Cexp%5B-(c_2%20+%20x%20*%20%5Cbeta%20)%7D%20%5Cright%20)%20%5Cright%5D%0A"></p>
 <p>Recall that <img src="https://latex.codecogs.com/png.latex?%5Cpi_i%20=%20%5Cfrac%7B1%7D%7B1%20+%20%5Cexp%5B-(c_2%20+%20x%20%5Cbeta%20)%5D%7D"> and therefore <img src="https://latex.codecogs.com/png.latex?1%20-%20%5Cpi_i%20=%20%5Cfrac%7B%5Cexp%5B-(c_2%20+%20x%20%5Cbeta%20)%5D%7D%7B1%20+%20%5Cexp%5B-(c_2%20+%20x%20%5Cbeta%20)%5D%7D">. Rewriting the above derivative gives the more compact equation:</p>
 <p><img src="https://latex.codecogs.com/png.latex?%0Af'(x)%20=%20c_1%20%5Cleft%20%5B%20%5Cleft%20(%20%5Cfrac%7B1%7D%7B100%7D%20%5Cright%20)%20%5Cpi_i%20+%20%5Cbeta%20(1%20+%20%5Cfrac%7Bx%7D%7B100%7D)%20%5Cpi_i%20(1%20-%20%5Cpi_i)%20%5Cright%5D%0A"></p>
-<p><strong>Scenario 1: when <img src="https://latex.codecogs.com/png.latex?%5Cbeta%20%3C%200"></strong></p>
+<p><strong>Scenario 1: when</strong> <img src="https://latex.codecogs.com/png.latex?%5Cbeta%20%3C%200"></p>
 <p>If <img src="https://latex.codecogs.com/png.latex?%5Cbeta%20%3C%200">, then <img src="https://latex.codecogs.com/png.latex?%5Cdisplaystyle%20%5Clim_%7Bx%20%5Cto%20%5Cinfty%7D%20%5Cpi_i%20=%200">. Applying this to the derivative reveals that</p>
 <p><img src="https://latex.codecogs.com/png.latex?%0A%5Cdisplaystyle%20%5Clim_%7Bx%20%5Cto%20%5Cinfty%7D%20f'(x)%20=%200%0A"></p>
 <p>Suppose that <img src="https://latex.codecogs.com/png.latex?f'(0)%20%3E%200">, then by Rolle’s Theorem there exists some value of <img src="https://latex.codecogs.com/png.latex?x%20%3E%200"> where <img src="https://latex.codecogs.com/png.latex?f'(x)%20%3C%200">. Therefore, we only need to check if <img src="https://latex.codecogs.com/png.latex?f'(0)%20%3E%200"> when <img src="https://latex.codecogs.com/png.latex?%5Cbeta%20%3C%200"> to know that a maximum exists.</p>
-<p><strong>Scenario 2: When <img src="https://latex.codecogs.com/png.latex?%5Cbeta%20%3E%200"></strong></p>
+<p><strong>Scenario 2: When</strong> <img src="https://latex.codecogs.com/png.latex?%5Cbeta%20%3E%200"></p>
 <p>If <img src="https://latex.codecogs.com/png.latex?%5Cbeta%20%3E%200">, then <img src="https://latex.codecogs.com/png.latex?%5Cdisplaystyle%20%5Clim_%7Bx%20%5Cto%20%5Cinfty%7D%20%5Cpi_i%20=%201"> and applying this to the original function now reveals that</p>
 <p><img src="https://latex.codecogs.com/png.latex?%0A%5Cdisplaystyle%20%5Clim_%7Bx%20%5Cto%20%5Cinfty%7D%20f(x)%20=%20%5Cinfty%0A"></p>
 <p>Therefore, no absolute maximum exists in this scenario. To interpret this scenario, the customers are more likely to buy the products the more markup percentage there is, so it would be wise to set the markup to infinity.</p>
-<p><strong>Scenario 3: When <img src="https://latex.codecogs.com/png.latex?%5Cbeta%20=%200"></strong></p>
+<p><strong>Scenario 3: When</strong> <img src="https://latex.codecogs.com/png.latex?%5Cbeta%20=%200"></p>
 <p>For completeness, if <img src="https://latex.codecogs.com/png.latex?%5Cbeta%20=%200">, then <img src="https://latex.codecogs.com/png.latex?%5Cpi_i"> is constant with respect to the markup percentage. Therefore the limit for the revenue function is again:</p>
 <p><img src="https://latex.codecogs.com/png.latex?%0A%5Cdisplaystyle%20%5Clim_%7Bx%20%5Cto%20%5Cinfty%7D%20f(x)%20=%20%5Cinfty%0A"></p>
 <p>No absolute maximum exists in this scenario. Unlike when <img src="https://latex.codecogs.com/png.latex?%5Cbeta%20%3E%200">, customers are indifferent to increases in markup, so one might as well set the markup to infinity.</p>
@@ -3736,7 +3736,7 @@ Matrix products: default
 
 locale:
 [1] LC_COLLATE=English_United States.utf8 
-[2] LC_CTYPE=en_US.UTF-8                  
+[2] LC_CTYPE=English_United States.utf8   
 [3] LC_MONETARY=English_United States.utf8
 [4] LC_NUMERIC=C                          
 [5] LC_TIME=English_United States.utf8    
@@ -3800,12 +3800,12 @@ Optimizing Expected Revenue.”</span> January 13, 2026. <a href="https://josh-t
   <pubDate>Tue, 13 Jan 2026 10:00:00 GMT</pubDate>
 </item>
 <item>
-  <title></title>
+  <title>Supplemental Dashboard: Optimizing Expected Revenue</title>
   <dc:creator>Josh Tomiyama</dc:creator>
   <link>https://josh-tomiyama.github.io/shakastats/projects/logisticRegressionShiny/shinyApp.html</link>
   <description><![CDATA[ undefined ]]></description>
   <guid>https://josh-tomiyama.github.io/shakastats/projects/logisticRegressionShiny/shinyApp.html</guid>
-  <pubDate>Fri, 16 Jan 2026 10:08:52 GMT</pubDate>
+  <pubDate>Tue, 20 Jan 2026 22:51:27 GMT</pubDate>
 </item>
 </channel>
 </rss>

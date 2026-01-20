@@ -8,7 +8,7 @@
 
 <meta name="author" content="Josh Tomiyama">
 
-<title>TESTING Dashboard: Optimizing Expected Revenue – ShakaStats</title>
+<title>Supplemental Dashboard: Optimizing Expected Revenue – ShakaStats</title>
 <style>
 code{white-space: pre-wrap;}
 span.smallcaps{font-variant: small-caps;}
@@ -20,6 +20,41 @@ ul.task-list li input[type="checkbox"] {
   width: 0.8em;
   margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
   vertical-align: middle;
+}
+/* CSS for syntax highlighting */
+html { -webkit-text-size-adjust: 100%; }
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+  }
+pre.numberSource { margin-left: 3em;  padding-left: 4px; }
+div.sourceCode
+  {   }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
 }
 </style>
 
@@ -95,8 +130,36 @@ cookieconsent.run({
 });
 </script> 
   
-<meta name="quarto:status" content="draft">
 
+  <script src="https://cdnjs.cloudflare.com/polyfill/v3/polyfill.min.js?features=es6"></script>
+  <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml-full.js" type="text/javascript"></script>
+
+<script type="text/javascript">
+const typesetMath = (el) => {
+  if (window.MathJax) {
+    // MathJax Typeset
+    window.MathJax.typeset([el]);
+  } else if (window.katex) {
+    // KaTeX Render
+    var mathElements = el.getElementsByClassName("math");
+    var macros = [];
+    for (var i = 0; i < mathElements.length; i++) {
+      var texText = mathElements[i].firstChild;
+      if (mathElements[i].tagName == "SPAN" && texText && texText.data) {
+        window.katex.render(texText.data, mathElements[i], {
+          displayMode: mathElements[i].classList.contains('display'),
+          throwOnError: false,
+          macros: macros,
+          fleqn: false
+        });
+      }
+    }
+  }
+}
+window.Quarto = {
+  typesetMath
+};
+</script>
 
 <link rel="stylesheet" href="../../styles.css">
 </head>
@@ -273,7 +336,7 @@ cookieconsent.run({
   </script>
 
 <div id="quarto-search-results"></div>
-  <header id="quarto-header" class="headroom fixed-top"><div id="quarto-draft-alert" class="alert alert-warning"><i class="bi bi-pencil-square"></i>Draft</div>
+  <header id="quarto-header" class="headroom fixed-top">
     <nav class="navbar navbar-expand-lg " data-bs-theme="dark">
       <div class="navbar-container container-fluid">
       <div class="navbar-brand-container mx-auto">
@@ -325,17 +388,15 @@ cookieconsent.run({
     </nav>
 </header>
 <!-- content -->
-<div id="quarto-content" class="quarto-container page-columns page-rows-contents page-layout-article page-navbar">
+<div id="quarto-content" class="quarto-container page-layout-custom page-navbar">
 <!-- sidebar -->
 <!-- margin-sidebar -->
-    
 <!-- main -->
-<main class="content" id="quarto-document-content">
 
 
 <header id="title-block-header" class="quarto-title-block default">
 <div class="quarto-title">
-<h1 class="title">TESTING Dashboard: Optimizing Expected Revenue</h1>
+<h1 class="title">Supplemental Dashboard: Optimizing Expected Revenue</h1>
 </div>
 
 
@@ -358,135 +419,770 @@ cookieconsent.run({
 </header>
 
 
-<div class="tabset-margin-container"></div><div class="panel-tabset">
-<ul class="nav nav-tabs" role="tablist"><li class="nav-item" role="presentation"><a class="nav-link active" id="tabset-1-1-tab" data-bs-toggle="tab" data-bs-target="#tabset-1-1" role="tab" aria-controls="tabset-1-1" aria-selected="true" href="">Data Summaries</a></li><li class="nav-item" role="presentation"><a class="nav-link" id="tabset-1-2-tab" data-bs-toggle="tab" data-bs-target="#tabset-1-2" role="tab" aria-controls="tabset-1-2" aria-selected="false" href="">Revenue Calculator</a></li><li class="nav-item" role="presentation"><a class="nav-link" id="tabset-1-3-tab" data-bs-toggle="tab" data-bs-target="#tabset-1-3" role="tab" aria-controls="tabset-1-3" aria-selected="false" href="">Raw Data Set</a></li></ul>
+<div class="panel-tabset">
+<ul class="nav nav-tabs" role="tablist"><li class="nav-item" role="presentation"><a class="nav-link active" id="tabset-1-1-tab" data-bs-toggle="tab" data-bs-target="#tabset-1-1" role="tab" aria-controls="tabset-1-1" aria-selected="true" href="">Notes</a></li><li class="nav-item" role="presentation"><a class="nav-link" id="tabset-1-2-tab" data-bs-toggle="tab" data-bs-target="#tabset-1-2" role="tab" aria-controls="tabset-1-2" aria-selected="false" href="">Data Dictionary</a></li><li class="nav-item" role="presentation"><a class="nav-link" id="tabset-1-3-tab" data-bs-toggle="tab" data-bs-target="#tabset-1-3" role="tab" aria-controls="tabset-1-3" aria-selected="false" href="">Model Used</a></li><li class="nav-item" role="presentation"><a class="nav-link" id="tabset-1-4-tab" data-bs-toggle="tab" data-bs-target="#tabset-1-4" role="tab" aria-controls="tabset-1-4" aria-selected="false" href="">Packages Used</a></li></ul>
 <div class="tab-content">
 <div id="tabset-1-1" class="tab-pane active" role="tabpanel" aria-labelledby="tabset-1-1-tab">
-<pre class="shinylive-r" data-engine="r"><code>#| '!! shinylive warning !!': |
-#|   shinylive does not work in self-contained HTML documents.
-#|   Please set `embed-resources: false` in your metadata.
-#| standalone: true
-#| viewerHeight: 800
-library(shiny)
-ui &lt;- fluidPage(
-  titlePanel("Hello Shiny!"),
-  sidebarLayout(
-    sidebarPanel(
-      sliderInput(
-        inputId = "bins",
-        label = "Number of bins:",
-        min = 1,
-        max = 50,
-        value = 30
-      )
-    ),
-    mainPanel(
-      plotOutput(outputId = "distPlot")
-    )
-  )
-)
-server &lt;- function(input, output) {
-  output$distPlot &lt;- renderPlot({
-    x &lt;- faithful$waiting
-    bins &lt;- seq(min(x), max(x), length.out = input$bins + 1)
-    hist(x,
-      breaks = bins, col = "#75AADB", border = "white",
-      xlab = "Waiting time to next eruption (in mins)",
-      main = "Histogram of waiting times"
-    )
-  })
-}
-shinyApp(ui = ui, server = server)</code></pre>
+<p>This dashboard is a supplement to the project article <a href="../../projects/optimizingExpectedReturns/index.html" target="_blank">“Logistic Regression Analysis Example: Optimizing Expected Revenue”</a>. More details on model building is discussed there, but results and general summary of the data are presented here.</p>
+<p>The dashboard below is created with R shinylive to allow publishing the application without using a dedicated server. Instead, the application will use the computing resources of the user viewing the app. <strong>This may result in a long loading times</strong>.</p>
 </div>
 <div id="tabset-1-2" class="tab-pane" role="tabpanel" aria-labelledby="tabset-1-2-tab">
-<pre class="shinylive-r" data-engine="r"><code>#| '!! shinylive warning !!': |
-#|   shinylive does not work in self-contained HTML documents.
-#|   Please set `embed-resources: false` in your metadata.
-#| standalone: true
-#| viewerHeight: 800
-library(shiny)
-ui &lt;- fluidPage(
-  titlePanel("Hello Shiny!"),
-  sidebarLayout(
-    sidebarPanel(
-      sliderInput(
-        inputId = "bins",
-        label = "Number of bins:",
-        min = 1,
-        max = 50,
-        value = 30
-      )
-    ),
-    mainPanel(
-      plotOutput(outputId = "distPlot")
-    )
-  )
-)
-server &lt;- function(input, output) {
-  output$distPlot &lt;- renderPlot({
-    x &lt;- faithful$waiting
-    bins &lt;- seq(min(x), max(x), length.out = input$bins + 1)
-    hist(x,
-      breaks = bins, col = "#75AADB", border = "white",
-      xlab = "Waiting time to next eruption (in mins)",
-      main = "Histogram of waiting times"
-    )
-  })
-}
-shinyApp(ui = ui, server = server)</code></pre>
+<ul>
+<li><p><code>sold</code> - The outcome of interest. 0 indicates failed sale, 1 indicates successful sale</p></li>
+<li><p><code>type</code> - The product type. Can be either of ‘accessories’, ‘shoes’, ‘clothes’.</p></li>
+<li><p><code>cost</code> - The cost to produce the product in USD.</p></li>
+<li><p><code>markup</code> - The markup percentage. A value of 20 indicates a 20% markup for sales.</p></li>
+</ul>
 </div>
 <div id="tabset-1-3" class="tab-pane" role="tabpanel" aria-labelledby="tabset-1-3-tab">
+<p>The logistic regression model with the following formula:</p>
+<p><span class="math display">\[
+  \log(\frac{\pi_i}{1 - \pi_i}) = \beta_0 + x_{markup} * \beta_{markup} +
+x_{cost} * \beta_{cost} + x_{type=shoes} * \beta_{type=shoes} + x_{type = clothes}*\beta_{type = clothes}
+\]</span></p>
+</div>
+<div id="tabset-1-4" class="tab-pane" role="tabpanel" aria-labelledby="tabset-1-4-tab">
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb1"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(shiny)</span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(bslib)</span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(reactable)</span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(dplyr)</span>
+<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(ggplot2)</span>
+<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(future.apply)</span>
+<span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(scales)</span>
+<span id="cb1-8"><a href="#cb1-8" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(knitr)</span>
+<span id="cb1-9"><a href="#cb1-9" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(kableExtra)</span>
+<span id="cb1-10"><a href="#cb1-10" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(gt)</span>
+<span id="cb1-11"><a href="#cb1-11" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(gtsummary)</span>
+<span id="cb1-12"><a href="#cb1-12" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(plotly)</span>
+<span id="cb1-13"><a href="#cb1-13" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(bsicons)</span>
+<span id="cb1-14"><a href="#cb1-14" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(htmltools)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</div>
+</div>
+</div>
+</div>
+<section id="dashboard" class="level2">
+<h2 data-anchor-id="dashboard">Dashboard</h2>
 <pre class="shinylive-r" data-engine="r"><code>#| '!! shinylive warning !!': |
 #|   shinylive does not work in self-contained HTML documents.
 #|   Please set `embed-resources: false` in your metadata.
-#| standalone: true
+#| standalone: TRUE
 #| viewerHeight: 800
 library(shiny)
-ui &lt;- fluidPage(
-  titlePanel("Hello Shiny!"),
-  sidebarLayout(
-    sidebarPanel(
-      sliderInput(
-        inputId = "bins",
-        label = "Number of bins:",
-        min = 1,
-        max = 50,
-        value = 30
+library(bslib)
+library(reactable)
+library(dplyr)
+library(ggplot2)
+library(future.apply)
+library(scales)
+library(knitr)
+library(kableExtra)
+library(gt)
+library(gtsummary)
+library(plotly)
+library(bsicons)
+library(htmltools)
+# Create Input Data-------------------------------------------------------------
+
+## True parameter values
+
+set.seed(2013)
+
+sample_size &lt;- 3000
+
+true_beta &lt;- c(2, # intercept
+               -0.2, # markup
+               0.002, # cost
+               1, # type=clothes
+               1.5 )# type=shoes
+
+### Simulate data
+
+type &lt;- sample(c("accessories", "clothes", "shoes"), 
+               size = sample_size,
+               replace = TRUE,
+               prob = c(0.3, 0.5, 0.2))
+cost &lt;- rnorm(sample_size, mean = 2000, sd = 400)
+markup &lt;- runif(sample_size, min = 20, max = 120)
+
+## make sure markup and cost are above 0
+markup &lt;- ifelse(markup &lt;= 0, 10, markup)
+cost &lt;- ifelse(cost &lt;= 0, 2000, cost)
+
+# convert type into a factor variable to prepare for analysis
+
+type &lt;- factor(type, levels = c("accessories", "clothes", "shoes"))
+
+x_df &lt;- data.frame(markup = markup, cost = cost, type = type)
+
+# get x_matrix
+
+x_matrix &lt;- model.matrix(~ 1 + markup + cost + type, data = x_df)
+
+#simulated log-odds per person
+
+log_odds &lt;- x_matrix %*% true_beta
+
+#convert log_odds to probabilities
+
+inverse_logit &lt;- function(x){(1 + exp(-x))^-1}
+true_probs &lt;- inverse_logit(log_odds)
+
+# get the outcome
+sold &lt;- rbinom(sample_size, 1, true_probs)
+x_df$sold &lt;- sold
+
+#-------------------------------------------------------------------------------
+
+# Fit model and confidence intervals--------------------------------------------
+
+fit &lt;- glm(sold ~ 1 + markup + cost + type, 
+           data = x_df,
+           family = binomial)
+
+ci &lt;- suppressMessages(confint(fit))
+
+#-------------------------------------------------------------------------------
+
+# Probability plot--------------------------------------------------------------
+getMode &lt;- function(x){
+  lx &lt;- levels(x)
+  ux &lt;- unique(lx)
+  factor(ux[which.max(tabulate(match(lx, ux)))], levels = lx)
+}
+#-------------------------------------------------------------------------------
+
+# Exp Return and Prob Plot------------------------------------------------------
+expected_return &lt;- function(markup, cost, type, fit, log = FALSE){
+  new_data &lt;- data.frame(markup = markup,
+                         cost = cost,
+                         type = type)
+  
+  if(log){
+    ### when doing optimization, the log scale is more stable if there are convergence issues
+    ### need to restrict if markup &gt; 0
+    log(1 + markup/100) + log(cost) + 
+      log(predict(fit, newdata = new_data, type = "response"))
+  }else{
+    (1 + markup/100)*cost * #total sale price
+      predict(fit, newdata = new_data, type = "response") #prob success 
+  }
+}
+
+expected_return_ci &lt;- function(markup, cost, type, fit){
+  new_data &lt;- data.frame(markup = markup,
+                         cost = cost,
+                         type = type)
+  preds &lt;- predict(fit, newdata = new_data, se.fit = TRUE)
+  preds_ci_upr &lt;- preds$fit + qnorm(0.975)*preds$se.fit
+  preds_ci_lwr &lt;- preds$fit - qnorm(0.975)*preds$se.fit
+  
+  c("ci_upr" = (1 + markup/100)*cost * #total sale price
+               inverse_logit(preds_ci_upr), #CI prob success 
+    "ci_lwr" =   (1 + markup/100)*cost * #total sale price
+               inverse_logit(preds_ci_lwr)  #CI prob success 
+    ) 
+
+}
+
+# Revenue Graph
+
+#-------------------------------------------------------------------------------
+
+# Apply Optimal Markup ---------------------------------------------------------
+
+calc_optimal_markup &lt;- function(cost, type, fit){
+  optim(par = 20, 
+        fn = expected_return, 
+        method = "BFGS",
+        control = list(fnscale = -1), # do maximization not minimization
+        # These params don't change
+        cost = cost, type = type, fit = fit 
+  )  
+}
+
+
+# non-parallel (sequential) version
+
+# optimal_markups &lt;- mapply(calc_optimal_markup,
+#                           cost = x_df$cost,
+#                           type = x_df$type,
+#                           MoreArgs = list(fit = fit)
+#                           )
+
+
+# set up parallel computing
+plan("multisession")
+# do the calculation for every data point in parallel
+# on my machine this speeds up the calculation about 6 fold
+optimal_markups &lt;- future_mapply(calc_optimal_markup, 
+                                 cost = x_df$cost, 
+                                 type = x_df$type, 
+                                 MoreArgs = list(fit = fit)
+)
+# return computing environment back to normal
+plan("sequential")
+
+optimal_x_df &lt;- x_df
+optimal_x_df$markup &lt;- unlist(optimal_markups[1,])
+
+## predicted probabilities with optimal markup
+hypothetical_probs &lt;- predict(fit, 
+                              newdata = optimal_x_df, 
+                              type = 'response')
+
+### simulate whether a sale was made for the optimal markup data set, 5000 times
+set.seed(2013)
+expected_results &lt;- replicate(5000,
+                              expr = {
+                                hypothetical_success &lt;- rbinom(sample_size, 1, hypothetical_probs)
+                                c(change_sales = sum(hypothetical_success) - sum(x_df$sold),
+                                  change_rev = sum(hypothetical_success * (1 + optimal_x_df$markup/100)*x_df$cost) - 
+                                    sum(x_df$sold * (1 + x_df$markup/100)*x_df$cost)
+                                )
+                              })
+
+## create table of observed and optimal results
+obs_revenue &lt;- sum(x_df$sold * (1 + x_df$markup/100)*x_df$cost)
+optimal_results &lt;- data.frame(observed = c(sum(x_df$sold), obs_revenue),
+                              sim_ave = c(floor(mean(expected_results[1,])),
+                                          mean(expected_results[2,]))
+)
+
+optimal_results &lt;- optimal_results %&gt;%
+  mutate(percent_change = 
+           ifelse(sim_ave/observed &gt; 1, 
+                  sim_ave/observed - 1, 
+                  1 - sim_ave/observed),
+         difference = sim_ave - observed
+  )
+rownames(optimal_results) &lt;- c("Sales", "Revenue")
+## format dollars and percentages as they are hard to read otherwise
+optimal_results$percent_change &lt;- scales::percent(optimal_results$percent_change, 
+                                                  accuracy = 1, 
+                                                  decimal.mark = ".")
+optimal_results[2, c(1, 2, 4)] &lt;- 
+  dollar(unlist(optimal_results[2, c(1, 2, 4)]), 
+         accuracy = 0.01, 
+         scale = 1/1e6, 
+         prefix = "$", 
+         suffix = " M")
+
+## print results
+optimal_results %&gt;% 
+  kable(digits = 2, align = 'c') %&gt;%
+  kable_styling() %&gt;%
+  footnote(number = "Revenue Rounded to nearest 0.01 Million Dollars")
+
+# Define UI ----
+ui &lt;- page_fluid(
+  titlePanel("Supplemental Dashboard for Optimal Markup Strategy"),
+  navset_tab(
+    nav_panel("Data Summary",
+                  ## top row be histograms/barplots of data
+                  card(full_screen = TRUE,
+                       card_header("Distribution of Markup Percentage"),
+                       card_body(
+                         inputPanel(
+                           selectInput("select_markup",
+                                       "Split By Category:",
+                                       list("None" = "none", 
+                                            "Type" = "type", 
+                                            "Sold" = "sold")
+                           ),
+                           sliderInput("nbin_markup", "Number of Bins:", 
+                                       min = 5, max = 100,
+                                       value = ceiling( 
+                                         diff(range(x_df$markup)) /
+                                           (2*IQR(x_df$markup)/(nrow(x_df))^(1/3)
+                                           )
+                                       )
+                           ) 
+                         ),
+                         layout_column_wrap(
+                         card(full_screen = TRUE,
+                              plotOutput("hist_markup")),
+                         card(full_screen = TRUE,
+                              gt_output("table_markup"))
+                       )
+                  )
+                  ),
+                  card(full_screen = TRUE,
+                       card_header("Distribution of Cost"),
+                       card_body(
+                         inputPanel(
+                           selectInput("select_cost",
+                                       "Split By Category:",
+                                       list("None" = "none", 
+                                            "Type" = "type", 
+                                            "Sold" = "sold")
+                           ),
+                           sliderInput("nbin_cost", "Number of Bins:", 
+                                       min = 5, max = 50, 
+                                       value = ceiling( 
+                                         diff(range(x_df$cost)) /
+                                           (2*IQR(x_df$cost)/(nrow(x_df))^(1/3))
+                                       )
+                           )
+                         ),
+                         layout_column_wrap(
+                         card(full_screen = TRUE,
+                                plotOutput("hist_cost")
+                              ),
+                         card(full_screen = TRUE,
+                                gt_output("table_cost")
+                              )
+                         )
+                       )
+                  ),
+                  card(full_screen = TRUE,
+                       card_header("Distribution of Product Type"),
+                       card_body(
+                         inputPanel(
+                           checkboxInput("type_by_sold", "By sold:", FALSE)
+                         ),
+                         layout_column_wrap(
+                           card(full_screen = TRUE,
+                                  plotOutput("bar_type")
+                           ),
+                           card(full_screen = TRUE,
+                                  gt_output("table_type")
+                           )
+                         )
+                       )
+                  ),
+                  card(full_screen = TRUE,
+                       card_header("Distribution of Sold Products"),
+                       card_body(
+                         inputPanel(
+                           checkboxInput("sold_by_type", "By type:", FALSE)
+                         ),
+                         layout_column_wrap(
+                           card(full_width = TRUE,
+                                plotOutput("bar_sold")
+                                ),
+                           card(full_width = TRUE,
+                                gt_output("table_sold")
+                                )
+                         )
+                       )
+                       )
+              # markup vs cost ommited for now
+                  # card(full_screen = TRUE,
+                  #      card_header("Markup vs Cost"),
+                  #      card_body(plotOutput("plot_markup_cost"))
+                  # )
+                )
+              ,
+    nav_panel("Expected Revenue Calculator",
+              # Revenue Highlights Here
+              card( "Optimal Revenue Highlights",
+                    card_body(
+                      layout_column_wrap(
+                        value_box("Projected Revenue Increase",
+                                  value = optimal_results$difference[2],
+                                  showcase = bs_icon("currency-dollar"),
+                                  span(bs_icon("arrow-up"), paste0(optimal_results$percent_change[2], " vs. Current Revenue")),
+                                  # paste0(optimal_results$percent_change[2], " Increase over Observed"),
+                                  theme = 'green'
+                                  ),
+                        value_box("Projected Sales Increase",
+                                  value = paste0(optimal_results$difference[1], "products"),
+                                  showcase = bs_icon("bag-check"),
+                                  span(bs_icon("arrow-up"), paste0(optimal_results$percent_change[1], " vs. Current Sales")),
+                                  theme = 'green'
+                                  ),
+                      )
+                    )
+              ),
+              layout_sidebar(
+                ## inputs for product type and cost in sidebar
+                sidebar = sidebar(
+                  h3("Inputs for Optimal Markup Calculator"),
+                  sliderInput("slider_markup_rev",
+                              "Markup: ",
+                              min = 0, 
+                              max = 200,
+                              value = c(0, 120)
+                  ),
+                  numericInput("num_cost_rev",
+                               "Cost: ",
+                               value = mean(x_df$cost),
+                               min = 1,
+                               max = 10000),
+                  selectInput("select_type_rev",
+                              "Type: ",
+                              choices = 
+                                c(
+                                  "Accessories" = "accessories",
+                                  "Shoes" = "shoes",
+                                  "Clothes" = "clothes" 
+                                )
+                  )
+                ),
+                # main content
+                layout_column_wrap(
+                  card(full_screen = TRUE,
+                    plotlyOutput("plot_exp_rev")),
+                  card(full_screen = TRUE,
+                    plotlyOutput("plot_prob_rev"))
+                )
+              )
+            ),
+    nav_panel("Interactive Raw Data",
+              helpText("Values rounded to 2 decimal places"),
+              reactableOutput("raw_data")),
+    id = "nav_tabs"
+  )
+
+)
+
+# Define server logic ----
+server &lt;- function(input, output) {
+  
+  # Data Summary Outputs -------------------------------------------------------
+  base_markup &lt;- reactive({
+    ggplot(x_df, aes(markup)) + 
+      geom_histogram(bins = input$nbin_markup)
+  })
+  
+  base_cost &lt;- reactive({
+    ggplot(x_df, aes(cost)) + 
+      geom_histogram(bins = input$nbin_cost)
+  })
+  
+  base_type &lt;- ggplot(x_df, aes(type)) + 
+    geom_bar() + 
+    geom_text(stat = "count", aes(label = after_stat(count)), vjust = -0.5) + 
+    labs(x = "Product Type") + 
+    scale_y_continuous(expand = expansion(mult = c(0.05, 0.10)))
+  
+  base_sold &lt;- ggplot(x_df, aes(sold)) + 
+    geom_bar() + 
+    geom_text(stat = "count", aes(label = after_stat(count)), vjust = -0.5) + 
+    labs(x = "Sold Products") + 
+    scale_y_continuous(expand = expansion(mult = c(0.05, 0.15)))
+  
+  output$hist_markup &lt;- renderPlot({
+    if(input$select_markup == "type"){
+      base_markup() + 
+        facet_wrap(~ type, ncol = 1)
+    }else if(input$select_markup == "sold"){
+      base_markup() + 
+        facet_wrap(~ as.factor(sold), ncol = 1)
+    }else{
+      base_markup()
+    }
+  })
+  
+  output$hist_cost &lt;- renderPlot({
+    if(input$select_cost == "type"){
+      base_cost() + 
+        facet_wrap(~ type, ncol = 1)
+    }else if(input$select_cost == "sold"){
+      base_markup() + 
+        facet_wrap(~ as.factor(sold), ncol = 1)
+    }else{
+      base_markup()
+    }
+  })
+  
+  output$bar_type &lt;- renderPlot({
+    if(input$type_by_sold){
+      base_type + facet_wrap(~as.factor(sold), ncol = 1) 
+    }else{
+      base_type
+    }
+  })
+  
+  output$bar_sold &lt;- renderPlot({
+    if(input$sold_by_type){
+      base_sold + facet_wrap(~as.factor(type), ncol = 1) 
+    }else{
+      base_sold
+    }
+  })
+  
+  output$table_markup &lt;- render_gt(
+    
+    if(input$select_markup == "type"){
+      x_df %&gt;%
+        tbl_summary(
+          include = c(markup),
+          type = list(all_continuous() ~ "continuous2"),
+          statistic = list(
+            all_continuous() ~ c("{mean} ({sd})", "{median} ({p25}, {p75})", "[{min}, {max}]")
+          ),
+          by = type) %&gt;% 
+        as_gt()
+    } else if(input$select_markup == "sold"){
+      x_df %&gt;%
+        tbl_summary(
+          include = c(markup),
+          type = list(all_continuous() ~ "continuous2"),
+          statistic = list(
+            all_continuous() ~ c("{mean} ({sd})", "{median} ({p25}, {p75})", "[{min}, {max}]")
+          ),
+          by = sold) %&gt;% 
+        as_gt()
+    }else{
+      x_df %&gt;%
+        tbl_summary(
+          include = c(markup),
+          type = list(all_continuous() ~ "continuous2"),
+          statistic = list(
+            all_continuous() ~ c("{mean} ({sd})", "{median} ({p25}, {p75})", "[{min}, {max}]")
+            )
+          ) %&gt;% 
+        as_gt()
+    }
+  )
+    
+  output$table_cost &lt;- render_gt(
+    
+    if(input$select_cost == "type"){
+      x_df %&gt;%
+        tbl_summary(
+          include = c(cost),
+          type = list(all_continuous() ~ "continuous2"),
+          statistic = list(
+            all_continuous() ~ c("{mean} ({sd})", "{median} ({p25}, {p75})", "[{min}, {max}]")
+          ),
+          by = type) %&gt;% 
+        as_gt()
+    } else if(input$select_cost == "sold"){
+      x_df %&gt;%
+        tbl_summary(
+          include = c(cost),
+          type = list(all_continuous() ~ "continuous2"),
+          statistic = list(
+            all_continuous() ~ c("{mean} ({sd})", "{median} ({p25}, {p75})", "[{min}, {max}]")
+          ),
+          by = sold) %&gt;%
+        as_gt()
+    }else{
+      x_df %&gt;%
+        tbl_summary(
+          include = c(cost),
+          type = list(all_continuous() ~ "continuous2"),
+          statistic = list(
+            all_continuous() ~ c("{mean} ({sd})", "{median} ({p25}, {p75})", "[{min}, {max}]")
+          )
+        ) %&gt;% 
+        as_gt()
+    }
+  )
+  
+  output$table_type &lt;- render_gt(
+    
+    if(input$type_by_sold){
+      x_df %&gt;%
+        tbl_summary(
+          include = c(type),
+          type = list(all_categorical() ~ "categorical"),
+          by = sold) %&gt;% 
+        as_gt()
+    }else{
+      x_df %&gt;%
+        tbl_summary(
+          include = c(type),
+          type = list(all_categorical() ~ "categorical")
+        ) %&gt;% 
+        as_gt()
+    }
+  )
+  
+  output$table_sold &lt;- render_gt(
+    
+    if(input$sold_by_type){
+      x_df %&gt;%
+        tbl_summary(
+          include = c(sold),
+          type = list(all_categorical() ~ "categorical"),
+          by = type) %&gt;%
+        as_gt()
+    }else{
+      x_df %&gt;%
+        tbl_summary(
+          include = c(sold),
+          type = list(all_categorical() ~ "categorical")
+        ) %&gt;%
+      as_gt()
+    }
+  )
+  
+  output$plot_markup_cost &lt;- renderPlot(
+    plot(markup, cost, 
+         main = "cost vs markup", 
+         ylab = "cost of production ($)", 
+         xlab = "markup of product (%)")
+  )
+  
+  
+  # Optimal Markup Outputs -----------------------------------------------------
+  
+  x_markup_vals &lt;- reactive({
+    seq(input$slider_markup_rev[1],
+        input$slider_markup_rev[2],
+        by = 0.1)
+  })
+  
+  optimal_markup_vals &lt;- reactive({
+    calc_optimal_markup(input$num_cost_rev, input_type_rev(), fit = fit)
+  })
+  
+  input_type_rev &lt;- reactive({
+    factor(input$select_type_rev, levels = levels(x_df$type))
+  })
+  
+  output$plot_exp_rev &lt;- renderPlotly({
+    exp_return_vals &lt;- sapply(x_markup_vals(),
+                              expected_return,
+                              cost = input$num_cost_rev,
+                              type = input_type_rev(),
+                              fit = fit,
+                              log = FALSE)
+    exp_return_ci &lt;- sapply(x_markup_vals(),
+                            expected_return_ci,
+                            cost = input$num_cost_rev,
+                            type = input_type_rev(),
+                            fit = fit)
+    exp_return_df &lt;- data.frame(x = x_markup_vals(),
+                                y = exp_return_vals,
+                                ci_lwr = exp_return_ci[2,],
+                                ci_upr = exp_return_ci[1,])
+    optimal_markup_df &lt;- data.frame(x_opt = optimal_markup_vals()$par,
+                                    y_opt = optimal_markup_vals()$value)
+    exp_rev_plot &lt;-
+      ggplot(exp_return_df, aes(x = x)) +
+      geom_line(aes(y = y, col = "Exp Revenue")) +
+      geom_ribbon(aes(ymin = ci_lwr, ymax = ci_upr, fill = "95% CI"), alpha = 0.2) +
+      geom_point(aes(x = x_opt,
+                     y = y_opt,
+                     col = "Optimal Markup"), data = optimal_markup_df) + 
+      scale_colour_manual(values = c("black", "green"), name = c("")) +
+      scale_fill_manual(values = 'red', name = "") +
+      ggtitle(paste0("Expected Revenue vs Markup Percentage")) +
+      labs(x = "markup (%)",
+           y = "Expected Revenue ($)") +
+      theme(legend.spacing = unit(0, "pt"),
+            legend.margin = margin(t =-16, r = 0, b = -4, l = 0, unit = "pt")
       )
-    ),
-    mainPanel(
-      plotOutput(outputId = "distPlot")
+    exp_rev_plotly &lt;-
+      ggplotly(exp_rev_plot)
+    
+    # ### manually rename plotly elements back to defaults
+    exp_rev_plotly$x$data[[1]]$name &lt;- "Exp Revenue"
+    exp_rev_plotly$x$data[[2]]$name &lt;- "95% CI"
+    exp_rev_plotly$x$data[[3]]$name &lt;- "Optimal Markup"
+    exp_rev_plotly$x$layout$legend$title$text &lt;- ""
+    exp_rev_plotly
+  }
+  )
+  
+  output$plot_prob_rev &lt;- renderPlotly({
+    new_x_df &lt;- data.frame("markup" = x_markup_vals(),
+                           "cost" = input$num_cost_rev,
+                           "type" = input_type_rev())
+    
+    preds &lt;- predict(fit, newdata = new_x_df, se.fit = TRUE)
+    preds_ci_upr &lt;- preds$fit + qnorm(0.975)*preds$se.fit
+    preds_ci_lwr &lt;- preds$fit - qnorm(0.975)*preds$se.fit
+    probs_df &lt;- data.frame(pred_prob = inverse_logit(preds$fit),
+                           pred_prob_lwr = inverse_logit(preds_ci_lwr),
+                           pred_prob_upr = inverse_logit(preds_ci_upr),
+                           markup = x_markup_vals()
+                           )
+    
+    ## optimal point
+    
+    x_df_opt &lt;- data.frame("markup" = optimal_markup_vals()$par,
+                           "cost" = input$num_cost_rev,
+                           "type" = input_type_rev())
+    
+    probs_df_opt &lt;- data.frame(x_opt = optimal_markup_vals()$par,
+                               y_opt = predict(fit, 
+                                               newdata = x_df_opt, 
+                                               type = 'response')
+                               )
+    
+    # true_probs &lt;- model.matrix(~ markup + cost + type, data = new_x_df) %*% true_beta
+    # probs_df$true_probs &lt;- inverse_logit(true_probs)
+    
+    est_prob_plot &lt;- ggplot(probs_df, aes(x = markup)) +
+      ## probability curve predicted from logistic regression in black
+      geom_line(aes(y = pred_prob, col = 'Est Prob')) +
+      geom_ribbon(aes(ymin = pred_prob_lwr, ymax = pred_prob_upr, fill = "95% CI"), alpha = 0.2) +
+      geom_point(aes(x = x_opt,
+                     y = y_opt,
+                     col = "Optimal Markup"), data = probs_df_opt) +
+      scale_colour_manual(values = c("black", "green"), name = c("")) +
+      scale_fill_manual(values = "red", name = "") +
+      ggtitle(paste0("Probablity of Selling Product vs Markup Percentage")) +
+      labs(x = "markup (%)",
+           y = "Probability of Selling Product") +
+      theme(legend.spacing = unit(0, "pt"),
+            legend.margin = margin(t =-16, r = 0, b = -4, l = 0, unit = "pt")
+      )
+    
+    est_prob_pltly &lt;- ggplotly(est_prob_plot)
+    ### manually rename plotly elements back to defaults
+    est_prob_pltly$x$data[[1]]$name &lt;- "Est Prob"
+    est_prob_pltly$x$data[[2]]$name &lt;- "95% CI"
+    est_prob_pltly$x$data[[3]]$name &lt;- "Optimal Markup"
+    est_prob_pltly$x$layout$legend$title$text &lt;- ""
+    
+    est_prob_pltly
+    }
+  )
+  
+  # Interactive raw data
+  
+  output$raw_data &lt;- renderReactable(
+    reactable(x_df, 
+             searchable = TRUE,
+             columns = list(
+               markup = colDef( 
+                 format = colFormat(digits = 2, 
+                                    suffix = "%")
+               ),
+               cost = colDef(
+                 format = colFormat(currency = "USD", 
+                                    digits = 2)
+               ),
+               type = colDef(
+                 cell = function(value){
+                   if(value == "clothes"){
+                     "👕 clothes"
+                   }else if (value == "shoes"){
+                     "👟 shoes"
+                   }else{
+                     "👜 accessories"
+                   }
+                 },
+                 align = "center"),
+               sold = colDef(
+                 style = function(value){
+                   if(value){
+                     list(background = "green")
+                   } else
+                     list(background = "red")
+                 })
+             ),
+             defaultColDef = colDef(align = "center")
+                                               
     )
   )
-)
-server &lt;- function(input, output) {
-  output$distPlot &lt;- renderPlot({
-    x &lt;- faithful$waiting
-    bins &lt;- seq(min(x), max(x), length.out = input$bins + 1)
-    hist(x,
-      breaks = bins, col = "#75AADB", border = "white",
-      xlab = "Waiting time to next eruption (in mins)",
-      main = "Histogram of waiting times"
-    )
-  })
+  
 }
+
+# Run the app ----
 shinyApp(ui = ui, server = server)</code></pre>
-</div>
-</div>
-</div>
 
 
+</section>
 
-<div id="quarto-appendix" class="default"><section class="quarto-appendix-contents" id="quarto-citation"><h2 class="anchored quarto-appendix-heading">Citation</h2><div><div class="quarto-appendix-secondary-label">BibTeX citation:</div><pre class="sourceCode code-with-copy quarto-appendix-bibtex"><code class="sourceCode bibtex">@online{tomiyama,
-  author = {Tomiyama, Josh},
-  title = {TESTING {Dashboard:} {Optimizing} {Expected} {Revenue}},
-  url = {https://josh-tomiyama.github.io/shakastats/projects/logisticRegressionShiny/shinyApp.html},
-  langid = {en}
-}
-</code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre><div class="quarto-appendix-secondary-label">For attribution, please cite this work as:</div><div id="ref-tomiyama" class="csl-entry quarto-appendix-citeas" role="listitem">
-Tomiyama, Josh. n.d. <span>“TESTING Dashboard: Optimizing Expected
-Revenue.”</span> <a href="https://josh-tomiyama.github.io/shakastats/projects/logisticRegressionShiny/shinyApp.html">https://josh-tomiyama.github.io/shakastats/projects/logisticRegressionShiny/shinyApp.html</a>.
-</div></div></section></div></main> <!-- /main -->
+
 <script id="quarto-html-after-body" type="application/javascript">
   window.document.addEventListener("DOMContentLoaded", function (event) {
     // Ensure there is a toggle, if there isn't float one in the top right
@@ -983,7 +1679,16 @@ Revenue.”</span> <a href="https://josh-tomiyama.github.io/shakastats/projects/
   }
   loadGiscus();
 </script>
-</div> <!-- /content -->
+<div id="quarto-appendix" class="default"><section class="quarto-appendix-contents" id="quarto-citation"><h2 class="anchored quarto-appendix-heading">Citation</h2><div><div class="quarto-appendix-secondary-label">BibTeX citation:</div><pre class="sourceCode code-with-copy quarto-appendix-bibtex"><code class="sourceCode bibtex">@online{tomiyama,
+  author = {Tomiyama, Josh},
+  title = {Supplemental {Dashboard:} {Optimizing} {Expected} {Revenue}},
+  url = {https://josh-tomiyama.github.io/shakastats/projects/logisticRegressionShiny/shinyApp.html},
+  langid = {en}
+}
+</code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre><div class="quarto-appendix-secondary-label">For attribution, please cite this work as:</div><div id="ref-tomiyama" class="csl-entry quarto-appendix-citeas" role="listitem">
+Tomiyama, Josh. n.d. <span>“Supplemental Dashboard: Optimizing Expected
+Revenue.”</span> <a href="https://josh-tomiyama.github.io/shakastats/projects/logisticRegressionShiny/shinyApp.html">https://josh-tomiyama.github.io/shakastats/projects/logisticRegressionShiny/shinyApp.html</a>.
+</div></div></section></div></div> <!-- /content -->
 <footer class="footer">
   <div class="nav-footer">
     <div class="nav-footer-left">
