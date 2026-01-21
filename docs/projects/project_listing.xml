@@ -23,6 +23,7 @@
   <category>Optimization</category>
   <guid>https://josh-tomiyama.github.io/shakastats/projects/logisticRegressionShiny/shinyApp.html</guid>
   <pubDate>Tue, 20 Jan 2026 10:00:00 GMT</pubDate>
+  <media:content url="https://josh-tomiyama.github.io/shakastats/projects/logisticRegressionShiny/preview.png" medium="image" type="image/png" height="108" width="144"/>
 </item>
 <item>
   <title>Logistic Regression Analysis Example: Optimizing Expected Revenue</title>
@@ -986,7 +987,7 @@ Table&nbsp;1: Summary Tables
 }
 </style>
 
-<div id="tbl-summ-1" class="gt_table do-not-create-environment quarto-float quarto-figure quarto-figure-center anchored" data-quarto-postprocess="true" data-quarto-bootstrap="false" data-quarto-disable-processing="false">
+<div id="tbl-summ-1" class="gt_table do-not-create-environment quarto-float quarto-figure quarto-figure-center anchored" data-quarto-disable-processing="false" data-quarto-postprocess="true" data-quarto-bootstrap="false">
 <figure class="quarto-float quarto-subfloat-tbl figure">
 <figcaption class="quarto-float-caption-top quarto-subfloat-caption quarto-subfloat-tbl" id="tbl-summ-1-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
 (a) Summary by Sold
@@ -1511,7 +1512,7 @@ N = 442</th>
 }
 </style>
 
-<div id="tbl-summ-2" class="gt_table do-not-create-environment quarto-float quarto-figure quarto-figure-center anchored" data-quarto-postprocess="true" data-quarto-bootstrap="false" data-quarto-disable-processing="false">
+<div id="tbl-summ-2" class="gt_table do-not-create-environment quarto-float quarto-figure quarto-figure-center anchored" data-quarto-disable-processing="false" data-quarto-postprocess="true" data-quarto-bootstrap="false">
 <figure class="quarto-float quarto-subfloat-tbl figure">
 <figcaption class="quarto-float-caption-top quarto-subfloat-caption quarto-subfloat-tbl" id="tbl-summ-2-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
 (b) Summary by Type
@@ -2343,7 +2344,7 @@ Figure&nbsp;5: Binned residual plot over the expected probabilities. No discerna
 <p>The relationship between markup and the log-odds might be linear, but when we invert the problem to get the relationship between markup and the probability it is certainly non-linear. To produce this non-linear relationship, we can invert the log-odds back to the probability scale through the following formula:</p>
 <p><img src="https://latex.codecogs.com/png.latex?%0A%5Cpi_i%20=%20(1%20+%20%5Cexp%5B-(%5Cbeta_0%20+%20x_%7Bmarkup%7D%20*%20%5Cbeta_%7Bmarkup%7D%20+%0Ax_%7Bcost%7D%20*%20%5Cbeta_%7Bcost%7D%20+%20x_%7Btype=shoes%7D%20*%20%5Cbeta_%7Btype=shoes%7D%20+%20x_%7Btype%20=%20clothes%7D*%5Cbeta_%7Btype%20=%20clothes%7D)%5D)%5E%7B-1%7D%0A"></p>
 <p>We are specifically interested in how markup relates to the probability of selling, but we have the other data variables in the formula. Before exploring how the probability of selling changes over a range of values for markup, it is pertinent to choose some representative values for cost and type. To start with, let’s set the cost level to be the observed average cost level and let type be the most common type in the data set to provide a curve.</p>
-<div class="cell">
+<div class="cell preview-image">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb12" style="background: #f1f3f5;"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb12-1"><span class="do" style="color: #5E5E5E;
 background-color: null;
 font-style: italic;">## there isn't a mode function in base R</span></span>
