@@ -46,7 +46,7 @@
     "href": "projects/optimizingExpectedReturns/index.html",
     "title": "Logistic Regression Analysis Example: Optimizing Expected Revenue",
     "section": "",
-    "text": "Last Update: January 20, 2026\nAll the packages used in this project are below.\nlibrary(knitr)\nlibrary(kableExtra)\nlibrary(arm)\nlibrary(gtsummary)\nlibrary(dplyr)\nlibrary(ggplot2)\nlibrary(future.apply)\nlibrary(scales)"
+    "text": "Last Update: January 21, 2026\nAll the packages used in this project are below.\nlibrary(knitr)\nlibrary(kableExtra)\nlibrary(arm)\nlibrary(gtsummary)\nlibrary(dplyr)\nlibrary(ggplot2)\nlibrary(future.apply)\nlibrary(scales)"
   },
   {
     "objectID": "projects/optimizingExpectedReturns/index.html#comments-on-logistic-regression-compared-to-other-machine-learning-models",
