@@ -903,10 +903,10 @@ server &lt;- function(input, output) {
       base_cost() + 
         facet_wrap(~ type, ncol = 1)
     }else if(input$select_cost == "sold"){
-      base_markup() + 
+      base_cost() + 
         facet_wrap(~ as.factor(sold), ncol = 1)
     }else{
-      base_markup()
+      base_cost()
     }
   })
   
